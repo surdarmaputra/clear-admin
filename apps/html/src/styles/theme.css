@@ -1,0 +1,154 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/inter';
+
+/* Class-based dark mode — .dark on <html>, system preference as initial default. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---------------------------------------------------------------------------
+   Tokens. See docs/design-tokens.md for provenance and contrast measurements.
+   Semantic roles are declared here with light values and overridden in .dark;
+   Tailwind v4 utilities compile to var() references, so the override swaps them.
+--------------------------------------------------------------------------- */
+
+@theme {
+  /* Brand — fixed, never themed */
+  --color-midnight-ink: #091135;
+  --color-slate: #36394a;
+  --color-electric-blue: #0f77ff;
+  --color-cobalt: #1070c9;
+  --color-frost-border: #e1e9f0;
+  --color-mist: #b1bbcd;
+  --color-paper: #ffffff;
+  --color-lavender-wash: #f5f3ff;
+  --color-graphite: #000000;
+
+  /* Semantic roles — overridden in .dark below */
+  --color-surface-page: #ffffff;
+  --color-surface-card: #ffffff;
+  --color-surface-raised: #f5f3ff;
+  --color-hairline:#e1e9f0;
+  --color-ink-primary: #091135;
+  --color-ink-secondary: #36394a;
+  --color-accent: #0f77ff;
+
+  /* State — small doses only, always paired with an icon and label */
+  --color-success: #0b6b45;
+  --color-warning: #8a5300;
+  --color-danger: #b0242c;
+  --color-info: #0a5fd0;
+
+  /* Chart series — fixed slot order, never cycled. Validated both modes. */
+  --color-series-1: #0f77ff;
+  --color-series-2: #eb6834;
+  --color-series-3: #1baf7a;
+  --color-series-4: #eda100;
+  --color-series-5: #e87ba4;
+  --color-series-6: #008300;
+  --color-series-7: #4a3aa7;
+  --color-series-8: #e34948;
+
+  /* Typography — tracking opens with size (0.004em → 0.018em, plateau at 32px) */
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+
+  --text-micro: 12px;
+  --text-micro--line-height: 1.33;
+  --text-micro--letter-spacing: 0.024px;
+  --text-caption: 14px;
+  --text-caption--line-height: 1.43;
+  --text-caption--letter-spacing: 0.056px;
+  --text-body: 16px;
+  --text-body--line-height: 1.5;
+  --text-body--letter-spacing: 0.128px;
+  --text-subheading: 18px;
+  --text-subheading--line-height: 1.5;
+  --text-subheading--letter-spacing: 0.252px;
+  --text-title-sm: 20px;
+  --text-title-sm--line-height: 1.4;
+  --text-title-sm--letter-spacing: 0.29px;
+  --text-title: 24px;
+  --text-title--line-height: 1.33;
+  --text-title--letter-spacing: 0.36px;
+  --text-heading-sm: 32px;
+  --text-heading-sm--line-height: 1.25;
+  --text-heading-sm--letter-spacing: 0.512px;
+  --text-heading: 56px;
+  --text-heading--line-height: 1.25;
+  --text-heading--letter-spacing: 1.008px;
+  --text-display: 64px;
+  --text-display--line-height: 1.25;
+  --text-display--letter-spacing: 1.152px;
+
+  /* Radii — 8 / 12 / full only. No intermediate values. */
+  --radius-control: 8px;
+  --radius-card: 12px;
+
+  /* The only shadow in the system is the focus state. */
+  --shadow-focus:
+    0 0 0 1px #0f77ff, 0 1px 2px rgba(12, 43, 100, 0.32),
+    0 6px 16px rgba(12, 43, 100, 0.32);
+}
+
+.dark {
+  --color-surface-page: #060b21;
+  --color-surface-card: #091135;
+  --color-surface-raised: #101a42;
+  --color-hairline:#1e2a52;
+  --color-ink-primary: #f5f7fc;
+  --color-ink-secondary: #9aa5c0;
+  --color-accent: #3a8df5;
+
+  --color-success: #3fbd85;
+  --color-warning: #e0a034;
+  --color-danger: #f2717a;
+  --color-info: #4d9bff;
+
+  --color-series-1: #3a8df5;
+  --color-series-2: #d95926;
+  --color-series-3: #199e70;
+  --color-series-4: #c98500;
+  --color-series-5: #d55181;
+  --color-series-6: #008300;
+  --color-series-7: #9085e9;
+  --color-series-8: #e66767;
+}
+
+@layer base {
+  /* Alpine hides these until it initialises, so x-show elements don't flash. */
+  [x-cloak] {
+    display: none !important;
+  }
+
+  html {
+    color-scheme: light;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--color-surface-page);
+    color: var(--color-ink-primary);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    letter-spacing: var(--text-body--letter-spacing);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Depth comes from tint and hairline, never a drop shadow. The focus ring is
+     the one exception in the system. */
+  :focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
+    border-radius: var(--radius-control);
+  }
+
+  /* Columns that must align vertically get tabular figures; standalone numbers
+     keep proportional ones. */
+  th,
+  td,
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}

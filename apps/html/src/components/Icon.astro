@@ -1,0 +1,32 @@
+---
+import { createRequire } from 'node:module';
+import { readFileSync } from 'node:fs';
+
+interface Props {
+  name: string;
+  size?: number;
+  class?: string;
+}
+
+const { name, size = 20, class: className = '' } = Astro.props;
+
+// Lucide SVGs are inlined at build time so the output ships zero icon runtime.
+const require = createRequire(import.meta.url);
+const raw = readFileSync(require.resolve(`lucide-static/icons/${name}.svg`), 'utf8');
+const body = raw.slice(raw.indexOf('>', raw.indexOf('<svg')) + 1, raw.lastIndexOf('</svg>')).trim();
+---
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  class={className}
+  set:html={body}
+/>

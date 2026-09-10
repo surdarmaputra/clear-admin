@@ -1,0 +1,24 @@
+{
+  "name": "clear-admin",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=20.11"
+  },
+  "scripts": {
+    "dev:html": "pnpm --filter @clear-admin/html dev",
+    "build:html": "pnpm --filter @clear-admin/html build",
+    "build": "pnpm -r build"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "sharp"
+    ]
+  },
+  "devDependencies": {
+    "playwright": "^1.63.0"
+  }
+}

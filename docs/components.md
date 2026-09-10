@@ -45,11 +45,11 @@ artifact, deployed.
 
 | Component | Priority | HTML | React |
 |---|---|---|---|
-| App shell / page wrapper | P0 | — | — |
-| Sidebar — collapsible, nested nav | P0 | — | — |
-| Topbar — breadcrumb, notifications, user menu | P0 | — | — |
-| Theme toggle (light/dark) | P0 | — | — |
-| Responsive behaviour — mobile drawer nav | P0 | — | — |
+| App shell / page wrapper | P0 | done | — |
+| Sidebar — collapsible, nested nav | P0 | done | — |
+| Topbar — breadcrumb, notifications, user menu | P0 | done | — |
+| Theme toggle (light/dark) | P0 | done | — |
+| Responsive behaviour — mobile drawer nav | P0 | done | — |
 
 ## Data display
 
@@ -132,7 +132,7 @@ artifact, deployed.
 
 | Page | Priority | HTML | React |
 |---|---|---|---|
-| Blank page template | P0 | — | — |
+| Blank page template | P0 | done | — |
 | Dashboard — overview | P1 | — | — |
 | Login | P1 | — | — |
 | Register | P1 | — | — |
