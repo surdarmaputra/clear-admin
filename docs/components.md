@@ -26,10 +26,18 @@ not through a shared package.
 | Tables | `@tanstack/table-core` | `@tanstack/react-table` |
 | Editor | `lexical` (vanilla) | `@lexical/react` |
 | Drag & drop | SortableJS | dnd-kit |
-| Router | n/a | React Router v7 |
+| Router | n/a | TanStack Router |
+| Authoring | Astro (build tool only — `.astro` is never shipped) | React + Vite |
 
 Shared across both: Tailwind CSS v4, TypeScript (strict), class-based dark mode,
 Motion for animation, Vite.
+
+Pages stay router-agnostic: navigation goes through a `Link` component and a
+`useNav()` shim, so swapping TanStack Router for React Router is a one-file change
+rather than an edit to every page.
+
+The HTML bundle's `astro build` output doubles as the live demo site — same
+artifact, deployed.
 
 ---
 
