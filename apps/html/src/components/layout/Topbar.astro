@@ -1,0 +1,105 @@
+---
+import Icon from '../Icon.astro';
+import ThemeToggle from './ThemeToggle.astro';
+import { withBase } from '../../lib/url';
+
+interface Props {
+  title: string;
+  breadcrumb?: { label: string; href?: string }[];
+}
+
+const { title, breadcrumb = [] } = Astro.props;
+---
+
+<header class="sticky top-0 z-20 flex h-14 items-center gap-3 bg-surface-page px-4">
+  <button
+    type="button"
+    x-on:click="mobileOpen = true"
+    aria-label="Open navigation"
+    class="grid size-9 place-items-center rounded-control text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink-primary lg:hidden"
+  >
+    <Icon name="menu" size={18} />
+  </button>
+
+  <div class="min-w-0 flex-1">
+    {breadcrumb.length > 0 ? (
+      <nav aria-label="Breadcrumb">
+        <ol class="flex items-center gap-1.5 text-caption text-ink-secondary">
+          {breadcrumb.map((crumb, i) => (
+            <li class="flex items-center gap-1.5">
+              {i > 0 && <Icon name="chevron-right" size={12} class="text-mist" />}
+              {crumb.href ? (
+                <a href={withBase(crumb.href)} class="transition-colors hover:text-ink-primary">
+                  {crumb.label}
+                </a>
+              ) : (
+                <span class="font-medium text-ink-primary">{crumb.label}</span>
+              )}
+            </li>
+          ))}
+        </ol>
+      </nav>
+    ) : (
+      <h1 class="truncate text-subheading font-semibold">{title}</h1>
+    )}
+  </div>
+
+  <button
+    type="button"
+    aria-label="Notifications"
+    class="relative grid size-9 place-items-center rounded-control text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink-primary"
+  >
+    <Icon name="bell" size={18} />
+    <span class="absolute right-2 top-2 size-1.5 rounded-full bg-electric-blue"></span>
+  </button>
+
+  <ThemeToggle />
+
+  <div class="relative" x-data="{ open: false }">
+    <button
+      type="button"
+      x-on:click="open = !open"
+      x-bind:aria-expanded="open"
+      aria-haspopup="menu"
+      class="flex items-center gap-2 rounded-control p-1 transition-colors hover:bg-surface-hover"
+    >
+      <span class="grid size-7 place-items-center rounded-full bg-surface-hover text-micro font-semibold text-ink-primary">
+        SD
+      </span>
+      <Icon name="chevron-down" size={14} class="text-ink-secondary" />
+    </button>
+
+    <div
+      x-show="open"
+      x-on:click.outside="open = false"
+      x-on:keydown.escape.window="open = false"
+      x-transition.opacity.duration.150ms
+      x-cloak
+      role="menu"
+      class="absolute right-0 mt-2 w-48 rounded-card border border-hairline bg-surface-card p-1"
+    >
+      <a
+        href={withBase('/profile')}
+        role="menuitem"
+        class="flex items-center gap-2 rounded-control px-3 py-2 text-caption text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink-primary"
+      >
+        <Icon name="user" size={16} /> Profile
+      </a>
+      <a
+        href={withBase('/settings')}
+        role="menuitem"
+        class="flex items-center gap-2 rounded-control px-3 py-2 text-caption text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink-primary"
+      >
+        <Icon name="settings" size={16} /> Settings
+      </a>
+      <div class="my-1 border-t border-hairline"></div>
+      <a
+        href={withBase('/login')}
+        role="menuitem"
+        class="flex items-center gap-2 rounded-control px-3 py-2 text-caption text-danger transition-colors hover:bg-surface-hover"
+      >
+        <Icon name="log-out" size={16} /> Sign out
+      </a>
+    </div>
+  </div>
+</header>

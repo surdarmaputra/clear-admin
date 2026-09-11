@@ -1,0 +1,112 @@
+---
+import Icon from '../Icon.astro';
+import { navigation } from '../../data/nav';
+import { withBase } from '../../lib/url';
+
+// Normalised both sides so a trailing slash never breaks the active check.
+const norm = (path: string) => path.replace(/\/+$/, '') || '/';
+const current = norm(Astro.url.pathname);
+const isActive = (href?: string) => href !== undefined && norm(withBase(href)) === current;
+const groupOpen = (children?: { href?: string }[]) =>
+  children?.some((child) => isActive(child.href)) ?? false;
+---
+
+<aside
+  class="fixed inset-y-0 left-0 z-40 flex shrink-0 flex-col bg-surface-sidebar transition-[width,transform] duration-200 ease-out lg:static lg:translate-x-0"
+  x-bind:class="[
+    collapsed ? 'w-16' : 'w-64',
+    mobileOpen ? 'translate-x-0' : '-translate-x-full',
+  ]"
+>
+  <div class="flex h-14 items-center gap-2 px-4">
+    <span class="grid size-7 shrink-0 place-items-center rounded-control bg-cobalt text-paper">
+      <Icon name="layout-dashboard" size={16} />
+    </span>
+    <span x-show="!collapsed" x-cloak class="text-subheading font-semibold">
+      Clear Admin
+    </span>
+  </div>
+
+  <nav class="flex-1 overflow-y-auto p-2" aria-label="Main">
+    <ul class="space-y-1">
+      {navigation.map((item) =>
+        item.children ? (
+          <li x-data={`{ open: ${groupOpen(item.children)} }`}>
+            <button
+              type="button"
+              x-on:click="open = !open"
+              class="flex w-full items-center gap-3 rounded-control px-3 py-2 text-caption text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink-primary"
+              x-bind:aria-expanded="open"
+            >
+              {item.icon && <Icon name={item.icon} size={18} class="shrink-0" />}
+              <span x-show="!collapsed" x-cloak class="flex-1 text-left">
+                {item.label}
+              </span>
+              <span
+                x-show="!collapsed"
+                x-cloak
+                x-bind:class="open && 'rotate-90'"
+                class="transition-transform"
+              >
+                <Icon name="chevron-right" size={14} />
+              </span>
+            </button>
+
+            <ul x-show="open && !collapsed" x-collapse x-cloak class="mt-1 ml-5 space-y-1 pl-3">
+              {item.children.map((child) => (
+                <li>
+                  <a
+                    href={withBase(child.href!)}
+                    aria-current={isActive(child.href) ? 'page' : undefined}
+                    class:list={[
+                      'block rounded-control px-3 py-1.5 text-caption transition-colors',
+                      isActive(child.href)
+                        ? 'bg-surface-card font-medium text-ink-primary'
+                        : 'text-ink-secondary hover:bg-surface-hover hover:text-ink-primary',
+                    ]}
+                  >
+                    {child.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </li>
+        ) : (
+          <li>
+            <a
+              href={withBase(item.href!)}
+              aria-current={isActive(item.href) ? 'page' : undefined}
+              class:list={[
+                'flex items-center gap-3 rounded-control px-3 py-2 text-caption transition-colors',
+                isActive(item.href)
+                  ? 'bg-surface-card font-medium text-ink-primary'
+                  : 'text-ink-secondary hover:bg-surface-hover hover:text-ink-primary',
+              ]}
+            >
+              {item.icon && <Icon name={item.icon} size={18} class="shrink-0" />}
+              <span x-show="!collapsed" x-cloak>
+                {item.label}
+              </span>
+            </a>
+          </li>
+        ),
+      )}
+    </ul>
+  </nav>
+
+  <div class="p-2">
+    <button
+      type="button"
+      x-on:click="toggleSidebar()"
+      class="hidden w-full items-center gap-3 rounded-control px-3 py-2 text-caption text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink-primary lg:flex"
+      x-bind:aria-label="collapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+    >
+      <span x-bind:class="collapsed && 'rotate-180'" class="shrink-0 transition-transform">
+        <Icon name="chevrons-left" size={18} />
+      </span>
+      <span x-show="!collapsed" x-cloak>
+        Collapse
+      </span>
+    </button>
+  </div>
+</aside>

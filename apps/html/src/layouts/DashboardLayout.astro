@@ -1,0 +1,77 @@
+---
+import '../styles/theme.css';
+import Sidebar from '../components/layout/Sidebar.astro';
+import Topbar from '../components/layout/Topbar.astro';
+import { withBase } from '../lib/url';
+
+interface Props {
+  title: string;
+  breadcrumb?: { label: string; href?: string }[];
+}
+
+const { title, breadcrumb = [] } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href={withBase('/favicon.svg')} type="image/svg+xml" />
+    <title>{title} · Clear Admin</title>
+
+    {/* Runs before paint so the correct theme is applied without a flash. */}
+    <script is:inline>
+      (() => {
+        const stored = localStorage.getItem('theme');
+        const dark = stored
+          ? stored === 'dark'
+          : matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.classList.toggle('dark', dark);
+      })();
+    </script>
+  </head>
+
+  <body class="bg-surface-page text-ink-primary">
+    <div
+      x-data="{
+        collapsed: localStorage.getItem('sidebar') === 'collapsed',
+        mobileOpen: false,
+        toggleSidebar() {
+          this.collapsed = !this.collapsed;
+          localStorage.setItem('sidebar', this.collapsed ? 'collapsed' : 'expanded');
+        },
+      }"
+      x-on:keydown.escape.window="mobileOpen = false"
+      class="flex min-h-screen"
+    >
+      <Sidebar />
+
+      {/* Mobile drawer backdrop */}
+      <div
+        x-show="mobileOpen"
+        x-on:click="mobileOpen = false"
+        x-transition.opacity
+        class="fixed inset-0 z-30 bg-graphite/50 lg:hidden"
+        aria-hidden="true"
+        style="display: none"
+      ></div>
+
+      <div class="flex min-w-0 flex-1 flex-col">
+        <Topbar title={title} breadcrumb={breadcrumb} />
+        <main class="flex-1 p-6">
+          <slot />
+        </main>
+      </div>
+    </div>
+
+    <script>
+      import Alpine from 'alpinejs';
+      import collapse from '@alpinejs/collapse';
+
+      Alpine.plugin(collapse);
+      window.Alpine = Alpine;
+      Alpine.start();
+    </script>
+  </body>
+</html>
