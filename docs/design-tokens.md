@@ -42,22 +42,50 @@ clears 4.5:1 AA against its own surface.
 
 Semantic colour never carries meaning alone — always paired with an icon and a label.
 
-## Colour — dark mode
+## Surfaces — the elevation ladder
 
-An inversion, not a new palette: the system is already navy, so Midnight Ink becomes
-the card surface and Paper becomes the ink.
+Four steps, ordered: **sidebar** (recessed) → **page** → **card** → **hover**. The
+sidebar is the darkest plane in both modes; the header shares the page surface so it
+reads as part of the canvas rather than a separate bar.
 
 | Role | Light | Dark |
 |---|---|---|
-| Page plane | `#ffffff` | `#060b21` |
-| Surface / card | `#ffffff` | `#091135` |
-| Raised / wash | `#f5f3ff` | `#101a42` |
-| Border (hairline) | `#e1e9f0` | `#1e2a52` |
-| Primary ink | `#091135` | `#f5f7fc` (17.14:1) |
-| Secondary ink | `#36394a` | `#9aa5c0` (7.45:1) |
-| Accent | `#0f77ff` | `#3a8df5` (5.52:1) |
+| Sidebar | `#f2f4f7` | `#08090c` |
+| Page (and header) | `#ffffff` | `#101217` |
+| Card | `#ffffff` | `#171a20` |
+| Hover | `#eceef2` | `#1f232a` |
+| Hairline | `#e6e9ef` | `#23262d` |
+| Primary ink | `#091135` (18.4:1) | `#f2f3f5` (17.4:1) |
+| Secondary ink | `#36394a` (11.4:1) | `#9ba1ad` (7.4:1) |
+| Accent | `#0f77ff` | `#3a8df5` (5.8:1) |
+
+An active nav item takes the **card** surface, so it lifts off the recessed sidebar in
+both modes without needing a border.
 
 Class-based (`.dark` on `<html>`), system preference as the initial default.
+
+### Why dark mode is not the navy inversion
+
+The first pass made Midnight Ink the dark surface. Navy at full strength across every
+plane reads as a blue cast rather than as dark — so the surfaces moved to near-neutral
+(RGB spread of 4–5, down from 27) and the brand identity now lives in the accent and
+the ink. Midnight Ink stays the light-mode ink, unchanged.
+
+Semantic and chart colours were re-validated against these surfaces: all four semantic
+roles clear 4.5:1 on both dark planes, and the chart palette passes all six checks
+against `#171a20`.
+
+## Borders
+
+Chrome carries **no** borders. Separation between the sidebar, header, and content is
+carried entirely by the surface step. Hairlines are reserved for:
+
+- card and panel edges
+- table row and column rules
+- input and control outlines
+- menu section separators
+
+A border on the sidebar edge or under the header is a regression, not a detail.
 
 ---
 
@@ -191,6 +219,8 @@ node scripts/validate_palette.js "<hex,...>" --mode dark   --surface "#091135"
 
 **Don't**
 - No drop shadows on resting cards — tint and hairline only
+- No borders on chrome — the sidebar edge and header underline are carried by surface
+  step alone
 - No second chrome accent (charts are the documented exception)
 - No negative letter-spacing on display type
 - No body text below 12px; no weight 700 beyond a single word

@@ -22,11 +22,14 @@
   --color-lavender-wash: #f5f3ff;
   --color-graphite: #000000;
 
-  /* Semantic roles — overridden in .dark below */
+  /* Semantic roles — overridden in .dark below.
+     Elevation ladder: sidebar (recessed) → page → card → hover.
+     Separation is carried by the step itself, so borders stay off chrome. */
+  --color-surface-sidebar: #f2f4f7;
   --color-surface-page: #ffffff;
   --color-surface-card: #ffffff;
-  --color-surface-raised: #f5f3ff;
-  --color-hairline:#e1e9f0;
+  --color-surface-hover: #eceef2;
+  --color-hairline: #e6e9ef;
   --color-ink-primary: #091135;
   --color-ink-secondary: #36394a;
   --color-accent: #0f77ff;
@@ -89,12 +92,16 @@
 }
 
 .dark {
-  --color-surface-page: #060b21;
-  --color-surface-card: #091135;
-  --color-surface-raised: #101a42;
-  --color-hairline:#1e2a52;
-  --color-ink-primary: #f5f7fc;
-  --color-ink-secondary: #9aa5c0;
+  /* Near-neutral, low chroma. Midnight Ink carries the brand in light mode;
+     in dark it would read as a blue cast across every surface, so the identity
+     moves to the accent and the surfaces stay out of the way. */
+  --color-surface-sidebar: #08090c;
+  --color-surface-page: #101217;
+  --color-surface-card: #171a20;
+  --color-surface-hover: #1f232a;
+  --color-hairline: #23262d;
+  --color-ink-primary: #f2f3f5;
+  --color-ink-secondary: #9ba1ad;
   --color-accent: #3a8df5;
 
   --color-success: #3fbd85;
