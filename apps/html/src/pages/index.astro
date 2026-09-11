@@ -26,6 +26,13 @@ const columns = [
 
 <DashboardLayout title="Dashboard" breadcrumb={[{ label: 'Dashboard' }]}>
   <div class="flex flex-col gap-6">
+    <div>
+      <h1 class="font-display text-title font-semibold tracking-display">Overview</h1>
+      <p class="mt-1 text-caption text-ink-secondary">
+        Revenue, traffic and orders for the current period.
+      </p>
+    </div>
+
     <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <StatCard
         label="Revenue"
@@ -33,6 +40,7 @@ const columns = [
         change="+8.0%"
         caption="vs last month"
         icon="banknote"
+        tone={1}
       />
       <StatCard
         label="Orders"
@@ -40,6 +48,7 @@ const columns = [
         change="+4.2%"
         caption="vs last month"
         icon="package"
+        tone={3}
       />
       <StatCard
         label="Active users"
@@ -47,6 +56,7 @@ const columns = [
         change="+1.9%"
         caption="vs last month"
         icon="users"
+        tone={7}
       />
       <StatCard
         label="Churn"
@@ -55,6 +65,7 @@ const columns = [
         higherIsBetter={false}
         caption="vs last month"
         icon="user-minus"
+        tone={2}
       />
     </div>
 
@@ -111,10 +122,10 @@ const columns = [
     >
       <template x-for="row in paged" x-bind:key="row.id">
         <tr class="border-b border-hairline last:border-0 hover:bg-surface-hover">
-          <td class="tabular px-4 py-3 font-medium" x-text="row.id"></td>
-          <td class="px-4 py-3" x-text="row.customer"></td>
-          <td class="px-4 py-3 text-ink-secondary" x-text="row.plan"></td>
-          <td class="px-4 py-3">
+          <td class="tabular px-4 py-2 font-medium" x-text="row.id"></td>
+          <td class="px-4 py-2" x-text="row.customer"></td>
+          <td class="px-4 py-2 text-ink-secondary" x-text="row.plan"></td>
+          <td class="px-4 py-2">
             <span
               class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-micro font-medium"
               x-bind:class="{
@@ -126,10 +137,10 @@ const columns = [
             ></span>
           </td>
           <td
-            class="tabular px-4 py-3 text-right"
+            class="tabular px-4 py-2 text-right"
             x-text="'$' + row.amount.toLocaleString('en-US')"
           ></td>
-          <td class="tabular px-4 py-3 text-right text-ink-secondary" x-text="row.date"></td>
+          <td class="tabular px-4 py-2 text-right text-ink-secondary" x-text="row.date"></td>
         </tr>
       </template>
     </DataTable>

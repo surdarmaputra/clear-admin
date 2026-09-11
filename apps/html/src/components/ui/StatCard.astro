@@ -10,31 +10,49 @@ interface Props {
   higherIsBetter?: boolean;
   caption?: string;
   icon?: string;
+  /** Categorical slot for the icon chip. Decorative identity, never status. */
+  tone?: 1 | 2 | 3 | 7;
 }
 
-const { label, value, change, higherIsBetter = true, caption, icon } = Astro.props;
+const { label, value, change, higherIsBetter = true, caption, icon, tone = 1 } = Astro.props;
+
+// The chip tint is drawn from the categorical palette, not the status one —
+// a tile is an identity, not a state.
+const tones = {
+  1: 'bg-series-1/12 text-series-1',
+  2: 'bg-series-2/12 text-series-2',
+  3: 'bg-series-3/12 text-series-3',
+  7: 'bg-series-7/12 text-series-7',
+};
 
 const rising = change?.trim().startsWith('+');
 const good = rising === higherIsBetter;
 ---
 
-<div class="rounded-card border border-hairline bg-surface-card p-5">
+<div class="rounded-card border border-hairline bg-surface-card p-5 shadow-card">
   <div class="flex items-start justify-between gap-3">
-    <p class="text-caption text-ink-secondary">{label}</p>
-    {icon && <Icon name={icon} size={18} class="shrink-0 text-ink-secondary" />}
+    <p class="text-micro font-medium tracking-label text-ink-secondary uppercase">{label}</p>
+    {icon && (
+      <span class:list={['grid size-8 shrink-0 place-items-center rounded-control', tones[tone]]}>
+        <Icon name={icon} size={16} />
+      </span>
+    )}
   </div>
 
   {/* The hero number carries the tile — everything else is support. */}
-  <p class="tabular mt-2 text-heading-sm font-semibold">{value}</p>
+  <p class="tabular font-display mt-3 text-heading-sm font-semibold tracking-display">{value}</p>
 
   {(change || caption) && (
     <div class="mt-2 flex items-center gap-2 text-micro">
       {change && (
         <span
-          class:list={['inline-flex items-center gap-0.5', good ? 'text-success' : 'text-danger']}
+          class:list={[
+            'inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 font-medium',
+            good ? 'bg-success/12 text-success' : 'bg-danger/12 text-danger',
+          ]}
         >
-          <Icon name={rising ? 'arrow-up-right' : 'arrow-down-right'} size={14} />
-          <span class="tabular font-medium">{change}</span>
+          <Icon name={rising ? 'arrow-up-right' : 'arrow-down-right'} size={13} />
+          <span class="tabular">{change}</span>
         </span>
       )}
       {caption && <span class="text-ink-secondary">{caption}</span>}

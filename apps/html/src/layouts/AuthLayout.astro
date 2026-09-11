@@ -43,11 +43,13 @@ const { title, heading, subheading } = Astro.props;
           <span class="grid size-8 place-items-center rounded-control bg-accent text-paper">
             <span class="text-caption font-semibold">C</span>
           </span>
-          <span class="text-subheading font-semibold">Clear Admin</span>
+          <span class="font-display text-subheading font-semibold tracking-display">
+            Clear Admin
+          </span>
         </a>
 
-        <div class="rounded-card border border-hairline bg-surface-card p-6">
-          <h1 class="text-title-sm font-semibold">{heading}</h1>
+        <div class="rounded-card border border-hairline bg-surface-card p-6 shadow-raised">
+          <h1 class="font-display text-title font-semibold tracking-display">{heading}</h1>
           {subheading && <p class="mt-1 text-caption text-ink-secondary">{subheading}</p>}
           <div class="mt-6">
             <slot />

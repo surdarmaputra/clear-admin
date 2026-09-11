@@ -13,12 +13,12 @@ const { title, description, class: className = '', ...config } = Astro.props;
 
 <section
   data-chart
-  class:list={['rounded-card border border-hairline bg-surface-card p-5', className]}
+  class:list={['rounded-card border border-hairline bg-surface-card p-5 shadow-card', className]}
 >
   <div class="mb-4">
     {/* A single-series chart needs no legend — the title names the series. */}
-    <h3 class="text-caption font-semibold">{title}</h3>
-    {description && <p class="mt-0.5 text-micro text-ink-secondary">{description}</p>}
+    <h3 class="font-display text-subheading font-semibold tracking-display">{title}</h3>
+    {description && <p class="mt-0.5 text-caption text-ink-secondary">{description}</p>}
   </div>
 
   <div data-chart-canvas></div>

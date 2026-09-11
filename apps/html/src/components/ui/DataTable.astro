@@ -85,9 +85,9 @@ const state = `{
 <div
   x-data={state}
   x-effect="if (page > pageCount) page = pageCount"
-  class:list={['rounded-card border border-hairline bg-surface-card', className]}
+  class:list={['rounded-card border border-hairline bg-surface-card shadow-card', className]}
 >
-  <div class="flex items-center gap-3 border-b border-hairline p-4">
+  <div class="flex items-center gap-3 border-b border-hairline px-4 py-3">
     <div class="relative w-full max-w-xs">
       <Icon
         name="search"
@@ -100,7 +100,7 @@ const state = `{
         x-on:input="page = 1"
         aria-label={searchLabel}
         placeholder={searchLabel}
-        class="w-full rounded-control border border-hairline bg-surface-card py-2 pr-3 pl-9 text-caption placeholder:text-ink-secondary"
+        class="w-full rounded-control border border-hairline bg-surface-card py-1.5 pr-3 pl-9 text-caption placeholder:text-ink-secondary"
       />
     </div>
     <slot name="actions" />
@@ -109,13 +109,13 @@ const state = `{
   <div class="overflow-x-auto" x-show="total > 0">
     <table class="w-full border-collapse text-caption">
       <thead>
-        <tr class="border-b border-hairline">
+        <tr class="border-b border-hairline bg-surface-hover/40">
           {columns.map((column) => (
             <th
               scope="col"
               x-bind:aria-sort={column.sortable === false ? undefined : `ariaSort('${column.key}')`}
               class:list={[
-                'px-4 py-3 text-micro font-medium text-ink-secondary',
+                'px-4 py-2 text-micro font-semibold tracking-label text-ink-secondary uppercase',
                 column.align === 'right' ? 'text-right' : 'text-left',
               ]}
             >
@@ -126,7 +126,7 @@ const state = `{
                   type="button"
                   x-on:click={`sortBy('${column.key}')`}
                   class:list={[
-                    'inline-flex items-center gap-1 rounded-control transition-colors hover:text-ink-primary',
+                    'inline-flex items-center gap-1 rounded-control uppercase transition-colors hover:text-ink-primary',
                     column.align === 'right' && 'flex-row-reverse',
                   ]}
                 >

@@ -13,12 +13,13 @@ interface Props {
 const { label = 'rows', class: className = '' } = Astro.props;
 ---
 
-<div class:list={['flex flex-wrap items-center justify-between gap-3 px-4 py-3', className]}>
-  <p class="text-micro text-ink-secondary">
-    Showing <span class="tabular" x-text="rangeStart"></span>–
-    <span class="tabular" x-text="rangeEnd"></span> of <span class="tabular" x-text="total"></span>
-    {label}
-  </p>
+<div class:list={['flex flex-wrap items-center justify-between gap-3 px-4 py-2', className]}>
+  {/* One binding, not three spans: the split markup let the formatter
+      introduce stray whitespace around the dash. */}
+  <p
+    class="tabular text-micro text-ink-secondary"
+    x-text={`\`Showing \${rangeStart}–\${rangeEnd} of \${total} ${label}\``}
+  ></p>
 
   <nav aria-label="Pagination" class="flex items-center gap-1">
     <button

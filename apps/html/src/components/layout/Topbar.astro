@@ -26,7 +26,7 @@ const { title, breadcrumb = [] } = Astro.props;
     {breadcrumb.length > 0 ? (
       <Breadcrumb items={breadcrumb} />
     ) : (
-      <h1 class="truncate text-subheading font-semibold">{title}</h1>
+      <h1 class="font-display truncate text-subheading font-semibold tracking-display">{title}</h1>
     )}
   </div>
 

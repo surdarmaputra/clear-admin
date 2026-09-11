@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import '@fontsource-variable/inter';
+@import '@fontsource-variable/bricolage-grotesque';
 
 /* Class-based dark mode — .dark on <html>, system preference as initial default. */
 @custom-variant dark (&:where(.dark, .dark *));
@@ -32,7 +33,7 @@
   --color-surface-page: #ffffff;
   --color-surface-card: #ffffff;
   --color-surface-hover: #eceef2;
-  --color-hairline: #e6e9ef;
+  --color-hairline: #eef1f6;
   --color-ink-primary: #091135;
   --color-ink-secondary: #36394a;
   --color-accent: #0f77ff;
@@ -55,6 +56,14 @@
 
   /* Typography — tracking opens with size (0.004em → 0.018em, plateau at 32px) */
   --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+  /* Display face for headings and hero numbers. Inter carries the UI; the
+     grotesque carries the voice, so the two never compete at the same size. */
+  --font-display: 'Bricolage Grotesque Variable', 'Inter Variable', ui-sans-serif, sans-serif;
+
+  /* Display type sets tight — the optical tracking that opens with size below
+     is tuned for Inter, and the grotesque needs the opposite. */
+  --tracking-display: -0.022em;
+  --tracking-label: 0.06em;
 
   --text-micro: 12px;
   --text-micro--line-height: 1.33;
@@ -88,7 +97,11 @@
   --radius-control: 8px;
   --radius-card: 12px;
 
-  /* The only shadow in the system is the focus state. */
+  /* Resting elevation. Kept far below the focus ring so the ring still reads
+     as the loudest thing on the page. */
+  --shadow-card: 0 1px 2px rgba(9, 17, 53, 0.04), 0 1px 3px rgba(9, 17, 53, 0.06);
+  --shadow-raised: 0 2px 4px rgba(9, 17, 53, 0.05), 0 6px 16px rgba(9, 17, 53, 0.08);
+
   --shadow-focus:
     0 0 0 1px #0f77ff, 0 1px 2px rgba(12, 43, 100, 0.32), 0 6px 16px rgba(12, 43, 100, 0.32);
 }
@@ -101,7 +114,7 @@
   --color-surface-page: #101217;
   --color-surface-card: #171a20;
   --color-surface-hover: #1f232a;
-  --color-hairline: #23262d;
+  --color-hairline: #1e2128;
   --color-ink-primary: #f2f3f5;
   --color-ink-secondary: #9ba1ad;
   --color-accent: #3a8df5;
@@ -119,6 +132,11 @@
   --color-series-6: #008300;
   --color-series-7: #9085e9;
   --color-series-8: #e66767;
+
+  /* On a dark ground a tinted shadow is invisible; depth comes from a darker
+     spread plus a hairline top edge instead. */
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-raised: 0 2px 4px rgba(0, 0, 0, 0.45), 0 6px 16px rgba(0, 0, 0, 0.35);
 }
 
 @layer base {
@@ -142,6 +160,11 @@
     font-size: var(--text-body);
     line-height: var(--text-body--line-height);
     letter-spacing: var(--text-body--letter-spacing);
+    font-optical-sizing: auto;
+    font-feature-settings:
+      'cv01' on,
+      'ss03' on,
+      'zero' on;
     -webkit-font-smoothing: antialiased;
   }
 
