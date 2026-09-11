@@ -1,9 +1,12 @@
 ---
 import Icon from '../Icon.astro';
 import { navigation } from '../../data/nav';
+import { withBase } from '../../lib/url';
 
-const current = Astro.url.pathname;
-const isActive = (href?: string) => href === current;
+// Normalised both sides so a trailing slash never breaks the active check.
+const norm = (path: string) => path.replace(/\/+$/, '') || '/';
+const current = norm(Astro.url.pathname);
+const isActive = (href?: string) => href !== undefined && norm(withBase(href)) === current;
 const groupOpen = (children?: { href?: string }[]) =>
   children?.some((child) => isActive(child.href)) ?? false;
 ---
@@ -47,7 +50,7 @@ const groupOpen = (children?: { href?: string }[]) =>
                 {item.children.map((child) => (
                   <li>
                     <a
-                      href={child.href}
+                      href={withBase(child.href!)}
                       aria-current={isActive(child.href) ? 'page' : undefined}
                       class:list={[
                         'block rounded-control px-3 py-1.5 text-caption transition-colors',
@@ -65,7 +68,7 @@ const groupOpen = (children?: { href?: string }[]) =>
           ) : (
             <li>
               <a
-                href={item.href}
+                href={withBase(item.href!)}
                 aria-current={isActive(item.href) ? 'page' : undefined}
                 class:list={[
                   'flex items-center gap-3 rounded-control px-3 py-2 text-caption transition-colors',

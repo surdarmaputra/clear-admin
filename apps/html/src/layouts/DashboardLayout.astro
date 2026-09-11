@@ -2,6 +2,7 @@
 import '../styles/theme.css';
 import Sidebar from '../components/layout/Sidebar.astro';
 import Topbar from '../components/layout/Topbar.astro';
+import { withBase } from '../lib/url';
 
 interface Props {
   title: string;
@@ -16,7 +17,7 @@ const { title, breadcrumb = [] } = Astro.props;
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href={withBase('/favicon.svg')} type="image/svg+xml" />
     <title>{title} · Clear Admin</title>
 
     {/* Runs before paint so the correct theme is applied without a flash. */}

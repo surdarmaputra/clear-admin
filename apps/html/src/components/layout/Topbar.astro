@@ -1,6 +1,7 @@
 ---
 import Icon from '../Icon.astro';
 import ThemeToggle from './ThemeToggle.astro';
+import { withBase } from '../../lib/url';
 
 interface Props {
   title: string;
@@ -31,7 +32,7 @@ const { title, breadcrumb = [] } = Astro.props;
               <li class="flex items-center gap-1.5">
                 {i > 0 && <Icon name="chevron-right" size={12} class="text-mist" />}
                 {crumb.href ? (
-                  <a href={crumb.href} class="transition-colors hover:text-ink-primary">
+                  <a href={withBase(crumb.href)} class="transition-colors hover:text-ink-primary">
                     {crumb.label}
                   </a>
                 ) : (
@@ -84,14 +85,14 @@ const { title, breadcrumb = [] } = Astro.props;
       class="absolute right-0 mt-2 w-48 rounded-card border border-hairline bg-surface-card p-1"
     >
       <a
-        href="/profile"
+        href={withBase('/profile')}
         role="menuitem"
         class="flex items-center gap-2 rounded-control px-3 py-2 text-caption text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink-primary"
       >
         <Icon name="user" size={16} /> Profile
       </a>
       <a
-        href="/settings"
+        href={withBase('/settings')}
         role="menuitem"
         class="flex items-center gap-2 rounded-control px-3 py-2 text-caption text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink-primary"
       >
@@ -99,7 +100,7 @@ const { title, breadcrumb = [] } = Astro.props;
       </a>
       <div class="my-1 border-t border-hairline"></div>
       <a
-        href="/login"
+        href={withBase('/login')}
         role="menuitem"
         class="flex items-center gap-2 rounded-control px-3 py-2 text-caption text-danger transition-colors hover:bg-surface-hover"
       >
