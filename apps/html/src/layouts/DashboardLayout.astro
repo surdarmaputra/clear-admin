@@ -24,7 +24,9 @@ const { title, breadcrumb = [] } = Astro.props;
     <script is:inline>
       (() => {
         const stored = localStorage.getItem('theme');
-        const dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+        const dark = stored
+          ? stored === 'dark'
+          : matchMedia('(prefers-color-scheme: dark)').matches;
         document.documentElement.classList.toggle('dark', dark);
       })();
     </script>
@@ -53,8 +55,7 @@ const { title, breadcrumb = [] } = Astro.props;
         class="fixed inset-0 z-30 bg-graphite/50 lg:hidden"
         aria-hidden="true"
         style="display: none"
-      >
-      </div>
+      ></div>
 
       <div class="flex min-w-0 flex-1 flex-col">
         <Topbar title={title} breadcrumb={breadcrumb} />

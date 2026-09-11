@@ -16,18 +16,18 @@ into a consumer project, so each carries its own `theme.css`, Tailwind config, a
 dependencies. Consistency is maintained through this tracker and repo co-location,
 not through a shared package.
 
-| | `apps/html` | `apps/react` |
-|---|---|---|
-| Target | Blade, Edge, any server-rendered app | React SPA |
-| Output | `dist/` — plain HTML + CSS + JS | copyable source tree |
-| Interactivity | Alpine.js | React 19 |
-| Primitives | hand-rolled + Alpine | shadcn/ui (Radix) |
-| Charts | ApexCharts | Recharts |
-| Tables | `@tanstack/table-core` | `@tanstack/react-table` |
-| Editor | `lexical` (vanilla) | `@lexical/react` |
-| Drag & drop | SortableJS | dnd-kit |
-| Router | n/a | TanStack Router |
-| Authoring | Astro (build tool only — `.astro` is never shipped) | React + Vite |
+|               | `apps/html`                                         | `apps/react`            |
+| ------------- | --------------------------------------------------- | ----------------------- |
+| Target        | Blade, Edge, any server-rendered app                | React SPA               |
+| Output        | `dist/` — plain HTML + CSS + JS                     | copyable source tree    |
+| Interactivity | Alpine.js                                           | React 19                |
+| Primitives    | hand-rolled + Alpine                                | shadcn/ui (Radix)       |
+| Charts        | ApexCharts                                          | Recharts                |
+| Tables        | `@tanstack/table-core`                              | `@tanstack/react-table` |
+| Editor        | `lexical` (vanilla)                                 | `@lexical/react`        |
+| Drag & drop   | SortableJS                                          | dnd-kit                 |
+| Router        | n/a                                                 | TanStack Router         |
+| Authoring     | Astro (build tool only — `.astro` is never shipped) | React + Vite            |
 
 Shared across both: Tailwind CSS v4, TypeScript (strict), class-based dark mode,
 Motion for animation, Vite.
@@ -43,103 +43,103 @@ artifact, deployed.
 
 ## Layout
 
-| Component | Priority | HTML | React |
-|---|---|---|---|
-| App shell / page wrapper | P0 | done | — |
-| Sidebar — collapsible, nested nav | P0 | done | — |
-| Topbar — breadcrumb, notifications, user menu | P0 | done | — |
-| Theme toggle (light/dark) | P0 | done | — |
-| Responsive behaviour — mobile drawer nav | P0 | done | — |
+| Component                                     | Priority | HTML | React |
+| --------------------------------------------- | -------- | ---- | ----- |
+| App shell / page wrapper                      | P0       | done | —     |
+| Sidebar — collapsible, nested nav             | P0       | done | —     |
+| Topbar — breadcrumb, notifications, user menu | P0       | done | —     |
+| Theme toggle (light/dark)                     | P0       | done | —     |
+| Responsive behaviour — mobile drawer nav      | P0       | done | —     |
 
 ## Data display
 
-| Component | Priority | HTML | React |
-|---|---|---|---|
-| Card | P0 | — | — |
-| Stat card / KPI tile | P1 | — | — |
-| Badge | P0 | — | — |
-| Avatar | P0 | — | — |
-| Chart — line | P1 | — | — |
-| Chart — bar | P1 | — | — |
-| Chart — area | P1 | — | — |
-| Chart — pie / donut | P1 | — | — |
-| Data table — sortable, paginated | P1 | — | — |
-| Pagination | P1 | — | — |
-| Data table — server-side filter/sort/paginate | P2 | — | — |
-| Data table — resizable columns | P2 | — | — |
-| Data table — edit in cell | P2 | — | — |
-| Spreadsheet-style table editing | P2 | — | — |
+| Component                                     | Priority | HTML | React |
+| --------------------------------------------- | -------- | ---- | ----- |
+| Card                                          | P0       | —    | —     |
+| Stat card / KPI tile                          | P1       | —    | —     |
+| Badge                                         | P0       | —    | —     |
+| Avatar                                        | P0       | —    | —     |
+| Chart — line                                  | P1       | —    | —     |
+| Chart — bar                                   | P1       | —    | —     |
+| Chart — area                                  | P1       | —    | —     |
+| Chart — pie / donut                           | P1       | —    | —     |
+| Data table — sortable, paginated              | P1       | —    | —     |
+| Pagination                                    | P1       | —    | —     |
+| Data table — server-side filter/sort/paginate | P2       | —    | —     |
+| Data table — resizable columns                | P2       | —    | —     |
+| Data table — edit in cell                     | P2       | —    | —     |
+| Spreadsheet-style table editing               | P2       | —    | —     |
 
 ## Feedback & state
 
-| Component | Priority | HTML | React |
-|---|---|---|---|
-| Alert | P1 | — | — |
-| Toast / notification | P1 | — | — |
-| Empty state | P1 | — | — |
-| Error state | P1 | — | — |
-| Loading state / skeleton | P1 | — | — |
-| Spinner | P1 | — | — |
-| Progress — bar | P1 | — | — |
-| Progress — circle | P1 | — | — |
+| Component                | Priority | HTML | React |
+| ------------------------ | -------- | ---- | ----- |
+| Alert                    | P1       | —    | —     |
+| Toast / notification     | P1       | —    | —     |
+| Empty state              | P1       | —    | —     |
+| Error state              | P1       | —    | —     |
+| Loading state / skeleton | P1       | —    | —     |
+| Spinner                  | P1       | —    | —     |
+| Progress — bar           | P1       | —    | —     |
+| Progress — circle        | P1       | —    | —     |
 
 ## Overlay
 
-| Component | Priority | HTML | React |
-|---|---|---|---|
-| Dropdown menu | P0 | — | — |
-| Tooltip | P1 | — | — |
-| Modal | P1 | — | — |
-| Drawer | P1 | — | — |
+| Component     | Priority | HTML | React |
+| ------------- | -------- | ---- | ----- |
+| Dropdown menu | P0       | —    | —     |
+| Tooltip       | P1       | —    | —     |
+| Modal         | P1       | —    | —     |
+| Drawer        | P1       | —    | —     |
 
 ## Navigation
 
-| Component | Priority | HTML | React |
-|---|---|---|---|
-| Breadcrumb | P0 | — | — |
-| Tabs | P1 | — | — |
+| Component  | Priority | HTML | React |
+| ---------- | -------- | ---- | ----- |
+| Breadcrumb | P0       | —    | —     |
+| Tabs       | P1       | —    | —     |
 
 ## Forms
 
-| Component | Priority | HTML | React |
-|---|---|---|---|
-| Input | P0 | — | — |
-| Textarea | P0 | — | — |
-| Select | P0 | — | — |
-| Checkbox | P0 | — | — |
-| Radio | P0 | — | — |
-| Switch | P1 | — | — |
-| Date picker | P1 | — | — |
-| Rich text editor — Lexical, markdown | P2 | — | — |
+| Component                            | Priority | HTML | React |
+| ------------------------------------ | -------- | ---- | ----- |
+| Input                                | P0       | —    | —     |
+| Textarea                             | P0       | —    | —     |
+| Select                               | P0       | —    | —     |
+| Checkbox                             | P0       | —    | —     |
+| Radio                                | P0       | —    | —     |
+| Switch                               | P1       | —    | —     |
+| Date picker                          | P1       | —    | —     |
+| Rich text editor — Lexical, markdown | P2       | —    | —     |
 
 ## Files & media
 
-| Component | Priority | HTML | React |
-|---|---|---|---|
-| File upload — drag & drop | P2 | — | — |
-| File preview | P2 | — | — |
-| Image preview / lightbox | P2 | — | — |
+| Component                 | Priority | HTML | React |
+| ------------------------- | -------- | ---- | ----- |
+| File upload — drag & drop | P2       | —    | —     |
+| File preview              | P2       | —    | —     |
+| Image preview / lightbox  | P2       | —    | —     |
 
 ## Interaction
 
-| Component | Priority | HTML | React |
-|---|---|---|---|
-| Kanban board — drag & drop | P2 | — | — |
+| Component                  | Priority | HTML | React |
+| -------------------------- | -------- | ---- | ----- |
+| Kanban board — drag & drop | P2       | —    | —     |
 
 ---
 
 ## Pages
 
-| Page | Priority | HTML | React |
-|---|---|---|---|
-| Blank page template | P0 | done | — |
-| Dashboard — overview | P1 | — | — |
-| Login | P1 | — | — |
-| Register | P1 | — | — |
-| Password reset | P1 | — | — |
-| 404 | P1 | — | — |
-| Profile | P2 | — | — |
-| Settings | P2 | — | — |
+| Page                 | Priority | HTML | React |
+| -------------------- | -------- | ---- | ----- |
+| Blank page template  | P0       | done | —     |
+| Dashboard — overview | P1       | —    | —     |
+| Login                | P1       | —    | —     |
+| Register             | P1       | —    | —     |
+| Password reset       | P1       | —    | —     |
+| 404                  | P1       | —    | —     |
+| Profile              | P2       | —    | —     |
+| Settings             | P2       | —    | —     |
 
 ---
 

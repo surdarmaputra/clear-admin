@@ -2,6 +2,7 @@
   "name": "clear-admin",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "license": "MIT",
   "packageManager": "pnpm@10.33.0",
   "engines": {
@@ -10,7 +11,12 @@
   "scripts": {
     "dev:html": "pnpm --filter @clear-admin/html dev",
     "build:html": "pnpm --filter @clear-admin/html build",
-    "build": "pnpm -r build"
+    "build": "pnpm -r build",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "pnpm --filter @clear-admin/html check",
+    "test": "playwright test"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
@@ -19,6 +25,14 @@
     ]
   },
   "devDependencies": {
-    "playwright": "^1.63.0"
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.63.0",
+    "eslint": "^10.10.0",
+    "eslint-plugin-astro": "^3.1.0",
+    "playwright": "^1.63.0",
+    "prettier": "^3.9.6",
+    "prettier-plugin-astro": "^1.0.0",
+    "prettier-plugin-tailwindcss": "^0.8.1",
+    "typescript-eslint": "^8.70.0"
   }
 }

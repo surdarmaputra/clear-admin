@@ -16,6 +16,10 @@ import Icon from '../Icon.astro';
   x-bind:aria-label="dark ? 'Switch to light theme' : 'Switch to dark theme'"
   class="grid size-9 place-items-center rounded-control text-ink-secondary transition-colors hover:bg-surface-raised hover:text-ink-primary"
 >
-  <span x-show="!dark" x-cloak><Icon name="moon" size={18} /></span>
-  <span x-show="dark" x-cloak><Icon name="sun" size={18} /></span>
+  <span x-show="!dark" x-cloak>
+    <Icon name="moon" size={18} />
+  </span>
+  <span x-show="dark" x-cloak>
+    <Icon name="sun" size={18} />
+  </span>
 </button>
