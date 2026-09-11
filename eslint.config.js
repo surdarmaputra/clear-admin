@@ -9,6 +9,10 @@ export default ts.config(
   ...astro.configs.recommended,
   {
     files: ['**/*.astro'],
+    languageOptions: {
+      // Astro's ambient JSX namespace, used for native element attribute types.
+      globals: { astroHTML: 'readonly' },
+    },
     rules: {
       // Astro components take props via a Props interface that ESLint reads as
       // unused; the compiler enforces it instead.
@@ -16,8 +20,10 @@ export default ts.config(
     },
   },
   {
-    // Build config runs in Node, not the browser.
-    files: ['**/*.config.{js,mjs,ts}'],
-    languageOptions: { globals: { process: 'readonly' } },
+    // Build config and CI scripts run in Node, not the browser.
+    files: ['**/*.config.{js,mjs,ts}', 'scripts/**'],
+    languageOptions: {
+      globals: { process: 'readonly', console: 'readonly', URL: 'readonly' },
+    },
   },
 );

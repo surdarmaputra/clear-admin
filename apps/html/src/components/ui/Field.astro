@@ -1,0 +1,36 @@
+---
+interface Props {
+  id: string;
+  label: string;
+  hint?: string;
+  error?: string;
+  required?: boolean;
+  class?: string;
+}
+
+const { id, label, hint, error, required = false, class: className = '' } = Astro.props;
+---
+
+<div class:list={['flex flex-col gap-1.5', className]}>
+  <label for={id} class="text-caption font-medium">
+    {label}
+    {required && (
+      <span class="text-danger" aria-hidden="true">
+        *
+      </span>
+    )}
+  </label>
+
+  <slot />
+
+  {hint && !error && (
+    <p id={`${id}-hint`} class="text-micro text-ink-secondary">
+      {hint}
+    </p>
+  )}
+  {error && (
+    <p id={`${id}-error`} class="text-micro text-danger">
+      {error}
+    </p>
+  )}
+</div>

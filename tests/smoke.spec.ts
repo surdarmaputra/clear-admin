@@ -18,7 +18,7 @@ test.describe('dashboard shell', () => {
     await page.goto('/');
 
     await expect(page.locator('nav[aria-label="Main"]')).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Blank page' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Revenue vs target' })).toBeVisible();
     expect(failures).toEqual([]);
   });
 
@@ -119,5 +119,151 @@ test.describe('sidebar collapse', () => {
 
     await page.reload();
     await expect(sidebar).toHaveClass(/w-16/);
+  });
+});
+
+test.describe('auth pack', () => {
+  const pages = [
+    { path: '/login', heading: 'Sign in' },
+    { path: '/register', heading: 'Create account' },
+    { path: '/forgot-password', heading: 'Reset password' },
+  ];
+
+  for (const { path, heading } of pages) {
+    test(`${path} renders cleanly and labels every control`, async ({ page }) => {
+      const failures = watchForFailures(page);
+
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: heading, level: 1 })).toBeVisible();
+
+      // A control with no accessible name is the failure mode these pages exist
+      // to demonstrate the absence of.
+      const controls = page.locator('input:not([type=hidden]), select, textarea');
+      const count = await controls.count();
+      expect(count).toBeGreaterThan(0);
+      for (let i = 0; i < count; i++) {
+        const name = await controls.nth(i).evaluate((el) => {
+          const id = el.getAttribute('id');
+          return id ? document.querySelector(`label[for="${id}"]`)?.textContent?.trim() : null;
+        });
+        expect(name, `control ${i} on ${path} has a label`).toBeTruthy();
+      }
+
+      expect(failures).toEqual([]);
+    });
+  }
+
+  test('password reset swaps the form for a confirmation', async ({ page }) => {
+    await page.goto('/forgot-password');
+
+    await page.getByLabel('Email').fill('ada@example.com');
+    await page.getByRole('button', { name: 'Send reset link' }).click();
+
+    await expect(page.getByRole('status').filter({ hasText: 'Check your inbox' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Send reset link' })).toBeHidden();
+  });
+
+  test('404 offers a way back', async ({ page }) => {
+    await page.goto('/404');
+
+    await expect(page.getByRole('heading', { name: 'Page not found', level: 2 })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Back to dashboard' })).toBeVisible();
+  });
+});
+
+test.describe('dashboard overview', () => {
+  test('draws every chart with themed colours, not Apex defaults', async ({ page }) => {
+    const failures = watchForFailures(page);
+    await page.goto('/');
+
+    // Four cards, four rendered SVGs — a chart that throws leaves the card up
+    // with an error state, so counting cards alone would not catch it.
+    await expect(page.locator('.apexcharts-canvas')).toHaveCount(4);
+    await expect(page.locator('[data-chart-error]:not([hidden])')).toHaveCount(0);
+    await expect(page.locator('[data-chart-skeleton]')).toHaveCount(0);
+
+    // The series colour comes from a CSS variable that Tailwind will drop if no
+    // utility references it; an empty token paints the marks black.
+    const stroke = await page
+      .locator('[data-chart] .apexcharts-line')
+      .first()
+      .getAttribute('stroke');
+    expect(stroke).toMatch(/15,\s*119,\s*255/);
+
+    expect(failures).toEqual([]);
+  });
+
+  test('charts re-theme when the toggle flips', async ({ page }) => {
+    await page.goto('/');
+
+    const line = page.locator('[data-chart] .apexcharts-line').first();
+    await expect(line).toHaveAttribute('stroke', /15,\s*119,\s*255/);
+
+    await page.getByRole('button', { name: 'Switch to dark theme' }).click();
+
+    // The dark palette is its own set of steps, not a filter over the light one.
+    await expect(line).toHaveAttribute('stroke', /58,\s*141,\s*245/);
+  });
+
+  test('table sorts, searches, pages, and empties', async ({ page }) => {
+    await page.goto('/');
+
+    const rows = page.locator('tbody tr');
+    await expect(rows).toHaveCount(6);
+    await expect(page.getByText('Showing 1–6 of 12 rows')).toBeVisible();
+
+    await page.getByRole('button', { name: 'Next page' }).click();
+    await expect(page.getByText('Showing 7–12 of 12 rows')).toBeVisible();
+
+    await page.getByRole('columnheader', { name: 'Amount' }).getByRole('button').click();
+    await expect(rows.first()).toContainText('$290');
+
+    await page.getByLabel('Search orders').fill('turing');
+    await expect(rows).toHaveCount(1);
+    await expect(rows.first()).toContainText('Alan Turing');
+
+    await page.getByLabel('Search orders').fill('nobody');
+    await expect(page.getByText('No matches')).toBeVisible();
+
+    await page.getByRole('button', { name: 'Clear search' }).click();
+    await expect(rows).toHaveCount(6);
+  });
+
+  test('blank template still ships at its own route', async ({ page }) => {
+    await page.goto('/blank');
+    await expect(page.getByRole('heading', { name: 'Blank page' })).toBeVisible();
+  });
+});
+
+test.describe('dashboard on a phone', () => {
+  test.skip(({ isMobile }) => !isMobile, 'this is the mobile contract');
+
+  test('never scrolls sideways, and the table scrolls instead of squashing', async ({ page }) => {
+    await page.goto('/');
+
+    // A page that pans horizontally on a phone is the failure this guards.
+    const { doc, win } = await page.evaluate(() => ({
+      doc: document.documentElement.scrollWidth,
+      win: window.innerWidth,
+    }));
+    expect(doc, `page is ${doc}px wide in a ${win}px viewport`).toBeLessThanOrEqual(win + 1);
+
+    // The table keeps its column widths and scrolls within its own container,
+    // rather than compressing until the status badges clip.
+    const scroller = page.locator('.overflow-x-auto').first();
+    const scrolls = await scroller.evaluate((el) => el.scrollWidth > el.clientWidth);
+    expect(scrolls, 'table container scrolls horizontally').toBe(true);
+  });
+
+  test('charts fit their cards', async ({ page }) => {
+    await page.goto('/');
+
+    for (const card of await page.locator('[data-chart]').all()) {
+      const fits = await card.evaluate((el) => {
+        const svg = el.querySelector('svg');
+        return !svg || svg.getBoundingClientRect().width <= el.getBoundingClientRect().width + 1;
+      });
+      expect(fits).toBe(true);
+    }
   });
 });

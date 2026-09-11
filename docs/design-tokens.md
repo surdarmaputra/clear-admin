@@ -54,7 +54,7 @@ reads as part of the canvas rather than a separate bar.
 | Page (and header) | `#ffffff`          | `#101217`          |
 | Card              | `#ffffff`          | `#171a20`          |
 | Hover             | `#eceef2`          | `#1f232a`          |
-| Hairline          | `#e6e9ef`          | `#23262d`          |
+| Hairline          | `#eef1f6`          | `#1e2128`          |
 | Primary ink       | `#091135` (18.4:1) | `#f2f3f5` (17.4:1) |
 | Secondary ink     | `#36394a` (11.4:1) | `#9ba1ad` (7.4:1)  |
 | Accent            | `#0f77ff`          | `#3a8df5` (5.8:1)  |
@@ -112,8 +112,28 @@ action color was observed" is treated as an extraction artifact.
 
 ## Typography
 
-**InterVar**, self-hosted via `@fontsource-variable/inter` — no CDN, so a copied bundle
-works offline. Fallback: `ui-sans-serif, system-ui, sans-serif`.
+Two faces, both self-hosted via `@fontsource-variable` — no CDN, so a copied bundle
+works offline.
+
+| Token            | Face                         | Used by                                           |
+| ---------------- | ---------------------------- | ------------------------------------------------- |
+| `--font-sans`    | Inter Variable               | Everything — body, labels, controls, table cells  |
+| `--font-display` | Bricolage Grotesque Variable | Headings, page titles, hero numbers, the wordmark |
+
+The pair is borrowed from `levelup-starter`. The split is strict: Inter carries the UI,
+the grotesque carries the voice, and the two never meet at the same size — so the
+hierarchy reads from the face as well as from the weight.
+
+Display type sets **tight** (`--tracking-display: -0.022em`), against the optical
+tracking that opens with size below. That curve is tuned for Inter at UI sizes; the
+grotesque at heading sizes needs the opposite, so display headings opt out of it.
+
+`--tracking-label: 0.06em` pairs with uppercase micro type for table headers and stat
+labels, where the extra letterspacing is what keeps small caps legible.
+
+Body sets `font-optical-sizing: auto` and Inter's `cv01` / `ss03` / `zero` — a
+disambiguated `l`, a single-storey `a`, and a slashed zero, which matters in a UI that
+is mostly numbers.
 
 The reference's signature is tracking that _opens_ with size (`0.004em → 0.018em`,
 plateauing at 32px). The scale below fills the reference's 18→32px hole and extends
@@ -155,14 +175,27 @@ No intermediate values — no 10px, no 16px.
 
 ## Elevation
 
-**No drop shadows on resting surfaces.** Depth is expressed by surface tint and hairline
-border. The only shadow in the system is the focus state:
+**Revised.** The original system carried no resting shadows — depth came from surface
+tint and hairline alone. In practice a dashboard of stacked cards read as flat, so
+cards now take a shadow, and the hairline lightened to compensate
+(`#e6e9ef → #eef1f6` light, `#23262d → #1e2128` dark): the edge and the shadow
+together do the work the edge used to do alone.
 
-```
-0 0 0 1px #0f77ff,
-0 1px 2px rgba(12, 43, 100, 0.32),
-0 6px 16px rgba(12, 43, 100, 0.32)
-```
+The shadows are **ambient, not elevated**: wide blur, low opacity, almost no offset,
+and a negative spread so the blur never crowds the card's own edge. A card should read
+as sitting in soft light, not propped above the page.
+
+| Token             | Light                                                                              | Dark                                                                | Use                          |
+| ----------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------- | ---------------------------- |
+| `--shadow-card`   | `0 2px 8px -2px rgba(9,17,53,.04), 0 12px 32px -8px rgba(9,17,53,.08)`             | `0 2px 8px -2px rgba(0,0,0,.3), 0 12px 32px -8px rgba(0,0,0,.45)`   | Resting cards, panels, table |
+| `--shadow-raised` | `0 4px 16px -4px rgba(9,17,53,.05), 0 28px 64px -16px rgba(9,17,53,.14)`           | `0 4px 16px -4px rgba(0,0,0,.35), 0 28px 64px -16px rgba(0,0,0,.6)` | Auth card, hover, modals     |
+| `--shadow-focus`  | `0 0 0 1px #0f77ff, 0 1px 2px rgba(12,43,100,.32), 0 6px 16px rgba(12,43,100,.32)` | same                                                                | Focus ring only              |
+
+Dark mode gets its own values: a blue-tinted shadow is invisible on a dark ground, so
+those steps are neutral and heavier.
+
+The resting shadows sit deliberately far below the focus ring in strength — the ring
+must stay the loudest thing on the page.
 
 ---
 

@@ -27,6 +27,16 @@ export const navigation: NavItem[] = [
       { label: 'Feedback', href: '/components/feedback' },
     ],
   },
+  {
+    label: 'Pages',
+    icon: 'file-text',
+    children: [
+      { label: 'Login', href: '/login' },
+      { label: 'Register', href: '/register' },
+      { label: 'Password reset', href: '/forgot-password' },
+      { label: '404', href: '/404' },
+    ],
+  },
   { label: 'Files', href: '/files', icon: 'folder' },
   { label: 'Editor', href: '/editor', icon: 'pen-line' },
   { label: 'Settings', href: '/settings', icon: 'settings' },

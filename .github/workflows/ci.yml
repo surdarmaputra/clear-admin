@@ -45,6 +45,11 @@ jobs:
       - name: Build
         run: pnpm build:html
 
+      # Tailwind drops a class naming a missing token without a word, so the
+      # compiled CSS is the only place the drift is visible.
+      - name: Token guard
+        run: pnpm guard:tokens
+
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps chromium
 

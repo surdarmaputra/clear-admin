@@ -1,0 +1,54 @@
+---
+interface Props {
+  /** Raw values; scaled to fit the box, so units do not matter. */
+  points: number[];
+  tone: 1 | 2 | 3 | 7;
+  class?: string;
+}
+
+const { points, tone, class: className = '' } = Astro.props;
+
+const WIDTH = 96;
+const HEIGHT = 32;
+
+// Plotted in a fixed viewBox and stretched by CSS — no measuring, no runtime.
+const min = Math.min(...points);
+const max = Math.max(...points);
+const span = max - min || 1;
+
+const coords = points.map((value, i) => {
+  const x = (i / (points.length - 1)) * WIDTH;
+  const y = HEIGHT - ((value - min) / span) * (HEIGHT - 4) - 2;
+  return `${x.toFixed(1)},${y.toFixed(1)}`;
+});
+
+const id = `spark-${tone}-${points.length}-${Math.round(max)}`;
+---
+
+<svg
+  viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+  preserveAspectRatio="none"
+  aria-hidden="true"
+  class:list={[`text-series-${tone}`, className]}
+>
+  <defs>
+    <linearGradient id={id} x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="currentColor" stop-opacity="0.22"></stop>
+      <stop offset="100%" stop-color="currentColor" stop-opacity="0"></stop>
+    </linearGradient>
+  </defs>
+
+  <polygon
+    points={`0,${HEIGHT} ${coords.join(' ')} ${WIDTH},${HEIGHT}`}
+    fill={`url(#${id})`}
+  ></polygon>
+  <polyline
+    points={coords.join(' ')}
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    vector-effect="non-scaling-stroke"
+  ></polyline>
+</svg>
