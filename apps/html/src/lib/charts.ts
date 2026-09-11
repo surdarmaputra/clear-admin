@@ -40,6 +40,10 @@ function themed(config: ChartConfig) {
 function buildOptions(config: ChartConfig): ApexOptions {
   const { type, series, categories, height, labels, valuePrefix = '' } = config;
   const money = (v: number) => `${valuePrefix}${v.toLocaleString('en-US')}`;
+  // Axis labels go compact ($71K) so the plot keeps its width on a phone; the
+  // tooltip still carries the exact figure.
+  const axisMoney = (v: number) =>
+    `${valuePrefix}${v >= 10000 ? `${Math.round(v / 1000)}K` : v.toLocaleString('en-US')}`;
   const multiSeries = Array.isArray(series) && series.length > 1;
   const theme = themed(config);
 
@@ -78,15 +82,36 @@ function buildOptions(config: ChartConfig): ApexOptions {
       categories,
       axisBorder: { show: false },
       axisTicks: { show: false },
-      labels: { style: { colors: theme.xaxis.labels.style.colors, fontSize: '12px' } },
+      labels: {
+        style: { colors: theme.xaxis.labels.style.colors, fontSize: '12px' },
+        // Rotated labels get clipped in a short card; dropping every other one
+        // keeps them level and readable instead.
+        rotate: 0,
+        rotateAlways: false,
+        hideOverlappingLabels: true,
+      },
       tooltip: { enabled: false },
     },
     yaxis: {
       labels: {
         style: { colors: theme.yaxis.labels.style.colors, fontSize: '12px' },
-        formatter: money,
+        formatter: axisMoney,
       },
     },
+    responsive: [
+      {
+        breakpoint: 640,
+        options: {
+          // A legend beside a donut leaves it no room at phone width.
+          legend: { position: 'bottom' as const, horizontalAlign: 'left' as const },
+          plotOptions: { pie: { donut: { size: '68%' } } },
+          yaxis: { labels: { formatter: axisMoney } },
+          // Twelve month labels collide even unrotated; show roughly every
+          // other one and let the tooltip name the exact point.
+          xaxis: { tickAmount: 5 },
+        },
+      },
+    ],
   };
 
   if (type === 'line' || type === 'area') {

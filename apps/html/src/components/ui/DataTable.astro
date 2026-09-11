@@ -107,7 +107,9 @@ const state = `{
   </div>
 
   <div class="overflow-x-auto" x-show="total > 0">
-    <table class="w-full border-collapse text-caption">
+    {/* min-width forces the overflow container to scroll rather than letting
+        the columns compress into each other on a phone. */}
+    <table class="w-full min-w-[42rem] border-collapse text-caption">
       <thead>
         <tr class="border-b border-hairline bg-surface-hover/40">
           {columns.map((column) => (

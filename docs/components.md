@@ -57,6 +57,7 @@ artifact, deployed.
 | --------------------------------------------- | -------- | ---- | ----- |
 | Card                                          | P0       | done | —     |
 | Stat card / KPI tile                          | P1       | done | —     |
+| Sparkline                                     | P2       | done | —     |
 | Badge                                         | P0       | done | —     |
 | Avatar                                        | P0       | done | —     |
 | Chart — line                                  | P1       | done | —     |

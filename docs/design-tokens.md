@@ -181,11 +181,15 @@ cards now take a shadow, and the hairline lightened to compensate
 (`#e6e9ef → #eef1f6` light, `#23262d → #1e2128` dark): the edge and the shadow
 together do the work the edge used to do alone.
 
-| Token             | Light                                                                              | Dark                                                    | Use                          |
-| ----------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------- | ---------------------------- |
-| `--shadow-card`   | `0 1px 2px rgba(9,17,53,.04), 0 1px 3px rgba(9,17,53,.06)`                         | `0 1px 2px rgba(0,0,0,.4), 0 1px 3px rgba(0,0,0,.3)`    | Resting cards, panels, table |
-| `--shadow-raised` | `0 2px 4px rgba(9,17,53,.05), 0 6px 16px rgba(9,17,53,.08)`                        | `0 2px 4px rgba(0,0,0,.45), 0 6px 16px rgba(0,0,0,.35)` | Auth card, popovers, modals  |
-| `--shadow-focus`  | `0 0 0 1px #0f77ff, 0 1px 2px rgba(12,43,100,.32), 0 6px 16px rgba(12,43,100,.32)` | same                                                    | Focus ring only              |
+The shadows are **ambient, not elevated**: wide blur, low opacity, almost no offset,
+and a negative spread so the blur never crowds the card's own edge. A card should read
+as sitting in soft light, not propped above the page.
+
+| Token             | Light                                                                              | Dark                                                                | Use                          |
+| ----------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------- | ---------------------------- |
+| `--shadow-card`   | `0 2px 8px -2px rgba(9,17,53,.04), 0 12px 32px -8px rgba(9,17,53,.08)`             | `0 2px 8px -2px rgba(0,0,0,.3), 0 12px 32px -8px rgba(0,0,0,.45)`   | Resting cards, panels, table |
+| `--shadow-raised` | `0 4px 16px -4px rgba(9,17,53,.05), 0 28px 64px -16px rgba(9,17,53,.14)`           | `0 4px 16px -4px rgba(0,0,0,.35), 0 28px 64px -16px rgba(0,0,0,.6)` | Auth card, hover, modals     |
+| `--shadow-focus`  | `0 0 0 1px #0f77ff, 0 1px 2px rgba(12,43,100,.32), 0 6px 16px rgba(12,43,100,.32)` | same                                                                | Focus ring only              |
 
 Dark mode gets its own values: a blue-tinted shadow is invisible on a dark ground, so
 those steps are neutral and heavier.

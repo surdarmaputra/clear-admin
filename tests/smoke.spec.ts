@@ -234,3 +234,36 @@ test.describe('dashboard overview', () => {
     await expect(page.getByRole('heading', { name: 'Blank page' })).toBeVisible();
   });
 });
+
+test.describe('dashboard on a phone', () => {
+  test.skip(({ isMobile }) => !isMobile, 'this is the mobile contract');
+
+  test('never scrolls sideways, and the table scrolls instead of squashing', async ({ page }) => {
+    await page.goto('/');
+
+    // A page that pans horizontally on a phone is the failure this guards.
+    const { doc, win } = await page.evaluate(() => ({
+      doc: document.documentElement.scrollWidth,
+      win: window.innerWidth,
+    }));
+    expect(doc, `page is ${doc}px wide in a ${win}px viewport`).toBeLessThanOrEqual(win + 1);
+
+    // The table keeps its column widths and scrolls within its own container,
+    // rather than compressing until the status badges clip.
+    const scroller = page.locator('.overflow-x-auto').first();
+    const scrolls = await scroller.evaluate((el) => el.scrollWidth > el.clientWidth);
+    expect(scrolls, 'table container scrolls horizontally').toBe(true);
+  });
+
+  test('charts fit their cards', async ({ page }) => {
+    await page.goto('/');
+
+    for (const card of await page.locator('[data-chart]').all()) {
+      const fits = await card.evaluate((el) => {
+        const svg = el.querySelector('svg');
+        return !svg || svg.getBoundingClientRect().width <= el.getBoundingClientRect().width + 1;
+      });
+      expect(fits).toBe(true);
+    }
+  });
+});

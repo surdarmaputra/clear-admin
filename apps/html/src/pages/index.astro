@@ -5,7 +5,14 @@ import Card from '../components/ui/Card.astro';
 import Chart from '../components/charts/Chart.astro';
 import DataTable from '../components/ui/DataTable.astro';
 import StatCard from '../components/ui/StatCard.astro';
-import { orders, ordersByChannel, revenue, sessions, trafficSources } from '../data/dashboard';
+import {
+  orders,
+  ordersByChannel,
+  revenue,
+  sessions,
+  trafficSources,
+  trend,
+} from '../data/dashboard';
 
 const topCustomers = [
   { name: 'Ada Lovelace', plan: 'Scale', revenue: '$9,600' },
@@ -41,6 +48,7 @@ const columns = [
         caption="vs last month"
         icon="banknote"
         tone={1}
+        trend={trend.revenue}
       />
       <StatCard
         label="Orders"
@@ -49,6 +57,7 @@ const columns = [
         caption="vs last month"
         icon="package"
         tone={3}
+        trend={trend.orders}
       />
       <StatCard
         label="Active users"
@@ -57,6 +66,7 @@ const columns = [
         caption="vs last month"
         icon="users"
         tone={7}
+        trend={trend.users}
       />
       <StatCard
         label="Churn"
@@ -66,6 +76,7 @@ const columns = [
         caption="vs last month"
         icon="user-minus"
         tone={2}
+        trend={trend.churn}
       />
     </div>
 
