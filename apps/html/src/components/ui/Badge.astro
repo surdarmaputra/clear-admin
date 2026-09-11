@@ -1,0 +1,29 @@
+---
+interface Props {
+  variant?: 'neutral' | 'accent' | 'success' | 'warning' | 'danger' | 'info';
+  class?: string;
+}
+
+const { variant = 'neutral', class: className = '' } = Astro.props;
+
+// State colours are used in small doses only, so the fill is a tint of the
+// token rather than the token itself.
+const variants = {
+  neutral: 'bg-surface-hover text-ink-secondary',
+  accent: 'bg-accent/12 text-accent',
+  success: 'bg-success/12 text-success',
+  warning: 'bg-warning/12 text-warning',
+  danger: 'bg-danger/12 text-danger',
+  info: 'bg-info/12 text-info',
+};
+---
+
+<span
+  class:list={[
+    'inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-micro font-medium',
+    variants[variant],
+    className,
+  ]}
+>
+  <slot />
+</span>

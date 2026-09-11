@@ -1,0 +1,28 @@
+---
+interface Props {
+  size?: number;
+  label?: string;
+  class?: string;
+}
+
+const { size = 20, label = 'Loading', class: className = '' } = Astro.props;
+---
+
+<span role="status" aria-label={label} class:list={['inline-flex', className]}>
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    aria-hidden="true"
+    class="animate-spin"
+  >
+    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" opacity="0.2"></circle>
+    <path
+      d="M22 12a10 10 0 0 0-10-10"
+      stroke="currentColor"
+      stroke-width="3"
+      stroke-linecap="round"
+    ></path>
+  </svg>
+</span>

@@ -121,3 +121,52 @@ test.describe('sidebar collapse', () => {
     await expect(sidebar).toHaveClass(/w-16/);
   });
 });
+
+test.describe('auth pack', () => {
+  const pages = [
+    { path: '/login', heading: 'Sign in' },
+    { path: '/register', heading: 'Create account' },
+    { path: '/forgot-password', heading: 'Reset password' },
+  ];
+
+  for (const { path, heading } of pages) {
+    test(`${path} renders cleanly and labels every control`, async ({ page }) => {
+      const failures = watchForFailures(page);
+
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: heading, level: 1 })).toBeVisible();
+
+      // A control with no accessible name is the failure mode these pages exist
+      // to demonstrate the absence of.
+      const controls = page.locator('input:not([type=hidden]), select, textarea');
+      const count = await controls.count();
+      expect(count).toBeGreaterThan(0);
+      for (let i = 0; i < count; i++) {
+        const name = await controls.nth(i).evaluate((el) => {
+          const id = el.getAttribute('id');
+          return id ? document.querySelector(`label[for="${id}"]`)?.textContent?.trim() : null;
+        });
+        expect(name, `control ${i} on ${path} has a label`).toBeTruthy();
+      }
+
+      expect(failures).toEqual([]);
+    });
+  }
+
+  test('password reset swaps the form for a confirmation', async ({ page }) => {
+    await page.goto('/forgot-password');
+
+    await page.getByLabel('Email').fill('ada@example.com');
+    await page.getByRole('button', { name: 'Send reset link' }).click();
+
+    await expect(page.getByRole('status').filter({ hasText: 'Check your inbox' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Send reset link' })).toBeHidden();
+  });
+
+  test('404 offers a way back', async ({ page }) => {
+    await page.goto('/404');
+
+    await expect(page.getByRole('heading', { name: 'Page not found', level: 2 })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Back to dashboard' })).toBeVisible();
+  });
+});

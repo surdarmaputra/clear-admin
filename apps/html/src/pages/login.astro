@@ -1,0 +1,45 @@
+---
+import AuthLayout from '../layouts/AuthLayout.astro';
+import Button from '../components/ui/Button.astro';
+import Checkbox from '../components/ui/Checkbox.astro';
+import Input from '../components/ui/Input.astro';
+import { withBase } from '../lib/url';
+---
+
+<AuthLayout title="Sign in" heading="Sign in" subheading="Welcome back. Enter your details.">
+  <form class="flex flex-col gap-4" method="post" action="#">
+    <Input
+      id="email"
+      label="Email"
+      type="email"
+      autocomplete="email"
+      placeholder="you@example.com"
+      required
+    />
+    <Input
+      id="password"
+      label="Password"
+      type="password"
+      autocomplete="current-password"
+      required
+    />
+
+    <div class="flex items-center justify-between">
+      <Checkbox id="remember" label="Remember me" />
+      <a href={withBase('/forgot-password')} class="text-caption text-accent hover:underline">
+        Forgot password?
+      </a>
+    </div>
+
+    <Button type="submit" class="w-full">
+      Sign in
+    </Button>
+  </form>
+
+  <p slot="footer" class="mt-6 text-center text-caption text-ink-secondary">
+    No account?
+    <a href={withBase('/register')} class="text-accent hover:underline">
+      Create one
+    </a>
+  </p>
+</AuthLayout>

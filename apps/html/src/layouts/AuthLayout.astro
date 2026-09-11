@@ -1,0 +1,68 @@
+---
+import '../styles/theme.css';
+import ThemeToggle from '../components/layout/ThemeToggle.astro';
+import { withBase } from '../lib/url';
+
+interface Props {
+  title: string;
+  heading: string;
+  subheading?: string;
+}
+
+const { title, heading, subheading } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href={withBase('/favicon.svg')} type="image/svg+xml" />
+    <title>{title} · Clear Admin</title>
+
+    {/* Runs before paint so the correct theme is applied without a flash. */}
+    <script is:inline>
+      (() => {
+        const stored = localStorage.getItem('theme');
+        const dark = stored
+          ? stored === 'dark'
+          : matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.classList.toggle('dark', dark);
+      })();
+    </script>
+  </head>
+
+  <body class="bg-surface-sidebar text-ink-primary">
+    <div class="flex min-h-screen flex-col items-center justify-center p-6">
+      <div class="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
+
+      <main class="w-full max-w-sm">
+        <a href={withBase('/')} class="mb-8 flex items-center justify-center gap-2">
+          <span class="grid size-8 place-items-center rounded-control bg-accent text-paper">
+            <span class="text-caption font-semibold">C</span>
+          </span>
+          <span class="text-subheading font-semibold">Clear Admin</span>
+        </a>
+
+        <div class="rounded-card border border-hairline bg-surface-card p-6">
+          <h1 class="text-title-sm font-semibold">{heading}</h1>
+          {subheading && <p class="mt-1 text-caption text-ink-secondary">{subheading}</p>}
+          <div class="mt-6">
+            <slot />
+          </div>
+        </div>
+
+        <slot name="footer" />
+      </main>
+    </div>
+
+    <script>
+      import Alpine from 'alpinejs';
+
+      window.Alpine = Alpine;
+      Alpine.start();
+    </script>
+  </body>
+</html>

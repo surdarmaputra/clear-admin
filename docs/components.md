@@ -55,9 +55,9 @@ artifact, deployed.
 
 | Component                                     | Priority | HTML | React |
 | --------------------------------------------- | -------- | ---- | ----- |
-| Card                                          | P0       | —    | —     |
+| Card                                          | P0       | done | —     |
 | Stat card / KPI tile                          | P1       | —    | —     |
-| Badge                                         | P0       | —    | —     |
+| Badge                                         | P0       | done | —     |
 | Avatar                                        | P0       | —    | —     |
 | Chart — line                                  | P1       | —    | —     |
 | Chart — bar                                   | P1       | —    | —     |
@@ -74,12 +74,12 @@ artifact, deployed.
 
 | Component                | Priority | HTML | React |
 | ------------------------ | -------- | ---- | ----- |
-| Alert                    | P1       | —    | —     |
+| Alert                    | P1       | done | —     |
 | Toast / notification     | P1       | —    | —     |
 | Empty state              | P1       | —    | —     |
 | Error state              | P1       | —    | —     |
 | Loading state / skeleton | P1       | —    | —     |
-| Spinner                  | P1       | —    | —     |
+| Spinner                  | P1       | done | —     |
 | Progress — bar           | P1       | —    | —     |
 | Progress — circle        | P1       | —    | —     |
 
@@ -103,11 +103,12 @@ artifact, deployed.
 
 | Component                            | Priority | HTML | React |
 | ------------------------------------ | -------- | ---- | ----- |
-| Input                                | P0       | —    | —     |
-| Textarea                             | P0       | —    | —     |
-| Select                               | P0       | —    | —     |
-| Checkbox                             | P0       | —    | —     |
-| Radio                                | P0       | —    | —     |
+| Button                               | P0       | done | —     |
+| Input                                | P0       | done | —     |
+| Textarea                             | P0       | done | —     |
+| Select                               | P0       | done | —     |
+| Checkbox                             | P0       | done | —     |
+| Radio                                | P0       | done | —     |
 | Switch                               | P1       | —    | —     |
 | Date picker                          | P1       | —    | —     |
 | Rich text editor — Lexical, markdown | P2       | —    | —     |
@@ -134,10 +135,10 @@ artifact, deployed.
 | -------------------- | -------- | ---- | ----- |
 | Blank page template  | P0       | done | —     |
 | Dashboard — overview | P1       | —    | —     |
-| Login                | P1       | —    | —     |
-| Register             | P1       | —    | —     |
-| Password reset       | P1       | —    | —     |
-| 404                  | P1       | —    | —     |
+| Login                | P1       | done | —     |
+| Register             | P1       | done | —     |
+| Password reset       | P1       | done | —     |
+| 404                  | P1       | done | —     |
 | Profile              | P2       | —    | —     |
 | Settings             | P2       | —    | —     |
 

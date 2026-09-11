@@ -1,0 +1,46 @@
+---
+import AuthLayout from '../layouts/AuthLayout.astro';
+import Button from '../components/ui/Button.astro';
+import Checkbox from '../components/ui/Checkbox.astro';
+import Input from '../components/ui/Input.astro';
+import { withBase } from '../lib/url';
+---
+
+<AuthLayout
+  title="Create account"
+  heading="Create account"
+  subheading="Set up your workspace in a minute."
+>
+  <form class="flex flex-col gap-4" method="post" action="#">
+    <Input id="name" label="Full name" autocomplete="name" placeholder="Ada Lovelace" required />
+    <Input
+      id="email"
+      label="Email"
+      type="email"
+      autocomplete="email"
+      placeholder="you@example.com"
+      required
+    />
+    <Input
+      id="password"
+      label="Password"
+      type="password"
+      autocomplete="new-password"
+      hint="At least 12 characters."
+      required
+    />
+
+    <Checkbox id="terms" label="I agree to the terms of service" />
+
+    <Button type="submit" class="w-full">
+      Create account
+    </Button>
+  </form>
+
+  <p slot="footer" class="mt-6 text-center text-caption text-ink-secondary">
+    Already registered?
+    <a href={withBase('/login')} class="text-accent hover:underline">
+      Sign in
+    </a>
+  </p>
+</AuthLayout>
