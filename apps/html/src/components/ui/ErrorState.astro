@@ -1,0 +1,30 @@
+---
+import Icon from '../Icon.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  class?: string;
+}
+
+const {
+  title = 'Something went wrong',
+  description = 'The data could not be loaded. Try again in a moment.',
+  class: className = '',
+} = Astro.props;
+---
+
+<div
+  role="alert"
+  class:list={['flex flex-col items-center gap-3 px-6 py-12 text-center', className]}
+>
+  {/* The icon, not the colour, is what says "error" to a colourblind reader. */}
+  <span class="grid size-11 place-items-center rounded-full bg-danger/10 text-danger">
+    <Icon name="triangle-alert" size={20} />
+  </span>
+  <div>
+    <p class="text-caption font-semibold">{title}</p>
+    <p class="mt-1 text-caption text-ink-secondary">{description}</p>
+  </div>
+  <slot />
+</div>

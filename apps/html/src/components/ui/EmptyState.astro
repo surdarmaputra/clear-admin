@@ -1,0 +1,23 @@
+---
+import Icon from '../Icon.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  icon?: string;
+  class?: string;
+}
+
+const { title, description, icon = 'inbox', class: className = '' } = Astro.props;
+---
+
+<div class:list={['flex flex-col items-center gap-3 px-6 py-12 text-center', className]}>
+  <span class="grid size-11 place-items-center rounded-full bg-surface-hover text-ink-secondary">
+    <Icon name={icon} size={20} />
+  </span>
+  <div>
+    <p class="text-caption font-semibold">{title}</p>
+    {description && <p class="mt-1 text-caption text-ink-secondary">{description}</p>}
+  </div>
+  <slot />
+</div>

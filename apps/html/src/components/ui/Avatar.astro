@@ -1,0 +1,43 @@
+---
+interface Props {
+  name: string;
+  src?: string;
+  size?: 'sm' | 'md' | 'lg';
+  class?: string;
+}
+
+const { name, src, size = 'md', class: className = '' } = Astro.props;
+
+const sizes = {
+  sm: 'size-7 text-micro',
+  md: 'size-9 text-caption',
+  lg: 'size-12 text-body',
+};
+
+// Two initials at most — three stops reading as a word and starts overflowing.
+const initials = name
+  .split(/\s+/)
+  .slice(0, 2)
+  .map((part) => part[0]?.toUpperCase() ?? '')
+  .join('');
+---
+
+{src ? (
+  <img
+    src={src}
+    alt={name}
+    class:list={['shrink-0 rounded-full object-cover', sizes[size], className]}
+  />
+) : (
+  <span
+    title={name}
+    class:list={[
+      'grid shrink-0 place-items-center rounded-full bg-surface-hover font-medium text-ink-secondary',
+      sizes[size],
+      className,
+    ]}
+  >
+    <span aria-hidden="true">{initials}</span>
+    <span class="sr-only">{name}</span>
+  </span>
+)}

@@ -1,6 +1,7 @@
 ---
 import Icon from '../Icon.astro';
 import ThemeToggle from './ThemeToggle.astro';
+import Breadcrumb from '../ui/Breadcrumb.astro';
 import { withBase } from '../../lib/url';
 
 interface Props {
@@ -23,22 +24,7 @@ const { title, breadcrumb = [] } = Astro.props;
 
   <div class="min-w-0 flex-1">
     {breadcrumb.length > 0 ? (
-      <nav aria-label="Breadcrumb">
-        <ol class="flex items-center gap-1.5 text-caption text-ink-secondary">
-          {breadcrumb.map((crumb, i) => (
-            <li class="flex items-center gap-1.5">
-              {i > 0 && <Icon name="chevron-right" size={12} class="text-mist" />}
-              {crumb.href ? (
-                <a href={withBase(crumb.href)} class="transition-colors hover:text-ink-primary">
-                  {crumb.label}
-                </a>
-              ) : (
-                <span class="font-medium text-ink-primary">{crumb.label}</span>
-              )}
-            </li>
-          ))}
-        </ol>
-      </nav>
+      <Breadcrumb items={breadcrumb} />
     ) : (
       <h1 class="truncate text-subheading font-semibold">{title}</h1>
     )}

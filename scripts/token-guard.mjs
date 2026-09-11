@@ -63,10 +63,38 @@ for (const file of walk(srcDir, /\.astro$/)) {
   }
 }
 
+// Second pass: tokens read at runtime rather than through a utility class.
+// Tailwind tree-shakes any @theme variable no class references, so a var that
+// only ever appears inside getComputedStyle is dropped from the stylesheet and
+// the feature reading it silently gets an empty string.
+const VAR = /--[a-z][a-z0-9-]*/g;
+
+// Only the default scope counts. A token that survives solely inside `.dark`
+// resolves to an empty string in light mode — which is the shape the bug took.
+const rootVars = [...css.matchAll(/:root[^{]*\{([^}]*)\}/g)].map((m) => m[1]).join('\n');
+
+for (const file of walk(srcDir, /\.(astro|ts)$/)) {
+  const source = readFileSync(file, 'utf8');
+
+  for (const match of source.matchAll(VAR)) {
+    const name = match[0];
+    // `--color-series-${slot}` is resolved at runtime; all we can check is that
+    // the prefix names a family the stylesheet actually carries.
+    const dynamic = source.slice(match.index + name.length).startsWith('${');
+    const found = dynamic
+      ? new RegExp(`${name}[a-z0-9-]+\\s*:`).test(rootVars)
+      : rootVars.includes(`${name}:`);
+
+    if (!found) missing.push({ file: relative(root, file), cls: `${name}${dynamic ? '*' : ''}` });
+  }
+}
+
 if (missing.length) {
-  console.error('::error::these classes compile to nothing — the token was renamed or removed:');
+  console.error(
+    '::error::these compile to nothing — the token was renamed, removed, or tree-shaken:',
+  );
   for (const { file, cls } of missing) console.error(`  ${file}: ${cls}`);
   process.exit(1);
 }
 
-console.log('token guard: every class in source compiles to a rule');
+console.log('token guard: every class and token reference in source resolves');

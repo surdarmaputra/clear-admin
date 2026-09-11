@@ -1,0 +1,50 @@
+---
+import ErrorState from '../ui/ErrorState.astro';
+import type { ChartConfig } from '../../lib/charts';
+
+interface Props extends ChartConfig {
+  title: string;
+  description?: string;
+  class?: string;
+}
+
+const { title, description, class: className = '', ...config } = Astro.props;
+---
+
+<section
+  data-chart
+  class:list={['rounded-card border border-hairline bg-surface-card p-5', className]}
+>
+  <div class="mb-4">
+    {/* A single-series chart needs no legend — the title names the series. */}
+    <h3 class="text-caption font-semibold">{title}</h3>
+    {description && <p class="mt-0.5 text-micro text-ink-secondary">{description}</p>}
+  </div>
+
+  <div data-chart-canvas></div>
+
+  {/* Holds the layout until Apex paints, so the card does not jump. */}
+  <div
+    data-chart-skeleton
+    aria-hidden="true"
+    class="animate-pulse rounded-control bg-surface-hover"
+    style={`height:${config.height}px`}
+  ></div>
+
+  <div data-chart-error hidden>
+    <ErrorState description="The chart could not be drawn." />
+  </div>
+
+  <script
+    is:inline
+    type="application/json"
+    data-chart-config
+    set:html={JSON.stringify(config)}
+  ></script>
+</section>
+
+<script>
+  import { mountCharts } from '../../lib/charts';
+
+  mountCharts();
+</script>

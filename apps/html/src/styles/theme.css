@@ -10,7 +10,10 @@
    Tailwind v4 utilities compile to var() references, so the override swaps them.
 --------------------------------------------------------------------------- */
 
-@theme {
+/* `static` because the chart palette is read at runtime by getComputedStyle,
+   not through a utility class. Without it Tailwind tree-shakes every
+   --color-series-* out of the stylesheet and the charts paint with no colour. */
+@theme static {
   /* Brand — fixed, never themed */
   --color-midnight-ink: #091135;
   --color-slate: #36394a;

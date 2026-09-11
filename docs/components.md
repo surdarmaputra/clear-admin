@@ -56,15 +56,15 @@ artifact, deployed.
 | Component                                     | Priority | HTML | React |
 | --------------------------------------------- | -------- | ---- | ----- |
 | Card                                          | P0       | done | —     |
-| Stat card / KPI tile                          | P1       | —    | —     |
+| Stat card / KPI tile                          | P1       | done | —     |
 | Badge                                         | P0       | done | —     |
-| Avatar                                        | P0       | —    | —     |
-| Chart — line                                  | P1       | —    | —     |
-| Chart — bar                                   | P1       | —    | —     |
-| Chart — area                                  | P1       | —    | —     |
-| Chart — pie / donut                           | P1       | —    | —     |
-| Data table — sortable, paginated              | P1       | —    | —     |
-| Pagination                                    | P1       | —    | —     |
+| Avatar                                        | P0       | done | —     |
+| Chart — line                                  | P1       | done | —     |
+| Chart — bar                                   | P1       | done | —     |
+| Chart — area                                  | P1       | done | —     |
+| Chart — pie / donut                           | P1       | done | —     |
+| Data table — sortable, paginated              | P1       | done | —     |
+| Pagination                                    | P1       | done | —     |
 | Data table — server-side filter/sort/paginate | P2       | —    | —     |
 | Data table — resizable columns                | P2       | —    | —     |
 | Data table — edit in cell                     | P2       | —    | —     |
@@ -76,9 +76,9 @@ artifact, deployed.
 | ------------------------ | -------- | ---- | ----- |
 | Alert                    | P1       | done | —     |
 | Toast / notification     | P1       | —    | —     |
-| Empty state              | P1       | —    | —     |
-| Error state              | P1       | —    | —     |
-| Loading state / skeleton | P1       | —    | —     |
+| Empty state              | P1       | done | —     |
+| Error state              | P1       | done | —     |
+| Loading state / skeleton | P1       | done | —     |
 | Spinner                  | P1       | done | —     |
 | Progress — bar           | P1       | —    | —     |
 | Progress — circle        | P1       | —    | —     |
@@ -96,7 +96,7 @@ artifact, deployed.
 
 | Component  | Priority | HTML | React |
 | ---------- | -------- | ---- | ----- |
-| Breadcrumb | P0       | —    | —     |
+| Breadcrumb | P0       | done | —     |
 | Tabs       | P1       | —    | —     |
 
 ## Forms
@@ -134,7 +134,7 @@ artifact, deployed.
 | Page                 | Priority | HTML | React |
 | -------------------- | -------- | ---- | ----- |
 | Blank page template  | P0       | done | —     |
-| Dashboard — overview | P1       | —    | —     |
+| Dashboard — overview | P1       | done | —     |
 | Login                | P1       | done | —     |
 | Register             | P1       | done | —     |
 | Password reset       | P1       | done | —     |

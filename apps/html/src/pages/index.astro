@@ -1,10 +1,152 @@
 ---
 import DashboardLayout from '../layouts/DashboardLayout.astro';
+import Avatar from '../components/ui/Avatar.astro';
+import Card from '../components/ui/Card.astro';
+import Chart from '../components/charts/Chart.astro';
+import DataTable from '../components/ui/DataTable.astro';
+import StatCard from '../components/ui/StatCard.astro';
+import { orders, ordersByChannel, revenue, sessions, trafficSources } from '../data/dashboard';
+
+const topCustomers = [
+  { name: 'Ada Lovelace', plan: 'Scale', revenue: '$9,600' },
+  { name: 'Katherine Johnson', plan: 'Scale', revenue: '$7,200' },
+  { name: 'Grace Hopper', plan: 'Growth', revenue: '$3,560' },
+  { name: 'Barbara Liskov', plan: 'Starter', revenue: '$1,160' },
+];
+
+const columns = [
+  { key: 'id', label: 'Invoice' },
+  { key: 'customer', label: 'Customer' },
+  { key: 'plan', label: 'Plan' },
+  { key: 'status', label: 'Status' },
+  { key: 'amount', label: 'Amount', align: 'right' as const },
+  { key: 'date', label: 'Date', align: 'right' as const },
+];
 ---
 
 <DashboardLayout title="Dashboard" breadcrumb={[{ label: 'Dashboard' }]}>
-  <div class="rounded-card border border-hairline bg-surface-card p-6">
-    <h2 class="text-title font-semibold">Blank page</h2>
-    <p class="mt-2 text-body text-ink-secondary">Layout shell is in place. Components land here.</p>
+  <div class="flex flex-col gap-6">
+    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <StatCard
+        label="Revenue"
+        value="$71,400"
+        change="+8.0%"
+        caption="vs last month"
+        icon="banknote"
+      />
+      <StatCard
+        label="Orders"
+        value="3,873"
+        change="+4.2%"
+        caption="vs last month"
+        icon="package"
+      />
+      <StatCard
+        label="Active users"
+        value="12,840"
+        change="+1.9%"
+        caption="vs last month"
+        icon="users"
+      />
+      <StatCard
+        label="Churn"
+        value="2.1%"
+        change="+0.3%"
+        higherIsBetter={false}
+        caption="vs last month"
+        icon="user-minus"
+      />
+    </div>
+
+    <div class="grid gap-4 xl:grid-cols-3">
+      <Chart
+        class="xl:col-span-2"
+        title="Revenue vs target"
+        description="Monthly, current year"
+        type="line"
+        series={revenue.series}
+        categories={revenue.categories}
+        slots={[1, 2]}
+        height={300}
+        valuePrefix="$"
+      />
+      <Chart
+        title="Traffic sources"
+        description="Sessions by acquisition channel"
+        type="donut"
+        series={trafficSources.series}
+        labels={trafficSources.labels}
+        slots={[1, 2, 3, 4]}
+        height={300}
+      />
+    </div>
+
+    <div class="grid gap-4 xl:grid-cols-2">
+      <Chart
+        title="Sessions"
+        description="Last 7 days"
+        type="area"
+        series={sessions.series}
+        categories={sessions.categories}
+        slots={[1]}
+        height={260}
+      />
+      <Chart
+        title="Orders by channel"
+        description="Last 30 days"
+        type="bar"
+        series={ordersByChannel.series}
+        categories={ordersByChannel.categories}
+        slots={[3]}
+        height={260}
+      />
+    </div>
+
+    <DataTable
+      columns={columns}
+      rows={orders}
+      searchKeys={['id', 'customer', 'plan', 'status']}
+      sortKey="date"
+      pageSize={6}
+    >
+      <template x-for="row in paged" x-bind:key="row.id">
+        <tr class="border-b border-hairline last:border-0 hover:bg-surface-hover">
+          <td class="tabular px-4 py-3 font-medium" x-text="row.id"></td>
+          <td class="px-4 py-3" x-text="row.customer"></td>
+          <td class="px-4 py-3 text-ink-secondary" x-text="row.plan"></td>
+          <td class="px-4 py-3">
+            <span
+              class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-micro font-medium"
+              x-bind:class="{
+                paid: 'bg-success/12 text-success',
+                pending: 'bg-warning/12 text-warning',
+                refunded: 'bg-danger/12 text-danger',
+              }[row.status]"
+              x-text="row.status"
+            ></span>
+          </td>
+          <td
+            class="tabular px-4 py-3 text-right"
+            x-text="'$' + row.amount.toLocaleString('en-US')"
+          ></td>
+          <td class="tabular px-4 py-3 text-right text-ink-secondary" x-text="row.date"></td>
+        </tr>
+      </template>
+    </DataTable>
+
+    <Card title="Top customers" description="By revenue this quarter">
+      <ul class="flex flex-col divide-y divide-hairline">
+        {topCustomers.map((customer) => (
+          <li class="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
+            <Avatar name={customer.name} size="sm" />
+            <div class="min-w-0 flex-1">
+              <p class="truncate text-caption font-medium">{customer.name}</p>
+              <p class="text-micro text-ink-secondary">{customer.plan}</p>
+            </div>
+            <p class="tabular text-caption font-medium">{customer.revenue}</p>
+          </li>
+        ))}
+      </ul>
+    </Card>
   </div>
 </DashboardLayout>

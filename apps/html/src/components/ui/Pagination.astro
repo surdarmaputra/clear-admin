@@ -1,0 +1,49 @@
+---
+import Icon from '../Icon.astro';
+
+/**
+ * Presentational only. The surrounding `x-data` owns the state and must expose
+ * `page`, `pageCount`, `rangeStart`, `rangeEnd`, `total`, `prev()` and `next()`.
+ */
+interface Props {
+  label?: string;
+  class?: string;
+}
+
+const { label = 'rows', class: className = '' } = Astro.props;
+---
+
+<div class:list={['flex flex-wrap items-center justify-between gap-3 px-4 py-3', className]}>
+  <p class="text-micro text-ink-secondary">
+    Showing <span class="tabular" x-text="rangeStart"></span>–
+    <span class="tabular" x-text="rangeEnd"></span> of <span class="tabular" x-text="total"></span>
+    {label}
+  </p>
+
+  <nav aria-label="Pagination" class="flex items-center gap-1">
+    <button
+      type="button"
+      x-on:click="prev()"
+      x-bind:disabled="page === 1"
+      class="grid size-8 place-items-center rounded-control text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink-primary disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+      aria-label="Previous page"
+    >
+      <Icon name="chevron-left" size={16} />
+    </button>
+
+    <span class="px-2 text-micro text-ink-secondary">
+      Page <span class="tabular" x-text="page"></span> of{' '}
+      <span class="tabular" x-text="pageCount"></span>
+    </span>
+
+    <button
+      type="button"
+      x-on:click="next()"
+      x-bind:disabled="page === pageCount"
+      class="grid size-8 place-items-center rounded-control text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink-primary disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+      aria-label="Next page"
+    >
+      <Icon name="chevron-right" size={16} />
+    </button>
+  </nav>
+</div>

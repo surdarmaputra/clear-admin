@@ -18,7 +18,7 @@ test.describe('dashboard shell', () => {
     await page.goto('/');
 
     await expect(page.locator('nav[aria-label="Main"]')).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Blank page' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Revenue vs target' })).toBeVisible();
     expect(failures).toEqual([]);
   });
 
@@ -168,5 +168,69 @@ test.describe('auth pack', () => {
 
     await expect(page.getByRole('heading', { name: 'Page not found', level: 2 })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Back to dashboard' })).toBeVisible();
+  });
+});
+
+test.describe('dashboard overview', () => {
+  test('draws every chart with themed colours, not Apex defaults', async ({ page }) => {
+    const failures = watchForFailures(page);
+    await page.goto('/');
+
+    // Four cards, four rendered SVGs — a chart that throws leaves the card up
+    // with an error state, so counting cards alone would not catch it.
+    await expect(page.locator('.apexcharts-canvas')).toHaveCount(4);
+    await expect(page.locator('[data-chart-error]:not([hidden])')).toHaveCount(0);
+    await expect(page.locator('[data-chart-skeleton]')).toHaveCount(0);
+
+    // The series colour comes from a CSS variable that Tailwind will drop if no
+    // utility references it; an empty token paints the marks black.
+    const stroke = await page
+      .locator('[data-chart] .apexcharts-line')
+      .first()
+      .getAttribute('stroke');
+    expect(stroke).toMatch(/15,\s*119,\s*255/);
+
+    expect(failures).toEqual([]);
+  });
+
+  test('charts re-theme when the toggle flips', async ({ page }) => {
+    await page.goto('/');
+
+    const line = page.locator('[data-chart] .apexcharts-line').first();
+    await expect(line).toHaveAttribute('stroke', /15,\s*119,\s*255/);
+
+    await page.getByRole('button', { name: 'Switch to dark theme' }).click();
+
+    // The dark palette is its own set of steps, not a filter over the light one.
+    await expect(line).toHaveAttribute('stroke', /58,\s*141,\s*245/);
+  });
+
+  test('table sorts, searches, pages, and empties', async ({ page }) => {
+    await page.goto('/');
+
+    const rows = page.locator('tbody tr');
+    await expect(rows).toHaveCount(6);
+    await expect(page.getByText('Showing 1–6 of 12 rows')).toBeVisible();
+
+    await page.getByRole('button', { name: 'Next page' }).click();
+    await expect(page.getByText('Showing 7–12 of 12 rows')).toBeVisible();
+
+    await page.getByRole('columnheader', { name: 'Amount' }).getByRole('button').click();
+    await expect(rows.first()).toContainText('$290');
+
+    await page.getByLabel('Search orders').fill('turing');
+    await expect(rows).toHaveCount(1);
+    await expect(rows.first()).toContainText('Alan Turing');
+
+    await page.getByLabel('Search orders').fill('nobody');
+    await expect(page.getByText('No matches')).toBeVisible();
+
+    await page.getByRole('button', { name: 'Clear search' }).click();
+    await expect(rows).toHaveCount(6);
+  });
+
+  test('blank template still ships at its own route', async ({ page }) => {
+    await page.goto('/blank');
+    await expect(page.getByRole('heading', { name: 'Blank page' })).toBeVisible();
   });
 });

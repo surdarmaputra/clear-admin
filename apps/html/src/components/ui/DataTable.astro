@@ -1,0 +1,166 @@
+---
+import Icon from '../Icon.astro';
+import EmptyState from './EmptyState.astro';
+import Pagination from './Pagination.astro';
+
+export interface Column {
+  key: string;
+  label: string;
+  align?: 'left' | 'right';
+  sortable?: boolean;
+}
+
+interface Props {
+  columns: Column[];
+  rows: object[];
+  /** Keys the search box matches against. */
+  searchKeys: string[];
+  sortKey: string;
+  sortDir?: 'asc' | 'desc';
+  pageSize?: number;
+  searchLabel?: string;
+  class?: string;
+}
+
+const {
+  columns,
+  rows,
+  searchKeys,
+  sortKey,
+  sortDir = 'desc',
+  pageSize = 6,
+  searchLabel = 'Search orders',
+  class: className = '',
+} = Astro.props;
+
+// Sorting, filtering and paging all happen client-side here. M4 swaps this
+// state object for a server-side one; the markup does not change.
+const state = `{
+  rows: ${JSON.stringify(rows)},
+  searchKeys: ${JSON.stringify(searchKeys)},
+  q: '',
+  sortKey: ${JSON.stringify(sortKey)},
+  sortDir: ${JSON.stringify(sortDir)},
+  page: 1,
+  pageSize: ${pageSize},
+  get filtered() {
+    const q = this.q.trim().toLowerCase();
+    if (!q) return this.rows;
+    return this.rows.filter((row) =>
+      this.searchKeys.some((key) => String(row[key]).toLowerCase().includes(q)),
+    );
+  },
+  get sorted() {
+    const dir = this.sortDir === 'asc' ? 1 : -1;
+    return [...this.filtered].sort((a, b) => {
+      const x = a[this.sortKey];
+      const y = b[this.sortKey];
+      if (typeof x === 'number' && typeof y === 'number') return (x - y) * dir;
+      return String(x).localeCompare(String(y)) * dir;
+    });
+  },
+  get total() { return this.filtered.length },
+  get pageCount() { return Math.max(1, Math.ceil(this.total / this.pageSize)) },
+  get paged() { return this.sorted.slice((this.page - 1) * this.pageSize, this.page * this.pageSize) },
+  get rangeStart() { return this.total === 0 ? 0 : (this.page - 1) * this.pageSize + 1 },
+  get rangeEnd() { return Math.min(this.page * this.pageSize, this.total) },
+  sortBy(key) {
+    if (this.sortKey === key) {
+      this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortKey = key;
+      this.sortDir = 'asc';
+    }
+    this.page = 1;
+  },
+  ariaSort(key) {
+    if (this.sortKey !== key) return 'none';
+    return this.sortDir === 'asc' ? 'ascending' : 'descending';
+  },
+  prev() { if (this.page > 1) this.page-- },
+  next() { if (this.page < this.pageCount) this.page++ },
+}`;
+---
+
+<div
+  x-data={state}
+  x-effect="if (page > pageCount) page = pageCount"
+  class:list={['rounded-card border border-hairline bg-surface-card', className]}
+>
+  <div class="flex items-center gap-3 border-b border-hairline p-4">
+    <div class="relative w-full max-w-xs">
+      <Icon
+        name="search"
+        size={16}
+        class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-ink-secondary"
+      />
+      <input
+        type="search"
+        x-model="q"
+        x-on:input="page = 1"
+        aria-label={searchLabel}
+        placeholder={searchLabel}
+        class="w-full rounded-control border border-hairline bg-surface-card py-2 pr-3 pl-9 text-caption placeholder:text-ink-secondary"
+      />
+    </div>
+    <slot name="actions" />
+  </div>
+
+  <div class="overflow-x-auto" x-show="total > 0">
+    <table class="w-full border-collapse text-caption">
+      <thead>
+        <tr class="border-b border-hairline">
+          {columns.map((column) => (
+            <th
+              scope="col"
+              x-bind:aria-sort={column.sortable === false ? undefined : `ariaSort('${column.key}')`}
+              class:list={[
+                'px-4 py-3 text-micro font-medium text-ink-secondary',
+                column.align === 'right' ? 'text-right' : 'text-left',
+              ]}
+            >
+              {column.sortable === false ? (
+                column.label
+              ) : (
+                <button
+                  type="button"
+                  x-on:click={`sortBy('${column.key}')`}
+                  class:list={[
+                    'inline-flex items-center gap-1 rounded-control transition-colors hover:text-ink-primary',
+                    column.align === 'right' && 'flex-row-reverse',
+                  ]}
+                >
+                  {column.label}
+                  <span
+                    x-show={`sortKey === '${column.key}'`}
+                    x-cloak
+                    x-text="sortDir === 'asc' ? '↑' : '↓'"
+                  />
+                </button>
+              )}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        <slot />
+      </tbody>
+    </table>
+  </div>
+
+  <div x-show="total === 0" x-cloak>
+    <EmptyState title="No matches" description="No rows match that search. Try a shorter term.">
+      <button
+        type="button"
+        x-on:click="q = ''"
+        class="text-caption font-medium text-accent hover:underline"
+      >
+        Clear search
+      </button>
+    </EmptyState>
+  </div>
+
+  <div x-show="total > 0" class="border-t border-hairline">
+    <Pagination />
+  </div>
+</div>
