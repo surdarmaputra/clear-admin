@@ -1,0 +1,59 @@
+---
+interface Props {
+  /** Row key this cell edits. Must also be listed in the table's `editable`. */
+  field: string;
+  /** Used in the cell's accessible name: "Edit amount for INV-2041". */
+  label: string;
+  /** Row key that identifies the row in that name. */
+  rowLabelKey?: string;
+  format?: 'text' | 'money';
+  align?: 'left' | 'right';
+  class?: string;
+}
+
+const {
+  field,
+  label,
+  rowLabelKey = 'id',
+  format = 'text',
+  align = 'left',
+  class: className = '',
+} = Astro.props;
+
+const display =
+  format === 'money' ? `'$' + Number(row.${field}).toLocaleString('en-US')` : `row.${field}`;
+---
+
+{/* Display and editor are both always in the DOM: swapping them with x-if would
+    take the focused button out of the document mid-keystroke. */}
+<td class:list={['p-0', className]}>
+  <button
+    type="button"
+    x-show={`!isEditing(row, '${field}')`}
+    x-bind:data-cell={`cellId(row, '${field}')`}
+    x-on:click={`startEdit(row, '${field}')`}
+    x-on:keydown.enter.prevent={`startEdit(row, '${field}')`}
+    x-bind:aria-label={`'Edit ${label} for ' + row.${rowLabelKey}`}
+    x-text={display}
+    class:list={[
+      'block w-full truncate px-4 py-2 text-caption transition-colors hover:bg-surface-hover',
+      align === 'right' ? 'text-right tabular' : 'text-left',
+    ]}
+  ></button>
+
+  <input
+    type="text"
+    x-show={`isEditing(row, '${field}')`}
+    x-cloak
+    x-bind:data-editor={`cellId(row, '${field}')`}
+    x-model="draft"
+    x-on:keydown.enter.prevent="commit()"
+    x-on:keydown.escape.prevent="cancel()"
+    x-on:blur={`isEditing(row, '${field}') && commit()`}
+    x-bind:aria-label={`'Edit ${label} for ' + row.${rowLabelKey}`}
+    class:list={[
+      'w-full border border-accent bg-surface-card px-4 py-2 text-caption outline-none',
+      align === 'right' ? 'text-right tabular' : 'text-left',
+    ]}
+  />
+</td>

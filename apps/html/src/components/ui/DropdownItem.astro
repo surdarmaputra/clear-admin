@@ -1,0 +1,35 @@
+---
+import Icon from '../Icon.astro';
+
+interface Props {
+  href?: string;
+  icon?: string;
+  tone?: 'default' | 'danger';
+  /** Alpine expression run on select. Buttons only. */
+  onSelect?: string;
+}
+
+const { href, icon, tone = 'default', onSelect } = Astro.props;
+
+const base = [
+  'flex w-full items-center gap-2 rounded-control px-3 py-2 text-caption transition-colors',
+  tone === 'danger'
+    ? 'text-danger hover:bg-danger/10'
+    : 'text-ink-secondary hover:bg-surface-hover hover:text-ink-primary',
+];
+
+// Selecting an item closes the menu — the state lives on the Dropdown wrapper.
+const click = [onSelect, 'close()'].filter(Boolean).join('; ');
+---
+
+{href ? (
+  <a href={href} role="menuitem" tabindex="-1" class:list={base}>
+    {icon && <Icon name={icon} size={16} class="shrink-0" />}
+    <slot />
+  </a>
+) : (
+  <button type="button" role="menuitem" tabindex="-1" x-on:click={click} class:list={base}>
+    {icon && <Icon name={icon} size={16} class="shrink-0" />}
+    <slot />
+  </button>
+)}

@@ -1,0 +1,59 @@
+---
+interface Props {
+  id: string;
+  label: string;
+  name?: string;
+  checked?: boolean;
+  hint?: string;
+  disabled?: boolean;
+  class?: string;
+}
+
+const {
+  id,
+  label,
+  name = id,
+  checked = false,
+  hint,
+  disabled = false,
+  class: className = '',
+} = Astro.props;
+---
+
+{/* A `label` element cannot name a button, so the text is wired up with
+    aria-labelledby and the hidden input carries the value to the form. */}
+<div
+  x-data={`{ on: ${checked} }`}
+  class:list={['flex items-start justify-between gap-4', className]}
+>
+  <div class="min-w-0">
+    <span id={`${id}-label`} class="text-caption font-medium">
+      {label}
+    </span>
+    {hint && (
+      <p id={`${id}-hint`} class="text-micro text-ink-secondary">
+        {hint}
+      </p>
+    )}
+  </div>
+
+  <button
+    type="button"
+    id={id}
+    role="switch"
+    disabled={disabled}
+    x-on:click="on = !on"
+    x-bind:aria-checked="on"
+    aria-labelledby={`${id}-label`}
+    aria-describedby={hint ? `${id}-hint` : undefined}
+    x-bind:class="on ? 'bg-accent' : 'bg-surface-hover'"
+    class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border border-hairline transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+  >
+    <span
+      x-bind:class="on ? 'translate-x-5' : 'translate-x-0.5'"
+      class="size-5 rounded-full bg-paper shadow-card transition-transform"
+    ></span>
+  </button>
+
+  <input type="hidden" name={name} x-bind:value="on ? 'on' : 'off'" />
+</div>

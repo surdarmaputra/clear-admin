@@ -22,12 +22,17 @@ not through a shared package.
 | Output        | `dist/` — plain HTML + CSS + JS                     | copyable source tree    |
 | Interactivity | Alpine.js                                           | React 19                |
 | Primitives    | hand-rolled + Alpine                                | shadcn/ui (Radix)       |
-| Charts        | ApexCharts                                          | Recharts                |
-| Tables        | `@tanstack/table-core`                              | `@tanstack/react-table` |
+| Charts        | Chart.js                                            | Recharts                |
+| Tables        | hand-rolled on Alpine; headless page in M4c         | `@tanstack/react-table` |
 | Editor        | `lexical` (vanilla)                                 | `@lexical/react`        |
 | Drag & drop   | SortableJS                                          | dnd-kit                 |
 | Router        | n/a                                                 | TanStack Router         |
 | Authoring     | Astro (build tool only — `.astro` is never shipped) | React + Vite            |
+
+The HTML table is hand-rolled on Alpine and is the reference implementation. A
+second page on `@tanstack/table-core` lands in M4c under
+[RFC-001 D9](rfc/RFC-001-completing-clear-admin-v4.md), so a consumer can pick
+an approach; it only carries features the headless core makes materially easier.
 
 Shared across both: Tailwind CSS v4, TypeScript (strict), class-based dark mode,
 Motion for animation, Vite.
@@ -66,17 +71,16 @@ artifact, deployed.
 | Chart — pie / donut                           | P1       | done | —     |
 | Data table — sortable, paginated              | P1       | done | —     |
 | Pagination                                    | P1       | done | —     |
-| Data table — server-side filter/sort/paginate | P2       | —    | —     |
-| Data table — resizable columns                | P2       | —    | —     |
-| Data table — edit in cell                     | P2       | —    | —     |
-| Spreadsheet-style table editing               | P2       | —    | —     |
+| Data table — server-side filter/sort/paginate | P2       | done | —     |
+| Data table — resizable columns                | P2       | done | —     |
+| Data table — edit in cell                     | P2       | done | —     |
 
 ## Feedback & state
 
 | Component                | Priority | HTML | React |
 | ------------------------ | -------- | ---- | ----- |
 | Alert                    | P1       | done | —     |
-| Toast / notification     | P1       | —    | —     |
+| Toast / notification     | P1       | done | —     |
 | Empty state              | P1       | done | —     |
 | Error state              | P1       | done | —     |
 | Loading state / skeleton | P1       | done | —     |
@@ -88,17 +92,17 @@ artifact, deployed.
 
 | Component     | Priority | HTML | React |
 | ------------- | -------- | ---- | ----- |
-| Dropdown menu | P0       | —    | —     |
-| Tooltip       | P1       | —    | —     |
-| Modal         | P1       | —    | —     |
-| Drawer        | P1       | —    | —     |
+| Dropdown menu | P0       | done | —     |
+| Tooltip       | P1       | done | —     |
+| Modal         | P1       | done | —     |
+| Drawer        | P1       | done | —     |
 
 ## Navigation
 
 | Component  | Priority | HTML | React |
 | ---------- | -------- | ---- | ----- |
 | Breadcrumb | P0       | done | —     |
-| Tabs       | P1       | —    | —     |
+| Tabs       | P1       | done | —     |
 
 ## Forms
 
@@ -110,8 +114,8 @@ artifact, deployed.
 | Select                               | P0       | done | —     |
 | Checkbox                             | P0       | done | —     |
 | Radio                                | P0       | done | —     |
-| Switch                               | P1       | —    | —     |
-| Date picker                          | P1       | —    | —     |
+| Switch                               | P1       | done | —     |
+| Date picker                          | P1       | done | —     |
 | Rich text editor — Lexical, markdown | P2       | —    | —     |
 
 ## Files & media
@@ -132,21 +136,28 @@ artifact, deployed.
 
 ## Pages
 
-| Page                 | Priority | HTML | React |
-| -------------------- | -------- | ---- | ----- |
-| Blank page template  | P0       | done | —     |
-| Dashboard — overview | P1       | done | —     |
-| Login                | P1       | done | —     |
-| Register             | P1       | done | —     |
-| Password reset       | P1       | done | —     |
-| 404                  | P1       | done | —     |
-| Profile              | P2       | —    | —     |
-| Settings             | P2       | —    | —     |
+| Page                  | Priority | HTML | React |
+| --------------------- | -------- | ---- | ----- |
+| Blank page template   | P0       | done | —     |
+| Components — forms    | P1       | done | —     |
+| Components — overlays | P1       | done | —     |
+| Components — feedback | P1       | done | —     |
+| Data — tables         | P2       | done | —     |
+| Dashboard — overview  | P1       | done | —     |
+| Login                 | P1       | done | —     |
+| Register              | P1       | done | —     |
+| Password reset        | P1       | done | —     |
+| 404                   | P1       | done | —     |
+| Profile               | P2       | —    | —     |
+| Settings              | P2       | —    | —     |
 
 ---
 
 ## Out of scope for v1
 
+- **Spreadsheet-style table editing** — descoped in
+  [RFC-001 D1](rfc/RFC-001-completing-clear-admin-v3.md). Cell edit and keyboard
+  navigation shipped instead; formulas, fill handle and multi-cell paste are out.
 - **Map** — cut. Heavy dependency, and provider choice (Leaflet vs Mapbox vs Google)
   pushes licensing decisions onto consumers.
 - **Astro / Vue / Angular bundles** — HTML and React only.

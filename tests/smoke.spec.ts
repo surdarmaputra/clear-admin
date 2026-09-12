@@ -172,23 +172,37 @@ test.describe('auth pack', () => {
 });
 
 test.describe('dashboard overview', () => {
-  test('draws every chart with themed colours, not Apex defaults', async ({ page }) => {
+  test('draws every chart with themed colours, not library defaults', async ({ page }) => {
     const failures = watchForFailures(page);
     await page.goto('/');
 
-    // Four cards, four rendered SVGs — a chart that throws leaves the card up
-    // with an error state, so counting cards alone would not catch it.
-    await expect(page.locator('.apexcharts-canvas')).toHaveCount(4);
+    // Four cards, four canvases — a chart that throws leaves the card up with
+    // an error state, so counting cards alone would not catch it.
+    await expect(page.locator('canvas[data-chart-canvas]')).toHaveCount(4);
     await expect(page.locator('[data-chart-error]:not([hidden])')).toHaveCount(0);
     await expect(page.locator('[data-chart-skeleton]')).toHaveCount(0);
 
-    // The series colour comes from a CSS variable that Tailwind will drop if no
-    // utility references it; an empty token paints the marks black.
-    const stroke = await page
-      .locator('[data-chart] .apexcharts-line')
+    // The series colours come from CSS variables Tailwind will drop if no
+    // utility references them; an empty token paints the marks black. A canvas
+    // has no DOM to inspect, so the chart publishes what it actually applied.
+    await expect(page.locator('[data-chart]').first()).toHaveAttribute(
+      'data-chart-colors',
+      '#0f77ff,#eb6834',
+    );
+
+    // And it really painted: an empty canvas would pass every check above.
+    const painted = await page
+      .locator('canvas[data-chart-canvas]')
       .first()
-      .getAttribute('stroke');
-    expect(stroke).toMatch(/15,\s*119,\s*255/);
+      .evaluate((canvas: HTMLCanvasElement) => {
+        const pixels = canvas
+          .getContext('2d')!
+          .getImageData(0, 0, canvas.width, canvas.height).data;
+        let count = 0;
+        for (let i = 3; i < pixels.length; i += 4) if (pixels[i] > 0) count++;
+        return count;
+      });
+    expect(painted).toBeGreaterThan(1000);
 
     expect(failures).toEqual([]);
   });
@@ -196,13 +210,13 @@ test.describe('dashboard overview', () => {
   test('charts re-theme when the toggle flips', async ({ page }) => {
     await page.goto('/');
 
-    const line = page.locator('[data-chart] .apexcharts-line').first();
-    await expect(line).toHaveAttribute('stroke', /15,\s*119,\s*255/);
+    const chart = page.locator('[data-chart]').first();
+    await expect(chart).toHaveAttribute('data-chart-colors', '#0f77ff,#eb6834');
 
     await page.getByRole('button', { name: 'Switch to dark theme' }).click();
 
     // The dark palette is its own set of steps, not a filter over the light one.
-    await expect(line).toHaveAttribute('stroke', /58,\s*141,\s*245/);
+    await expect(chart).toHaveAttribute('data-chart-colors', '#3a8df5,#d95926');
   });
 
   test('table sorts, searches, pages, and empties', async ({ page }) => {
@@ -260,10 +274,325 @@ test.describe('dashboard on a phone', () => {
 
     for (const card of await page.locator('[data-chart]').all()) {
       const fits = await card.evaluate((el) => {
-        const svg = el.querySelector('svg');
-        return !svg || svg.getBoundingClientRect().width <= el.getBoundingClientRect().width + 1;
+        const canvas = el.querySelector('canvas');
+        return (
+          !canvas || canvas.getBoundingClientRect().width <= el.getBoundingClientRect().width + 1
+        );
       });
       expect(fits).toBe(true);
     }
+  });
+});
+
+test.describe('interaction pack', () => {
+  test('overlays, feedback and forms pages render cleanly', async ({ page }) => {
+    for (const path of ['/components/overlays', '/components/feedback', '/components/forms']) {
+      const failures = watchForFailures(page);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+      expect(failures, `${path} is clean`).toEqual([]);
+    }
+  });
+
+  test('modal traps Tab, closes on escape, and restores focus', async ({ page }) => {
+    await page.goto('/components/overlays');
+
+    const trigger = page.getByRole('button', { name: 'Delete order', exact: true });
+    await trigger.click();
+
+    const dialog = page.getByRole('dialog', { name: 'Delete this order?' });
+    await expect(dialog).toBeVisible();
+
+    // Focus starts inside the panel and Tab never leaves it — the drawer
+    // shipping untrapped is the bug this directive exists to prevent.
+    for (let i = 0; i < 8; i++) {
+      const inside = await dialog.evaluate((el) => el.contains(document.activeElement));
+      expect(inside, `focus stayed in the dialog after ${i} tabs`).toBe(true);
+      await page.keyboard.press('Tab');
+    }
+
+    await page.keyboard.press('Escape');
+    await expect(dialog).toBeHidden();
+    await expect(trigger).toBeFocused();
+  });
+
+  test('drawer opens from either edge and closes on the backdrop', async ({ page }) => {
+    await page.goto('/components/overlays');
+
+    await page.getByRole('button', { name: 'Order details' }).click();
+    const drawer = page.getByRole('dialog', { name: 'Order #1042' });
+    await expect(drawer).toBeVisible();
+    await expect(drawer).toContainText('Ada Lovelace');
+
+    await page.keyboard.press('Escape');
+    await expect(drawer).toBeHidden();
+
+    await page.getByRole('button', { name: 'Filters' }).click();
+    await expect(page.getByRole('dialog', { name: 'Filters' })).toBeVisible();
+  });
+
+  test('dropdown walks with the arrow keys and raises the selected action', async ({ page }) => {
+    await page.goto('/components/overlays');
+
+    const menu = page.getByRole('menu', { name: 'Actions' });
+    await page.getByRole('button', { name: 'Actions' }).click();
+    await expect(menu).toBeVisible();
+    await expect(menu.getByRole('menuitem').first()).toBeFocused();
+
+    await page.keyboard.press('ArrowDown');
+    await expect(menu.getByRole('menuitem').nth(1)).toBeFocused();
+
+    await page.keyboard.press('End');
+    await expect(menu.getByRole('menuitem').last()).toBeFocused();
+
+    await page.keyboard.press('Enter');
+    await expect(menu).toBeHidden();
+    await expect(page.locator('[data-toast]')).toContainText('Order deleted');
+  });
+
+  test('tooltip answers the keyboard, not just the pointer', async ({ page }) => {
+    await page.goto('/components/overlays');
+
+    const tip = page.getByRole('tooltip').filter({ hasText: 'Refresh the table' });
+    await expect(tip).toBeHidden();
+
+    const trigger = page.getByRole('button', { name: 'Refresh' });
+    await trigger.focus();
+    await expect(tip).toBeVisible();
+
+    // The trigger has to point at the tooltip, or a screen reader never hears it.
+    const describedBy = await trigger.getAttribute('aria-describedby');
+    expect(describedBy).toBe(await tip.getAttribute('id'));
+
+    await page.keyboard.press('Escape');
+    await expect(tip).toBeHidden();
+  });
+
+  test('tabs move with the arrow keys and swap panels', async ({ page }) => {
+    await page.goto('/components/overlays');
+
+    const details = page.getByRole('tab', { name: 'Details' });
+    await expect(details).toHaveAttribute('aria-selected', 'true');
+    await expect(page.getByRole('tabpanel')).toContainText('placed 12 March');
+
+    await details.focus();
+    await page.keyboard.press('ArrowRight');
+    await expect(page.getByRole('tab', { name: 'Members' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+    await expect(page.getByRole('tabpanel')).toContainText('Grace Hopper');
+
+    // One Tab stop for the whole tablist: the unselected tabs are skipped.
+    await expect(details).toHaveAttribute('tabindex', '-1');
+
+    await page.keyboard.press('ArrowLeft');
+    await expect(details).toHaveAttribute('aria-selected', 'true');
+  });
+
+  test('toast stacks, announces politely, and dismisses', async ({ page }) => {
+    await page.goto('/components/feedback');
+
+    const toasts = page.locator('[data-toast]');
+    await page.getByRole('button', { name: 'Success' }).click();
+    await expect(toasts).toHaveCount(1);
+    await expect(toasts.first()).toContainText('Changes saved.');
+
+    await page.getByRole('button', { name: 'Persistent' }).click();
+    await expect(toasts).toHaveCount(2);
+
+    await toasts.last().getByRole('button', { name: 'Dismiss notification' }).click();
+    await expect(toasts).toHaveCount(1);
+
+    // The auto-dismissing one clears itself; the persistent one would not have.
+    await expect(toasts).toHaveCount(0, { timeout: 6000 });
+  });
+
+  test('switch reports its state and posts a value', async ({ page }) => {
+    await page.goto('/components/forms');
+
+    const toggle = page.getByRole('switch', { name: 'Auto-renew' });
+    await expect(toggle).toHaveAttribute('aria-checked', 'true');
+    const value = page.locator('input[name="auto-renew"]');
+    await expect(value).toHaveValue('on');
+
+    await toggle.click();
+    await expect(toggle).toHaveAttribute('aria-checked', 'false');
+    await expect(value).toHaveValue('off');
+
+    await expect(page.getByRole('switch', { name: 'Sandbox mode' })).toBeDisabled();
+  });
+
+  test('date picker walks the grid and posts an ISO value', async ({ page }) => {
+    await page.goto('/components/forms');
+
+    const input = page.getByRole('textbox', { name: 'Period start' });
+    await expect(input).toHaveValue('Sep 1, 2026');
+
+    await input.click();
+    const calendar = page.getByRole('dialog', { name: 'Period start calendar' });
+    await expect(calendar).toBeVisible();
+    await expect(calendar.getByText('September 2026')).toBeVisible();
+
+    // Right moves a day, down moves a week: the 1st plus 8 days is the 9th.
+    await page.keyboard.press('ArrowRight');
+    await page.keyboard.press('ArrowDown');
+    await page.keyboard.press('Enter');
+
+    await expect(calendar).toBeHidden();
+    await expect(input).toHaveValue('Sep 9, 2026');
+    await expect(page.locator('input[name="period-start"]')).toHaveValue('2026-09-09');
+  });
+});
+
+test.describe('mobile nav trap', () => {
+  test.skip(({ isMobile }) => !isMobile, 'the off-canvas drawer is mobile-only');
+
+  test('keeps focus inside the open drawer', async ({ page }) => {
+    await page.goto('/');
+
+    await page.getByRole('button', { name: 'Open navigation' }).click();
+    const sidebar = page.locator('aside');
+
+    for (let i = 0; i < 6; i++) {
+      await page.keyboard.press('Tab');
+      const inside = await sidebar.evaluate((el) => el.contains(document.activeElement));
+      expect(inside, `focus stayed in the drawer after ${i + 1} tabs`).toBe(true);
+    }
+  });
+});
+
+test.describe('data pack', () => {
+  const firstCustomerCell = (page: Page) => page.locator('[data-cell$=":customer"]').first();
+
+  test('renders cleanly and pages through the endpoint', async ({ page }) => {
+    const failures = watchForFailures(page);
+    await page.goto('/data/tables');
+
+    const rows = page.locator('tbody tr');
+    await expect(rows).toHaveCount(8);
+    await expect(page.getByText('Showing 1–8 of 48 rows')).toBeVisible();
+
+    // The request line is the contract: every control writes to these params.
+    await expect(page.locator('pre')).toContainText('page=1&pageSize=8&sort=date&dir=desc');
+
+    await page.getByRole('button', { name: 'Next page' }).click();
+    await expect(page.getByText('Showing 9–16 of 48 rows')).toBeVisible();
+    await expect(page.locator('pre')).toContainText('page=2');
+
+    expect(failures).toEqual([]);
+  });
+
+  test('sorting and searching go to the endpoint, not the page', async ({ page }) => {
+    await page.goto('/data/tables');
+    await expect(page.locator('tbody tr')).toHaveCount(8);
+
+    await page.getByRole('columnheader', { name: 'Amount' }).getByRole('button').click();
+    await expect(page.locator('pre')).toContainText('sort=amount&dir=asc');
+    // Ascending across all 48 rows, not just the 8 on screen.
+    await expect(page.locator('tbody tr').first()).toContainText('$240');
+
+    await page.getByLabel('Search invoices').fill('turing');
+    await expect(page.getByText('Showing 1–4 of 4 rows')).toBeVisible();
+    await expect(page.locator('pre')).toContainText('q=turing');
+
+    await page.getByLabel('Search invoices').fill('nobody at all');
+    await expect(page.getByText('No invoices match')).toBeVisible();
+
+    await page.getByRole('button', { name: 'Clear search' }).click();
+    await expect(page.getByText('Showing 1–8 of 48 rows')).toBeVisible();
+  });
+
+  test('a failed request shows the error state and recovers', async ({ page }) => {
+    await page.goto('/data/tables');
+    await expect(page.locator('tbody tr')).toHaveCount(8);
+
+    await page.getByRole('button', { name: 'Break the endpoint' }).click();
+    await expect(page.getByText('Could not load invoices')).toBeVisible();
+
+    await page.getByRole('button', { name: 'Try again' }).click();
+    await expect(page.locator('tbody tr')).toHaveCount(8);
+  });
+
+  test('cells edit in place, commit, and cancel', async ({ page }) => {
+    await page.goto('/data/tables');
+    const cell = firstCustomerCell(page);
+    await expect(cell).toHaveAttribute('aria-label', /^Edit customer for INV-/);
+
+    await cell.click();
+    const editor = page.locator('input[data-editor$=":customer"]').first();
+    await expect(editor).toBeFocused();
+
+    await editor.fill('Edited Name');
+    await page.keyboard.press('Enter');
+    await expect(page.locator('[data-toast]')).toContainText('Saved.');
+    await expect(cell).toHaveText('Edited Name');
+    // Focus comes back to the cell, so the next arrow key still works.
+    await expect(cell).toBeFocused();
+
+    await cell.click();
+    await editor.fill('Discarded');
+    await page.keyboard.press('Escape');
+    await expect(cell).toHaveText('Edited Name');
+    await expect(cell).toBeFocused();
+  });
+
+  test('rejects a draft that the column cannot hold', async ({ page }) => {
+    await page.goto('/data/tables');
+
+    const amount = page.locator('[data-cell$=":amount"]').first();
+    const before = await amount.textContent();
+    await amount.click();
+
+    const editor = page.locator('input[data-editor$=":amount"]').first();
+    await editor.fill('not a number');
+    await page.keyboard.press('Enter');
+
+    await expect(page.locator('[data-toast]')).toContainText('That is not a number.');
+    // The editor stays open rather than discarding what was typed.
+    await expect(editor).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(amount).toHaveText(before!.trim());
+  });
+
+  test('arrow keys walk the editable cells', async ({ page }) => {
+    await page.goto('/data/tables');
+
+    const cell = firstCustomerCell(page);
+    await cell.focus();
+    const id = await cell.getAttribute('data-cell');
+    const row = id!.split(':')[0];
+
+    await page.keyboard.press('ArrowRight');
+    await expect(page.locator(`[data-cell="${row}:amount"]`)).toBeFocused();
+
+    await page.keyboard.press('ArrowDown');
+    const next = await page.evaluate(() => document.activeElement?.getAttribute('data-cell'));
+    expect(next).toMatch(/:amount$/);
+    expect(next).not.toBe(`${row}:amount`);
+
+    await page.keyboard.press('ArrowLeft');
+    await expect(
+      page.evaluate(() => document.activeElement?.getAttribute('data-cell')),
+    ).resolves.toMatch(/:customer$/);
+  });
+
+  test('columns resize from the keyboard and the width persists', async ({ page }) => {
+    await page.goto('/data/tables');
+    await expect(page.locator('tbody tr')).toHaveCount(8);
+
+    const column = page.locator('colgroup col').nth(1);
+    const width = () => column.evaluate((el) => Number.parseFloat(getComputedStyle(el).width));
+    const before = await width();
+
+    // A resizer only a mouse can reach is not a resizer for everyone.
+    await page.getByRole('separator', { name: 'Resize Customer' }).focus();
+    for (let i = 0; i < 3; i++) await page.keyboard.press('ArrowRight');
+    const after = await width();
+    expect(after).toBeGreaterThan(before);
+
+    await page.reload();
+    await expect(page.locator('tbody tr')).toHaveCount(8);
+    expect(await width()).toBe(after);
   });
 });

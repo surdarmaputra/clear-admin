@@ -1,0 +1,79 @@
+---
+import Icon from '../Icon.astro';
+
+interface Props {
+  /** Text on the trigger button. Override the whole button with the `trigger` slot. */
+  label?: string;
+  align?: 'left' | 'right';
+  class?: string;
+}
+
+const { label = 'Options', align = 'left', class: className = '' } = Astro.props;
+
+// Keyboard contract of a menu button: arrows move between items, Home/End jump
+// to the ends, Escape closes and hands focus back to the trigger.
+const state = `{
+  open: false,
+  toggle() {
+    this.open = !this.open;
+    if (this.open) this.$nextTick(() => this.move(0));
+  },
+  close(refocus = true) {
+    this.open = false;
+    if (refocus) this.$refs.trigger.focus();
+  },
+  items() {
+    return [...this.$refs.menu.querySelectorAll('[role="menuitem"]:not([disabled])')];
+  },
+  move(index) {
+    const items = this.items();
+    if (items.length === 0) return;
+    items[(index + items.length) % items.length].focus();
+  },
+  step(delta) {
+    if (!this.open) return this.toggle();
+    const items = this.items();
+    this.move(items.indexOf(document.activeElement) + delta);
+  },
+}`;
+---
+
+<div x-data={state} class:list={['relative', className]}>
+  <div
+    x-on:keydown.arrow-down.prevent="step(1)"
+    x-on:keydown.arrow-up.prevent="step(-1)"
+    x-on:keydown.home.prevent="move(0)"
+    x-on:keydown.end.prevent="move(-1)"
+    x-on:keydown.escape.prevent="open && close()"
+  >
+    <slot name="trigger">
+      <button
+        type="button"
+        x-ref="trigger"
+        x-on:click="toggle()"
+        x-bind:aria-expanded="open"
+        aria-haspopup="menu"
+        class="inline-flex items-center gap-2 rounded-control border border-hairline bg-surface-card px-3 py-2 text-caption font-medium transition-colors hover:bg-surface-hover"
+      >
+        {label}
+        <Icon name="chevron-down" size={14} class="text-ink-secondary" />
+      </button>
+    </slot>
+
+    <div
+      x-ref="menu"
+      x-show="open"
+      x-on:click.outside="open && close(false)"
+      x-transition.opacity.duration.150ms
+      x-cloak
+      role="menu"
+      aria-label={label}
+      class:list={[
+        'absolute z-30 mt-2 w-52 rounded-card border border-hairline bg-surface-card p-1 shadow-raised',
+        align === 'right' ? 'right-0' : 'left-0',
+      ]}
+    >
+      <slot />
+    </div>
+  </div>
+</div>

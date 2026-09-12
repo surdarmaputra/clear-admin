@@ -1,0 +1,46 @@
+---
+interface Props {
+  text: string;
+  placement?: 'top' | 'bottom' | 'left' | 'right';
+  class?: string;
+}
+
+const { text, placement = 'top', class: className = '' } = Astro.props;
+
+const positions = {
+  top: 'bottom-full left-1/2 mb-2 -translate-x-1/2',
+  bottom: 'top-full left-1/2 mt-2 -translate-x-1/2',
+  left: 'top-1/2 right-full mr-2 -translate-y-1/2',
+  right: 'top-1/2 left-full ml-2 -translate-y-1/2',
+};
+---
+
+{/* Pointer and keyboard both reveal it — a tooltip only reachable by hover is
+    invisible to anyone tabbing through the page. The trigger is the slotted
+    element itself, which is what `aria-describedby` has to land on. */}
+<span
+  x-data="{ open: false, id: $id('tooltip') }"
+  x-init="$el.firstElementChild?.setAttribute('aria-describedby', id)"
+  x-on:mouseenter="open = true"
+  x-on:mouseleave="open = false"
+  x-on:focusin="open = true"
+  x-on:focusout="open = false"
+  x-on:keydown.escape.window="open = false"
+  class:list={['relative inline-flex', className]}
+>
+  <slot />
+
+  <span
+    x-bind:id="id"
+    x-show="open"
+    x-transition.opacity.duration.150ms
+    x-cloak
+    role="tooltip"
+    class:list={[
+      'pointer-events-none absolute z-40 w-max max-w-56 rounded-control bg-ink-primary px-2 py-1 text-micro text-surface-page',
+      positions[placement],
+    ]}
+  >
+    {text}
+  </span>
+</span>

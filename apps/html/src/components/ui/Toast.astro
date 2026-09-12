@@ -1,0 +1,49 @@
+---
+import Icon from '../Icon.astro';
+
+/**
+ * The live region every page mounts once. Anything can raise a toast with
+ * `$store.toast.show('Saved', 'success')`.
+ */
+const variants = {
+  info: { tone: 'text-info', icon: 'info' },
+  success: { tone: 'text-success', icon: 'circle-check' },
+  warning: { tone: 'text-warning', icon: 'triangle-alert' },
+  danger: { tone: 'text-danger', icon: 'circle-alert' },
+};
+---
+
+<div
+  x-data
+  role="status"
+  aria-live="polite"
+  class="pointer-events-none fixed inset-x-4 bottom-4 z-50 flex flex-col items-end gap-2 sm:inset-x-auto sm:right-6"
+>
+  <template x-for="item in $store.toast.items" x-bind:key="item.id">
+    <div
+      x-transition:enter="transition ease-out duration-200"
+      x-transition:enter-start="translate-y-2 opacity-0"
+      x-transition:leave="transition ease-in duration-150"
+      x-transition:leave-end="opacity-0"
+      data-toast
+      class="pointer-events-auto flex w-full items-start gap-3 rounded-card border border-hairline bg-surface-card p-3 shadow-raised sm:w-80"
+    >
+      {Object.entries(variants).map(([variant, { tone, icon }]) => (
+        <span x-show={`item.variant === '${variant}'`} class:list={['mt-0.5 shrink-0', tone]}>
+          <Icon name={icon} size={18} />
+        </span>
+      ))}
+
+      <p class="min-w-0 flex-1 text-caption" x-text="item.message"></p>
+
+      <button
+        type="button"
+        x-on:click="$store.toast.dismiss(item.id)"
+        aria-label="Dismiss notification"
+        class="grid size-6 shrink-0 place-items-center rounded-control text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink-primary"
+      >
+        <Icon name="x" size={14} />
+      </button>
+    </div>
+  </template>
+</div>

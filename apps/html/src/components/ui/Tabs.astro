@@ -1,0 +1,62 @@
+---
+export interface Tab {
+  id: string;
+  label: string;
+}
+
+interface Props {
+  tabs: Tab[];
+  /** Defaults to the first tab. */
+  active?: string;
+  class?: string;
+}
+
+const { tabs, active = tabs[0]?.id, class: className = '' } = Astro.props;
+
+// Roving tabindex: one stop for the whole tablist, arrows move between tabs.
+const state = `{
+  active: ${JSON.stringify(active)},
+  ids: ${JSON.stringify(tabs.map((tab) => tab.id))},
+  select(id) {
+    this.active = id;
+    this.$nextTick(() => this.$refs.tablist.querySelector('[aria-selected="true"]').focus());
+  },
+  step(delta) {
+    const next = (this.ids.indexOf(this.active) + delta + this.ids.length) % this.ids.length;
+    this.select(this.ids[next]);
+  },
+}`;
+---
+
+<div x-data={state} class={className}>
+  <div
+    x-ref="tablist"
+    role="tablist"
+    x-on:keydown.arrow-right.prevent="step(1)"
+    x-on:keydown.arrow-left.prevent="step(-1)"
+    x-on:keydown.home.prevent="select(ids[0])"
+    x-on:keydown.end.prevent="select(ids[ids.length - 1])"
+    class="flex gap-1 overflow-x-auto border-b border-hairline"
+  >
+    {tabs.map((tab) => (
+      <button
+        type="button"
+        role="tab"
+        id={`${tab.id}-tab`}
+        data-tab={tab.id}
+        aria-controls={`${tab.id}-panel`}
+        x-bind:aria-selected="active === $el.dataset.tab"
+        x-bind:tabindex="active === $el.dataset.tab ? 0 : -1"
+        x-on:click="select($el.dataset.tab)"
+        x-bind:class="active === $el.dataset.tab
+          ? 'border-accent text-accent'
+          : 'border-transparent text-ink-secondary hover:text-ink-primary'"
+        class="-mb-px shrink-0 border-b-2 px-3 py-2 text-caption font-medium transition-colors"
+      >
+        {tab.label}
+      </button>
+    ))}
+  </div>
+
+  <slot />
+</div>

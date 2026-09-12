@@ -1,0 +1,74 @@
+---
+import Icon from '../Icon.astro';
+
+interface Props {
+  /** Name the trigger opens: `$store.overlay.open('<id>')`. */
+  id: string;
+  title: string;
+  description?: string;
+  size?: 'sm' | 'md' | 'lg';
+}
+
+const { id, title, description, size = 'md' } = Astro.props;
+
+const widths = { sm: 'max-w-sm', md: 'max-w-lg', lg: 'max-w-2xl' };
+---
+
+<template x-teleport="body">
+  <div
+    x-show={`$store.overlay.is('${id}')`}
+    x-on:keydown.escape.window="$store.overlay.close()"
+    x-transition.opacity.duration.200ms
+    x-cloak
+    class="fixed inset-0 z-50 flex items-end justify-center p-4 sm:items-center"
+  >
+    <div
+      x-on:click="$store.overlay.close()"
+      class="absolute inset-0 bg-graphite/50"
+      aria-hidden="true"
+    ></div>
+
+    <div
+      x-show={`$store.overlay.is('${id}')`}
+      x-focus-trap={`$store.overlay.is('${id}')`}
+      x-transition
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={`${id}-title`}
+      aria-describedby={description ? `${id}-description` : undefined}
+      class:list={[
+        'relative w-full rounded-card border border-hairline bg-surface-card shadow-raised',
+        widths[size],
+      ]}
+    >
+      <div class="flex items-start gap-4 p-6 pb-0">
+        <div class="min-w-0 flex-1">
+          <h2 id={`${id}-title`} class="font-display text-title-sm font-semibold tracking-display">
+            {title}
+          </h2>
+          {description && (
+            <p id={`${id}-description`} class="mt-1 text-caption text-ink-secondary">
+              {description}
+            </p>
+          )}
+        </div>
+        <button
+          type="button"
+          x-on:click="$store.overlay.close()"
+          aria-label="Close dialog"
+          class="grid size-8 shrink-0 place-items-center rounded-control text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink-primary"
+        >
+          <Icon name="x" size={16} />
+        </button>
+      </div>
+
+      <div class="p-6 text-caption text-ink-secondary">
+        <slot />
+      </div>
+
+      <div class="flex justify-end gap-2 border-t border-hairline p-4">
+        <slot name="footer" />
+      </div>
+    </div>
+  </div>
+</template>

@@ -1,0 +1,104 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import Button from '../../components/ui/Button.astro';
+import EditableCell from '../../components/ui/EditableCell.astro';
+import EmptyState from '../../components/ui/EmptyState.astro';
+import ErrorState from '../../components/ui/ErrorState.astro';
+import ServerTable from '../../components/ui/ServerTable.astro';
+import { invoices } from '../../data/invoices';
+
+const breadcrumb = [{ label: 'Data' }, { label: 'Tables' }];
+
+const columns = [
+  { key: 'id', label: 'Invoice' },
+  { key: 'customer', label: 'Customer' },
+  { key: 'plan', label: 'Plan' },
+  { key: 'status', label: 'Status', sortable: false },
+  { key: 'amount', label: 'Amount', align: 'right' as const },
+  { key: 'date', label: 'Date', align: 'right' as const },
+];
+---
+
+<DashboardLayout title="Tables" breadcrumb={breadcrumb}>
+  <div class="flex flex-col gap-6">
+    <div>
+      <h1 class="font-display text-title font-semibold tracking-display">Data table</h1>
+      <p class="mt-1 max-w-3xl text-caption text-ink-secondary">
+        48 invoices behind a paged endpoint. Sorting, searching and paging are the server's job —
+        the table holds one page at a time and says so while a request is in flight. Drag a column
+        edge to resize it, or focus the divider and use the arrow keys. Customer, amount and date
+        edit in place: click or press Enter, arrows move between cells, Escape cancels.
+      </p>
+    </div>
+
+    <ServerTable
+      columns={columns}
+      rows={invoices}
+      sort="date"
+      dir="desc"
+      pageSize={8}
+      searchKeys={['id', 'customer', 'plan', 'status']}
+      editable={['customer', 'amount', 'date']}
+      storageKey="clear-admin:invoices:widths"
+      searchLabel="Search invoices"
+    >
+      <Button slot="actions" variant="secondary" x-on:click="failing = !failing; load()">
+        <span x-text="failing ? 'Fix the endpoint' : 'Break the endpoint'"></span>
+      </Button>
+
+      <template x-for="row in rows" x-bind:key="row.id">
+        <tr class="border-b border-hairline last:border-0">
+          <td class="tabular truncate px-4 py-2 font-medium" x-text="row.id"></td>
+          <EditableCell field="customer" label="customer" />
+          <td class="truncate px-4 py-2 text-ink-secondary" x-text="row.plan"></td>
+          <td class="px-4 py-2">
+            <span
+              class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-micro font-medium"
+              x-bind:class="{
+                paid: 'bg-success/12 text-success',
+                pending: 'bg-warning/12 text-warning',
+                refunded: 'bg-danger/12 text-danger',
+              }[row.status]"
+              x-text="row.status"
+            ></span>
+          </td>
+          <EditableCell field="amount" label="amount" format="money" align="right" />
+          <EditableCell field="date" label="date" align="right" />
+        </tr>
+      </template>
+
+      <EmptyState
+        slot="empty"
+        title="No invoices match"
+        description="The endpoint returned nothing for that search."
+      >
+        <button
+          type="button"
+          x-on:click="q = ''"
+          class="text-caption font-medium text-accent hover:underline"
+        >
+          Clear search
+        </button>
+      </EmptyState>
+
+      <ErrorState
+        slot="error"
+        title="Could not load invoices"
+        description="The request failed. Nothing was lost — try again."
+      >
+        <Button variant="secondary" x-on:click="retry()">
+          Try again
+        </Button>
+      </ErrorState>
+      {/* Inside the table on purpose: this is the state the next request will
+          carry, and a sibling element could not read it. */}
+      <div slot="footer" class="border-t border-hairline px-4 py-3">
+        <p class="text-micro tracking-label text-ink-secondary uppercase">Next request</p>
+        <pre
+          class="tabular mt-1 overflow-x-auto text-micro text-ink-secondary"
+          x-text="`GET /api/invoices?page=${page}&pageSize=${pageSize}&sort=${sort}&dir=${dir}&q=${q}`"
+        ></pre>
+      </div>
+    </ServerTable>
+  </div>
+</DashboardLayout>

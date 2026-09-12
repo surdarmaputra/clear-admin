@@ -1,0 +1,23 @@
+---
+interface Props {
+  /** Must match the tab id given to the surrounding `Tabs`. */
+  id: string;
+  class?: string;
+}
+
+const { id, class: className = '' } = Astro.props;
+---
+
+{/* A sibling component rather than a named slot: Astro requires slot names to
+    be static strings, so a `tabs.map()` cannot generate them. */}
+<div
+  role="tabpanel"
+  id={`${id}-panel`}
+  aria-labelledby={`${id}-tab`}
+  tabindex="0"
+  x-show={`active === '${id}'`}
+  x-cloak
+  class:list={['pt-4', className]}
+>
+  <slot />
+</div>

@@ -7,6 +7,7 @@ interface Props {
   label: string;
   name?: string;
   placeholder?: string;
+  value?: string;
   rows?: number;
   hint?: string;
   error?: string;
@@ -19,6 +20,7 @@ const {
   label,
   name = id,
   placeholder,
+  value = '',
   rows = 4,
   hint,
   error,
@@ -38,5 +40,5 @@ const {
     aria-invalid={error ? 'true' : undefined}
     aria-describedby={describedBy(id, hint, error)}
     class:list={[controlClass, 'resize-y', error && 'border-danger']}
-  ><slot /></textarea>
+  >{value}</textarea>
 </Field>

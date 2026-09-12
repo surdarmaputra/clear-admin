@@ -5,6 +5,8 @@ interface Props {
   href?: string;
   disabled?: boolean;
   class?: string;
+  /** Anything else lands on the element — Alpine bindings, data-*, aria-*. */
+  [attr: string]: unknown;
 }
 
 const {
@@ -13,6 +15,7 @@ const {
   href,
   disabled = false,
   class: className = '',
+  ...rest
 } = Astro.props;
 
 const variants = {
@@ -30,11 +33,11 @@ const base = [
 ---
 
 {href ? (
-  <a href={href} class:list={base}>
+  <a href={href} class:list={base} {...rest}>
     <slot />
   </a>
 ) : (
-  <button type={type} disabled={disabled} class:list={base}>
+  <button type={type} disabled={disabled} class:list={base} {...rest}>
     <slot />
   </button>
 )}

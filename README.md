@@ -6,7 +6,7 @@ server-rendered apps, and React for SPAs.
 **Status: early.** The HTML bundle has its layout shell; components are landing
 milestone by milestone. The React bundle has not started. See
 [`docs/components.md`](docs/components.md) for exactly what exists today, and
-[RFC-001](docs/rfc/RFC-001-completing-clear-admin-v2.md) for the plan.
+[RFC-001](docs/rfc/RFC-001-completing-clear-admin-v4.md) for the plan.
 
 ## The two bundles
 
@@ -21,8 +21,8 @@ every component is built twice.
 | Authoring     | Astro (build tool only — `.astro` never ships) | React 19 + Vite         |
 | Interactivity | Alpine.js                                      | React                   |
 | Primitives    | hand-rolled + Alpine                           | shadcn/ui (Radix)       |
-| Charts        | ApexCharts                                     | Recharts                |
-| Tables        | `@tanstack/table-core`                         | `@tanstack/react-table` |
+| Charts        | Chart.js                                       | Recharts                |
+| Tables        | hand-rolled on Alpine; headless page in M4c    | `@tanstack/react-table` |
 | Editor        | `lexical`                                      | `@lexical/react`        |
 | Router        | n/a                                            | TanStack Router         |
 
@@ -87,7 +87,7 @@ allowed to drift.
 
 Work proceeds in **page-shaped milestones**: a milestone is done when you can
 build a real screen with it, not when a checklist of components is ticked off.
-Order and scope are in [RFC-001](docs/rfc/RFC-001-completing-clear-admin-v2.md).
+Order and scope are in [RFC-001](docs/rfc/RFC-001-completing-clear-admin-v4.md).
 
 Update [`docs/components.md`](docs/components.md) in the same PR that implements
 a component — the tracker is how HTML and React parity stays visible.
