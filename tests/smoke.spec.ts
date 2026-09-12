@@ -596,3 +596,176 @@ test.describe('data pack', () => {
     expect(await width()).toBe(after);
   });
 });
+
+test.describe('progress', () => {
+  test('reports its value to assistive technology, not just in pixels', async ({ page }) => {
+    await page.goto('/components/feedback');
+
+    const bar = page.getByRole('progressbar', { name: 'Seats used' });
+    await expect(bar).toHaveAttribute('aria-valuenow', '34');
+    await expect(bar).toHaveAttribute('aria-valuemax', '50');
+
+    // 34 of 50 is 68%, and the fill has to agree with the number.
+    const fill = bar.locator('div');
+    const [fillWidth, trackWidth] = await Promise.all([
+      fill.evaluate((el) => el.getBoundingClientRect().width),
+      bar.evaluate((el) => el.getBoundingClientRect().width),
+    ]);
+    expect(Math.round((fillWidth / trackWidth) * 100)).toBe(68);
+
+    const ring = page.getByRole('progressbar', { name: 'Import complete' });
+    await expect(ring).toHaveAttribute('aria-valuenow', '68');
+    await expect(ring).toContainText('68%');
+  });
+});
+
+test.describe('account pages', () => {
+  for (const path of ['/profile', '/settings']) {
+    test(`${path} renders cleanly and labels every control`, async ({ page }) => {
+      const failures = watchForFailures(page);
+
+      await page.goto(path);
+      await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+
+      const controls = page.locator('input:not([type=hidden]), select, textarea');
+      const count = await controls.count();
+      expect(count).toBeGreaterThan(0);
+      for (let i = 0; i < count; i++) {
+        const name = await controls.nth(i).evaluate((el) => {
+          const id = el.getAttribute('id');
+          return id ? document.querySelector(`label[for="${id}"]`)?.textContent?.trim() : null;
+        });
+        expect(name, `control ${i} on ${path} has a label`).toBeTruthy();
+      }
+
+      expect(failures).toEqual([]);
+    });
+  }
+
+  test('the account menu reaches both pages', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'the account menu is the same dropdown the overlay tests cover');
+    await page.goto('/');
+
+    await page.getByRole('button', { name: 'Account' }).click();
+    await expect(page.getByRole('menuitem', { name: 'Profile' })).toBeVisible();
+    await page.getByRole('menuitem', { name: 'Settings' }).click();
+
+    await expect(page.getByRole('heading', { name: 'Settings', level: 1 })).toBeVisible();
+  });
+
+  test('profile saves through a toast rather than a reload', async ({ page }) => {
+    await page.goto('/profile');
+
+    await page.getByLabel('Full name').fill('Ada Lovelace');
+    await page.getByRole('button', { name: 'Save changes' }).click();
+
+    await expect(page.getByRole('status').filter({ hasText: 'Profile saved' })).toBeVisible();
+  });
+
+  test('settings tabs swap panels and the danger zone confirms first', async ({ page }) => {
+    await page.goto('/settings');
+
+    await expect(page.getByLabel('Workspace name')).toBeVisible();
+
+    await page.getByRole('tab', { name: 'Notifications' }).click();
+    await expect(page.getByRole('switch', { name: 'Weekly digest' })).toBeVisible();
+    await expect(page.getByLabel('Workspace name')).toBeHidden();
+
+    await page.getByRole('tab', { name: 'Danger zone' }).click();
+    await page.getByRole('button', { name: 'Delete workspace', exact: true }).click();
+
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible();
+    await dialog.getByRole('button', { name: 'Cancel' }).click();
+    await expect(dialog).toBeHidden();
+  });
+});
+
+test.describe('headless table', () => {
+  test('renders cleanly and only this page pays for table-core', async ({ page }) => {
+    const failures = watchForFailures(page);
+    await page.goto('/data/headless');
+
+    await expect(page.locator('tbody tr')).toHaveCount(8);
+    await expect(page.getByText('Showing 1–8 of 48 invoices')).toBeVisible();
+
+    await page.getByRole('button', { name: 'Next page' }).click();
+    await expect(page.getByText('Showing 9–16 of 48 invoices')).toBeVisible();
+
+    expect(failures).toEqual([]);
+  });
+
+  test('the core chunk is fetched here and nowhere else', async ({ page }) => {
+    const chunks: string[] = [];
+    page.on('request', (request) => chunks.push(request.url()));
+
+    await page.goto('/data/tables');
+    await expect(page.locator('tbody tr')).toHaveCount(8);
+    expect(chunks.filter((url) => /headless/.test(url))).toEqual([]);
+
+    await page.goto('/data/headless');
+    await expect(page.locator('tbody tr')).toHaveCount(8);
+    expect(chunks.filter((url) => /headless.*\.js$/.test(url)).length).toBeGreaterThan(0);
+  });
+
+  test('facet counts filter the rows and exclude their own column', async ({ page }) => {
+    await page.goto('/data/headless');
+    await expect(page.locator('tbody tr')).toHaveCount(8);
+
+    // 48 invoices, 7 refunded — the count is the core's, computed before this
+    // column's own filter is applied.
+    const refunded = page.getByRole('checkbox', { name: /^refunded/ });
+    await expect(refunded).toBeVisible();
+    await refunded.check();
+
+    await expect(page.getByText('Showing 1–7 of 7 invoices')).toBeVisible();
+    // Still listed with its count, because a facet does not filter itself away.
+    await expect(page.getByRole('checkbox', { name: /^paid/ })).toBeVisible();
+
+    await page.getByRole('checkbox', { name: /^paid/ }).check();
+    await expect(page.getByText('Showing 1–8 of 35 invoices')).toBeVisible();
+
+    await page.getByRole('button', { name: 'Reset view' }).click();
+    await expect(page.getByText('Showing 1–8 of 48 invoices')).toBeVisible();
+  });
+
+  test('columns hide, reorder and pin', async ({ page }) => {
+    await page.goto('/data/headless');
+    await expect(page.locator('tbody tr')).toHaveCount(8);
+
+    const headers = () =>
+      page.locator('thead th').evaluateAll((cells) => cells.map((cell) => cell.dataset.column));
+    expect(await headers()).toEqual(['id', 'customer', 'plan', 'status', 'amount', 'date']);
+
+    await page.getByRole('checkbox', { name: 'Plan', exact: true }).uncheck();
+    expect(await headers()).not.toContain('plan');
+
+    await page.getByRole('button', { name: 'Move Date left' }).click();
+    const reordered = await headers();
+    expect(reordered.indexOf('date')).toBeLessThan(reordered.indexOf('amount'));
+
+    // Invoice is pinned on load, so the first cell stays put as the table scrolls.
+    const first = page.locator('tbody tr').first().locator('td').first();
+    await expect(first).toHaveCSS('position', 'sticky');
+
+    await page.getByRole('button', { name: 'Pin Invoice' }).click();
+    await expect(first).not.toHaveCSS('position', 'sticky');
+  });
+
+  test('search and sort run in the browser, with no request', async ({ page }) => {
+    const requests: string[] = [];
+    page.on('request', (request) => requests.push(request.url()));
+
+    await page.goto('/data/headless');
+    await expect(page.locator('tbody tr')).toHaveCount(8);
+    const before = requests.length;
+
+    await page.getByLabel('Search invoices').fill('turing');
+    await expect(page.getByText('Showing 1–4 of 4 invoices')).toBeVisible();
+
+    await page.getByRole('columnheader', { name: 'Amount' }).getByRole('button').click();
+    await expect(page.locator('tbody tr').first()).toContainText('$');
+
+    expect(requests.length, 'nothing was fetched to sort or search').toBe(before);
+  });
+});

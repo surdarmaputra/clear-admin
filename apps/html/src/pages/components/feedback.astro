@@ -5,6 +5,8 @@ import Button from '../../components/ui/Button.astro';
 import Card from '../../components/ui/Card.astro';
 import EmptyState from '../../components/ui/EmptyState.astro';
 import ErrorState from '../../components/ui/ErrorState.astro';
+import Progress from '../../components/ui/Progress.astro';
+import ProgressCircle from '../../components/ui/ProgressCircle.astro';
 import Skeleton from '../../components/ui/Skeleton.astro';
 import Spinner from '../../components/ui/Spinner.astro';
 
@@ -93,6 +95,25 @@ const toasts = [
         <div class="flex items-center gap-3 py-6 text-caption text-ink-secondary">
           <Spinner label="Loading orders" />
           Loading orders…
+        </div>
+      </Card>
+
+      <Card
+        title="Progress — bar"
+        description="For work with a known end. The tone carries the reading, the number states it."
+      >
+        <div class="flex flex-col gap-4">
+          <Progress label="Seats used" value={34} max={50} showLabel />
+          <Progress label="Storage used" value={78} tone="warning" showLabel />
+          <Progress label="Quota used" value={96} tone="danger" showLabel />
+        </div>
+      </Card>
+
+      <Card title="Progress — circle" description="The same value where a bar has no room.">
+        <div class="flex flex-wrap items-center justify-around gap-6 py-2">
+          <ProgressCircle label="Onboarding complete" value={25} />
+          <ProgressCircle label="Import complete" value={68} tone="success" />
+          <ProgressCircle label="Retries used" value={90} tone="danger" />
         </div>
       </Card>
     </div>

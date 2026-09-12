@@ -13,6 +13,7 @@ export const navigation: NavItem[] = [
     icon: 'table-2',
     children: [
       { label: 'Tables', href: '/data/tables' },
+      { label: 'Headless table', href: '/data/headless' },
       { label: 'Spreadsheet', href: '/data/spreadsheet' },
       { label: 'Kanban', href: '/data/kanban' },
     ],

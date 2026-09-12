@@ -1,0 +1,52 @@
+---
+interface Props {
+  label: string;
+  value: number;
+  max?: number;
+  /** Shows the label and percentage above the track. */
+  showLabel?: boolean;
+  tone?: 'accent' | 'success' | 'warning' | 'danger';
+  class?: string;
+}
+
+const {
+  label,
+  value,
+  max = 100,
+  showLabel = false,
+  tone = 'accent',
+  class: className = '',
+} = Astro.props;
+
+const tones = {
+  accent: 'bg-accent',
+  success: 'bg-success',
+  warning: 'bg-warning',
+  danger: 'bg-danger',
+};
+
+const percent = Math.round((Math.min(Math.max(value, 0), max) / max) * 100);
+---
+
+<div class:list={['flex flex-col gap-1.5', className]}>
+  {showLabel && (
+    <div class="flex items-baseline justify-between gap-3">
+      <span class="text-caption font-medium">{label}</span>
+      <span class="tabular text-micro text-ink-secondary">{percent}%</span>
+    </div>
+  )}
+
+  <div
+    role="progressbar"
+    aria-label={label}
+    aria-valuenow={value}
+    aria-valuemin="0"
+    aria-valuemax={max}
+    class="h-2 w-full overflow-hidden rounded-full bg-surface-hover"
+  >
+    <div
+      class:list={['h-full rounded-full transition-[width] duration-300', tones[tone]]}
+      style={`width: ${percent}%`}
+    ></div>
+  </div>
+</div>
