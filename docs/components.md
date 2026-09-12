@@ -23,16 +23,18 @@ not through a shared package.
 | Interactivity | Alpine.js                                           | React 19                |
 | Primitives    | hand-rolled + Alpine                                | shadcn/ui (Radix)       |
 | Charts        | Chart.js                                            | Recharts                |
-| Tables        | hand-rolled on Alpine; headless page in M4c         | `@tanstack/react-table` |
+| Tables        | hand-rolled on Alpine + `@tanstack/table-core` page | `@tanstack/react-table` |
 | Editor        | `lexical` (vanilla)                                 | `@lexical/react`        |
 | Drag & drop   | SortableJS                                          | dnd-kit                 |
 | Router        | n/a                                                 | TanStack Router         |
 | Authoring     | Astro (build tool only — `.astro` is never shipped) | React + Vite            |
 
 The HTML table is hand-rolled on Alpine and is the reference implementation. A
-second page on `@tanstack/table-core` lands in M4c under
-[RFC-001 D9](rfc/RFC-001-completing-clear-admin-v4.md), so a consumer can pick
-an approach; it only carries features the headless core makes materially easier.
+second page on `@tanstack/table-core` shipped in M4c under
+[RFC-001 D9](rfc/RFC-001-completing-clear-admin-v5.md), so a consumer can pick
+an approach; it only carries features the headless core makes materially easier —
+faceted filters, column visibility, ordering and pinning. The core is fetched by
+a dynamic import, so only that page pays its 17.1 KB gz.
 
 Shared across both: Tailwind CSS v4, TypeScript (strict), class-based dark mode,
 Motion for animation, Vite.
@@ -85,8 +87,8 @@ artifact, deployed.
 | Error state              | P1       | done | —     |
 | Loading state / skeleton | P1       | done | —     |
 | Spinner                  | P1       | done | —     |
-| Progress — bar           | P1       | —    | —     |
-| Progress — circle        | P1       | —    | —     |
+| Progress — bar           | P1       | done | —     |
+| Progress — circle        | P1       | done | —     |
 
 ## Overlay
 
@@ -143,13 +145,14 @@ artifact, deployed.
 | Components — overlays | P1       | done | —     |
 | Components — feedback | P1       | done | —     |
 | Data — tables         | P2       | done | —     |
+| Data — headless table | P2       | done | —     |
 | Dashboard — overview  | P1       | done | —     |
 | Login                 | P1       | done | —     |
 | Register              | P1       | done | —     |
 | Password reset        | P1       | done | —     |
 | 404                   | P1       | done | —     |
-| Profile               | P2       | —    | —     |
-| Settings              | P2       | —    | —     |
+| Profile               | P2       | done | —     |
+| Settings              | P2       | done | —     |
 
 ---
 

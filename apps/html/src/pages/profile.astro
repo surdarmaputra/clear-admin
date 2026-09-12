@@ -1,0 +1,135 @@
+---
+import DashboardLayout from '../layouts/DashboardLayout.astro';
+import Avatar from '../components/ui/Avatar.astro';
+import Badge from '../components/ui/Badge.astro';
+import Button from '../components/ui/Button.astro';
+import Card from '../components/ui/Card.astro';
+import Input from '../components/ui/Input.astro';
+import Progress from '../components/ui/Progress.astro';
+import Select from '../components/ui/Select.astro';
+import Textarea from '../components/ui/Textarea.astro';
+
+const breadcrumb = [{ label: 'Account' }, { label: 'Profile' }];
+
+const user = {
+  name: 'Surya Darma',
+  email: 'surya@example.com',
+  role: 'Owner',
+  bio: 'Keeps the billing pipeline honest. Ships the admin nobody has to be trained on.',
+};
+
+// The three fields a profile is judged complete on. Hard-coded here because the
+// page has no store behind it — a real one counts from the record.
+const completeness = 2 / 3;
+---
+
+<DashboardLayout title="Profile" breadcrumb={breadcrumb}>
+  <div class="flex max-w-4xl flex-col gap-6">
+    <div class="flex flex-wrap items-start gap-4">
+      <Avatar name={user.name} size="lg" />
+      <div class="min-w-0 flex-1">
+        <div class="flex flex-wrap items-center gap-2">
+          <h1 class="font-display text-title font-semibold tracking-display">{user.name}</h1>
+          <Badge variant="accent">{user.role}</Badge>
+        </div>
+        <p class="mt-1 text-caption text-ink-secondary">{user.email}</p>
+      </div>
+    </div>
+
+    <Card
+      title="Profile completeness"
+      description="Two of three fields filled in. The last one is a photo."
+    >
+      <Progress
+        label="Profile completeness"
+        value={Math.round(completeness * 100)}
+        tone="warning"
+        showLabel
+      />
+    </Card>
+
+    <form
+      class="flex flex-col gap-6"
+      x-on:submit.prevent="$store.toast.show('Profile saved', 'success')"
+    >
+      <Card title="Identity" description="How your name appears on invoices and in the audit log.">
+        <div class="grid gap-4 sm:grid-cols-2">
+          <Input id="full-name" label="Full name" value={user.name} autocomplete="name" required />
+          <Input
+            id="profile-email"
+            label="Email"
+            type="email"
+            value={user.email}
+            autocomplete="email"
+            hint="Changing this sends a confirmation to both addresses."
+            required
+          />
+          <Select id="profile-role" label="Role" hint="Only an owner can change a role.">
+            <option selected>Owner</option>
+            <option>Admin</option>
+            <option>Analyst</option>
+          </Select>
+          <Input id="profile-title" label="Job title" placeholder="Head of Finance" />
+          <div class="sm:col-span-2">
+            <Textarea
+              id="profile-bio"
+              label="Bio"
+              value={user.bio}
+              hint="Shown to teammates on the members page."
+            />
+          </div>
+        </div>
+      </Card>
+
+      <div class="flex justify-end gap-2">
+        <Button variant="ghost" type="reset">
+          Discard
+        </Button>
+        <Button type="submit">Save changes</Button>
+      </div>
+    </form>
+
+    {/* Its own form on purpose: a required password field in the identity form
+        would block a plain name change. */}
+    <form
+      class="flex flex-col gap-6"
+      x-on:submit.prevent="$store.toast.show('Password updated', 'success')"
+    >
+      <Card
+        title="Password"
+        description="Signing out everywhere else is the safe default after a change."
+      >
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div class="sm:col-span-2">
+            <Input
+              id="current-password"
+              label="Current password"
+              type="password"
+              autocomplete="current-password"
+              required
+            />
+          </div>
+          <Input
+            id="new-password"
+            label="New password"
+            type="password"
+            autocomplete="new-password"
+            hint="At least 12 characters."
+            required
+          />
+          <Input
+            id="confirm-password"
+            label="Confirm new password"
+            type="password"
+            autocomplete="new-password"
+            required
+          />
+        </div>
+      </Card>
+
+      <div class="flex justify-end">
+        <Button type="submit">Update password</Button>
+      </div>
+    </form>
+  </div>
+</DashboardLayout>

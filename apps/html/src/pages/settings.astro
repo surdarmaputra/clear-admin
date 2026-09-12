@@ -1,0 +1,182 @@
+---
+import DashboardLayout from '../layouts/DashboardLayout.astro';
+import Button from '../components/ui/Button.astro';
+import Card from '../components/ui/Card.astro';
+import Input from '../components/ui/Input.astro';
+import Modal from '../components/ui/Modal.astro';
+import Select from '../components/ui/Select.astro';
+import Switch from '../components/ui/Switch.astro';
+import TabPanel from '../components/ui/TabPanel.astro';
+import Tabs from '../components/ui/Tabs.astro';
+
+const breadcrumb = [{ label: 'Account' }, { label: 'Settings' }];
+
+const tabs = [
+  { id: 'general', label: 'General' },
+  { id: 'notifications', label: 'Notifications' },
+  { id: 'danger', label: 'Danger zone' },
+];
+
+const notifications = [
+  {
+    id: 'notify-invoices',
+    label: 'Invoice receipts',
+    hint: 'One email per successful charge.',
+    checked: true,
+  },
+  {
+    id: 'notify-failures',
+    label: 'Failed payments',
+    hint: 'Sent immediately — this one is hard to switch off for a reason.',
+    checked: true,
+  },
+  {
+    id: 'notify-digest',
+    label: 'Weekly digest',
+    hint: 'Monday morning, the numbers from the week before.',
+    checked: false,
+  },
+  {
+    id: 'notify-product',
+    label: 'Product updates',
+    hint: 'What changed in the app. Roughly monthly.',
+    checked: false,
+  },
+];
+---
+
+<DashboardLayout title="Settings" breadcrumb={breadcrumb}>
+  <div class="flex max-w-4xl flex-col gap-6">
+    <div>
+      <h1 class="font-display text-title font-semibold tracking-display">Settings</h1>
+      <p class="mt-1 text-caption text-ink-secondary">
+        Workspace preferences. Nothing here posts anywhere — the forms raise a toast so the
+        interaction is complete without a backend.
+      </p>
+    </div>
+
+    <Tabs tabs={tabs}>
+      <TabPanel id="general">
+        <form
+          class="flex flex-col gap-6"
+          x-on:submit.prevent="$store.toast.show('Preferences saved', 'success')"
+        >
+          <Card title="Workspace" description="Shown on invoices and in the browser title.">
+            <div class="grid gap-4 sm:grid-cols-2">
+              <Input
+                id="workspace-name"
+                label="Workspace name"
+                value="Analytical Engines"
+                required
+              />
+              <Input
+                id="workspace-slug"
+                label="URL slug"
+                value="analytical-engines"
+                hint="clear-admin.dev/analytical-engines"
+              />
+            </div>
+          </Card>
+
+          <Card title="Locale" description="Dates and money everywhere in the app follow these.">
+            <div class="grid gap-4 sm:grid-cols-2">
+              <Select id="language" label="Language">
+                <option selected>English (UK)</option>
+                <option>English (US)</option>
+                <option>Bahasa Indonesia</option>
+              </Select>
+              <Select id="timezone" label="Time zone">
+                <option selected>Europe/London</option>
+                <option>Asia/Makassar</option>
+                <option>America/New_York</option>
+              </Select>
+              <Select id="date-format" label="Date format">
+                <option selected>2026-09-12</option>
+                <option>12/09/2026</option>
+                <option>09/12/2026</option>
+              </Select>
+              <Select id="currency" label="Currency">
+                <option selected>GBP — £</option>
+                <option>USD — $</option>
+                <option>IDR — Rp</option>
+              </Select>
+            </div>
+          </Card>
+
+          <Card title="Display" description="Preferences that only affect this browser.">
+            <div class="flex flex-col gap-4">
+              <Switch
+                id="compact-tables"
+                label="Compact tables"
+                hint="Tighter rows, more of them on screen."
+              />
+              <Switch
+                id="reduce-motion"
+                label="Reduce motion"
+                hint="Skips the overlay and toast transitions."
+              />
+            </div>
+          </Card>
+
+          <div class="flex justify-end gap-2">
+            <Button variant="ghost" type="reset">
+              Discard
+            </Button>
+            <Button type="submit">Save preferences</Button>
+          </div>
+        </form>
+      </TabPanel>
+
+      <TabPanel id="notifications">
+        <form
+          class="flex flex-col gap-6"
+          x-on:submit.prevent="$store.toast.show('Notification settings saved', 'success')"
+        >
+          <Card title="Email" description="Every switch posts its state with the form.">
+            <div class="flex flex-col gap-4">
+              {notifications.map(({ id, label, hint, checked }) => (
+                <Switch id={id} label={label} hint={hint} checked={checked} />
+              ))}
+            </div>
+          </Card>
+
+          <div class="flex justify-end">
+            <Button type="submit">Save notifications</Button>
+          </div>
+        </form>
+      </TabPanel>
+
+      <TabPanel id="danger">
+        <Card
+          title="Delete this workspace"
+          description="Every invoice, member and export goes with it. This cannot be undone."
+        >
+          <Button variant="secondary" x-on:click="$store.overlay.open('delete-workspace')">
+            Delete workspace
+          </Button>
+        </Card>
+      </TabPanel>
+    </Tabs>
+  </div>
+
+  <Modal
+    id="delete-workspace"
+    title="Delete this workspace?"
+    description="48 invoices and 3 members will be removed immediately."
+    size="sm"
+  >
+    <p>
+      Deleting is permanent. Export anything you still need before you confirm — there is no
+      recovery window.
+    </p>
+
+    <Fragment slot="footer">
+      <Button variant="secondary" x-on:click="$store.overlay.close()">
+        Cancel
+      </Button>
+      <Button x-on:click="$store.overlay.close(); $store.toast.show('Workspace deleted', 'danger')">
+        Delete workspace
+      </Button>
+    </Fragment>
+  </Modal>
+</DashboardLayout>

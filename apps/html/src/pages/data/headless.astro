@@ -1,0 +1,258 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import Button from '../../components/ui/Button.astro';
+import Card from '../../components/ui/Card.astro';
+import EmptyState from '../../components/ui/EmptyState.astro';
+import Icon from '../../components/Icon.astro';
+import Pagination from '../../components/ui/Pagination.astro';
+import { invoices } from '../../data/invoices';
+import type { HeadlessTableConfig } from '../../lib/headless-table';
+import { withBase } from '../../lib/url';
+
+const breadcrumb = [{ label: 'Data' }, { label: 'Headless table' }];
+
+const config: HeadlessTableConfig = {
+  columns: [
+    { key: 'id', label: 'Invoice', tabular: true },
+    { key: 'customer', label: 'Customer' },
+    { key: 'plan', label: 'Plan', facet: true },
+    { key: 'status', label: 'Status', format: 'badge', facet: true },
+    { key: 'amount', label: 'Amount', align: 'right', format: 'money', tabular: true },
+    { key: 'date', label: 'Date', align: 'right', tabular: true },
+  ],
+  rows: invoices,
+  sort: 'date',
+  pageSize: 8,
+  pinned: ['id'],
+};
+---
+
+<DashboardLayout title="Headless table" breadcrumb={breadcrumb}>
+  <div class="flex flex-col gap-6">
+    <div>
+      <h1 class="font-display text-title font-semibold tracking-display">Headless table</h1>
+      <p class="mt-1 max-w-3xl text-caption text-ink-secondary">
+        The same 48 invoices as the{' '}
+        <a href={withBase('/data/tables')} class="font-medium text-accent hover:underline">
+          data table
+        </a>
+        , driven by <code class="text-micro">@tanstack/table-core</code> instead of hand-written
+        state. Everything here is something the core makes materially cheaper: facet counts that
+        update as you filter, column visibility, ordering and pinning. Sorting, search and paging
+        are along for the ride.
+      </p>
+    </div>
+
+    {/* The attribute is the signal: the Alpine bundle only fetches table-core
+        when a page on screen actually asks for it. */}
+    <div
+      data-headless-table
+      x-data={`headlessTable(${JSON.stringify(config)})`}
+      class="rounded-card border border-hairline bg-surface-card shadow-card"
+    >
+      <div class="flex flex-wrap items-center gap-3 border-b border-hairline px-4 py-3">
+        <div class="relative w-full max-w-xs">
+          <Icon
+            name="search"
+            size={16}
+            class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-ink-secondary"
+          />
+          <input
+            type="search"
+            x-model="q"
+            aria-label="Search invoices"
+            placeholder="Search invoices"
+            class="w-full rounded-control border border-hairline bg-surface-card py-1.5 pr-3 pl-9 text-caption placeholder:text-ink-secondary"
+          />
+        </div>
+
+        <div class="ml-auto">
+          <Button variant="secondary" x-on:click="reset()">
+            Reset view
+          </Button>
+        </div>
+      </div>
+
+      {/* Faceted filters — the counts come from the core's faceted row model,
+          which excludes this column's own filter so the numbers stay useful. */}
+      <div class="flex flex-col gap-3 border-b border-hairline px-4 py-3">
+        <template x-for="facet in facets" x-bind:key="facet.key">
+          <fieldset class="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <legend
+              class="text-micro font-semibold tracking-label text-ink-secondary uppercase"
+              x-text="facet.label"
+            ></legend>
+            <template x-for="option in facet.values" x-bind:key="option.value">
+              <label class="flex cursor-pointer items-center gap-2 text-caption">
+                <input
+                  type="checkbox"
+                  x-bind:checked="option.checked"
+                  x-on:change="toggleFacet(facet.key, option.value)"
+                  class="size-4 shrink-0 cursor-pointer rounded-[4px] border border-hairline bg-surface-card accent-accent"
+                />
+                <span x-text="option.value"></span>
+                <span
+                  class="tabular text-micro text-ink-secondary"
+                  x-text="`(${option.count})`"
+                ></span>
+              </label>
+            </template>
+          </fieldset>
+        </template>
+
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+          <span class="text-micro font-semibold tracking-label text-ink-secondary uppercase">
+            Columns
+          </span>
+          <template x-for="column in allColumns" x-bind:key="column.key">
+            <div class="flex items-center gap-1 rounded-control border border-hairline px-2 py-1">
+              <label class="flex cursor-pointer items-center gap-2 text-caption">
+                <input
+                  type="checkbox"
+                  x-bind:checked="column.visible"
+                  x-on:change="toggleVisible(column.key)"
+                  class="size-4 shrink-0 cursor-pointer rounded-[4px] border border-hairline bg-surface-card accent-accent"
+                />
+                <span x-text="column.label"></span>
+              </label>
+
+              <button
+                type="button"
+                x-on:click="togglePin(column.key)"
+                x-bind:aria-pressed="column.pinned"
+                x-bind:aria-label="`Pin ${column.label}`"
+                x-bind:class="column.pinned ? 'text-accent' : 'text-ink-secondary'"
+                class="grid size-6 place-items-center rounded-control transition-colors hover:bg-surface-hover"
+              >
+                <Icon name="pin" size={14} />
+              </button>
+              <button
+                type="button"
+                x-on:click="move(column.key, -1)"
+                x-bind:disabled="!canMove(column.key, -1)"
+                x-bind:aria-label="`Move ${column.label} left`"
+                class="grid size-6 place-items-center rounded-control text-ink-secondary transition-colors hover:bg-surface-hover disabled:opacity-30 disabled:hover:bg-transparent"
+              >
+                <Icon name="chevron-left" size={14} />
+              </button>
+              <button
+                type="button"
+                x-on:click="move(column.key, 1)"
+                x-bind:disabled="!canMove(column.key, 1)"
+                x-bind:aria-label="`Move ${column.label} right`"
+                class="grid size-6 place-items-center rounded-control text-ink-secondary transition-colors hover:bg-surface-hover disabled:opacity-30 disabled:hover:bg-transparent"
+              >
+                <Icon name="chevron-right" size={14} />
+              </button>
+            </div>
+          </template>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[48rem] border-collapse text-caption">
+          <thead>
+            <tr class="border-b border-hairline bg-surface-hover/40">
+              <template x-for="column in columns" x-bind:key="column.key">
+                <th
+                  scope="col"
+                  x-bind:data-column="column.key"
+                  x-bind:aria-sort="column.ariaSort"
+                  x-bind:class="[
+                    column.align === 'right' ? 'text-right' : 'text-left',
+                    column.pinned && 'sticky left-0 z-10 bg-surface-card',
+                  ]"
+                  class="px-4 py-2 text-micro font-semibold tracking-label text-ink-secondary uppercase"
+                >
+                  <button
+                    type="button"
+                    x-on:click="sortBy(column.key)"
+                    x-bind:class="column.align === 'right' && 'flex-row-reverse'"
+                    class="inline-flex max-w-full items-center gap-1 truncate rounded-control uppercase transition-colors hover:text-ink-primary"
+                  >
+                    <span x-text="column.label"></span>
+                    <span x-text="column.sorted === 'asc' ? '↑' : column.sorted ? '↓' : ''"></span>
+                  </button>
+                </th>
+              </template>
+            </tr>
+          </thead>
+
+          <tbody>
+            <template x-for="row in rows" x-bind:key="row.id">
+              <tr class="border-b border-hairline last:border-0">
+                <template x-for="cell in row.cells" x-bind:key="cell.key">
+                  <td
+                    x-bind:data-cell="cell.key"
+                    x-bind:class="[
+                      cell.align === 'right' ? 'text-right' : 'text-left',
+                      cell.tabular && 'tabular',
+                      cell.pinned && 'sticky left-0 z-10 bg-surface-card font-medium',
+                    ]"
+                    class="truncate px-4 py-2"
+                  >
+                    <template x-if="cell.format === 'badge'">
+                      <span
+                        class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-micro font-medium"
+                        x-bind:class="{
+                          paid: 'bg-success/12 text-success',
+                          pending: 'bg-warning/12 text-warning',
+                          refunded: 'bg-danger/12 text-danger',
+                        }[cell.text]"
+                        x-text="cell.text"
+                      ></span>
+                    </template>
+                    <template x-if="cell.format !== 'badge'">
+                      <span x-text="cell.text"></span>
+                    </template>
+                  </td>
+                </template>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </div>
+
+      <div x-show="total === 0" x-cloak>
+        <EmptyState
+          title="No invoices match"
+          description="Clear a facet or the search to widen the result."
+        >
+          <button
+            type="button"
+            x-on:click="reset()"
+            class="text-caption font-medium text-accent hover:underline"
+          >
+            Reset view
+          </button>
+        </EmptyState>
+      </div>
+
+      <div class="border-t border-hairline">
+        <Pagination label="invoices" />
+      </div>
+    </div>
+
+    <Card title="Which one to copy" class="max-w-3xl">
+      <dl class="flex flex-col gap-4 text-caption">
+        <div>
+          <dt class="font-medium">Take the hand-rolled table</dt>
+          <dd class="mt-0.5 text-ink-secondary">
+            When the screen is rows, a sort, a search and a page — and the endpoint does that work.
+            It is the reference implementation here and gets every feature first, with no table
+            dependency and cell editing already wired.
+          </dd>
+        </div>
+        <div>
+          <dt class="font-medium">Take the headless core</dt>
+          <dd class="mt-0.5 text-ink-secondary">
+            When you need the things on this page: facet counts, column visibility, ordering,
+            pinning — or grouping and row selection later. It costs 17.1 KB gz on the pages that
+            import it, and the state adapter is the one <code class="text-micro">subscribe</code> in
+            <code class="text-micro">lib/headless-table.ts</code>.
+          </dd>
+        </div>
+      </dl>
+    </Card>
+  </div>
+</DashboardLayout>

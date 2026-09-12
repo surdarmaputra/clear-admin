@@ -19,7 +19,7 @@ interface Magics {
 }
 
 /** Types `this` inside the returned object without naming its shape twice. */
-const component = <T>(data: T & ThisType<T & Magics>): T => data;
+export const component = <T>(data: T & ThisType<T & Magics>): T => data;
 
 export interface PageRequest {
   page: number;

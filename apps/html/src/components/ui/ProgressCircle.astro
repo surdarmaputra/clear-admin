@@ -1,0 +1,73 @@
+---
+interface Props {
+  label: string;
+  value: number;
+  max?: number;
+  size?: number;
+  /** Prints the percentage in the middle of the ring. */
+  showValue?: boolean;
+  tone?: 'accent' | 'success' | 'warning' | 'danger';
+  class?: string;
+}
+
+const {
+  label,
+  value,
+  max = 100,
+  size = 72,
+  showValue = true,
+  tone = 'accent',
+  class: className = '',
+} = Astro.props;
+
+const tones = {
+  accent: 'text-accent',
+  success: 'text-success',
+  warning: 'text-warning',
+  danger: 'text-danger',
+};
+
+const percent = Math.round((Math.min(Math.max(value, 0), max) / max) * 100);
+
+// Drawn on a 24-unit viewBox like every other icon in the system, so the stroke
+// scales with `size` instead of thinning out as the ring grows.
+const radius = 10;
+const circumference = 2 * Math.PI * radius;
+---
+
+<div
+  role="progressbar"
+  aria-label={label}
+  aria-valuenow={value}
+  aria-valuemin="0"
+  aria-valuemax={max}
+  class:list={['relative inline-grid shrink-0 place-items-center', className]}
+  style={`width: ${size}px; height: ${size}px`}
+>
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" aria-hidden="true">
+    <circle
+      cx="12"
+      cy="12"
+      r={radius}
+      stroke="currentColor"
+      stroke-width="2.5"
+      class="text-surface-hover"
+    ></circle>
+    {/* Starts at twelve o'clock rather than three — a dial that begins on the
+        right reads as already part-spent. */}
+    <circle
+      cx="12"
+      cy="12"
+      r={radius}
+      stroke="currentColor"
+      stroke-width="2.5"
+      stroke-linecap="round"
+      stroke-dasharray={circumference}
+      stroke-dashoffset={circumference * (1 - percent / 100)}
+      transform="rotate(-90 12 12)"
+      class:list={['transition-[stroke-dashoffset] duration-300', tones[tone]]}
+    ></circle>
+  </svg>
+
+  {showValue && <span class="tabular absolute text-caption font-semibold">{percent}%</span>}
+</div>

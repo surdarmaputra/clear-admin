@@ -124,6 +124,16 @@ const toast: ToastStore = {
 
 Alpine.plugin(collapse);
 Alpine.data('serverTable', serverTable);
+
+// The headless table carries `@tanstack/table-core`, and one page uses it. A
+// static import would put it in this bundle and charge every page for it, so
+// it is fetched here — before `start()`, because `Alpine.data` registered after
+// that never reaches markup already on the page.
+if (document.querySelector('[data-headless-table]')) {
+  const { headlessTable } = await import('./headless-table');
+  Alpine.data('headlessTable', headlessTable);
+}
+
 Alpine.store('overlay', overlay);
 Alpine.store('toast', toast);
 

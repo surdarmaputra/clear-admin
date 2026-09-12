@@ -3,10 +3,11 @@
 A comprehensive dashboard template in two self-contained bundles — plain HTML for
 server-rendered apps, and React for SPAs.
 
-**Status: early.** The HTML bundle has its layout shell; components are landing
-milestone by milestone. The React bundle has not started. See
+**Status: early.** The HTML bundle is one milestone from complete — 49 of 54
+items, with the rich pack (editor, files, kanban) still to land. The React bundle
+has not started. See
 [`docs/components.md`](docs/components.md) for exactly what exists today, and
-[RFC-001](docs/rfc/RFC-001-completing-clear-admin-v4.md) for the plan.
+[RFC-001](docs/rfc/RFC-001-completing-clear-admin-v5.md) for the plan.
 
 ## The two bundles
 
@@ -22,7 +23,7 @@ every component is built twice.
 | Interactivity | Alpine.js                                      | React                   |
 | Primitives    | hand-rolled + Alpine                           | shadcn/ui (Radix)       |
 | Charts        | Chart.js                                       | Recharts                |
-| Tables        | hand-rolled on Alpine; headless page in M4c    | `@tanstack/react-table` |
+| Tables        | hand-rolled on Alpine + a `table-core` page    | `@tanstack/react-table` |
 | Editor        | `lexical`                                      | `@lexical/react`        |
 | Router        | n/a                                            | TanStack Router         |
 
