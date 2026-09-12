@@ -23,11 +23,16 @@ not through a shared package.
 | Interactivity | Alpine.js                                           | React 19                |
 | Primitives    | hand-rolled + Alpine                                | shadcn/ui (Radix)       |
 | Charts        | Chart.js                                            | Recharts                |
-| Tables        | `@tanstack/table-core`                              | `@tanstack/react-table` |
+| Tables        | hand-rolled on Alpine; headless page in M4c         | `@tanstack/react-table` |
 | Editor        | `lexical` (vanilla)                                 | `@lexical/react`        |
 | Drag & drop   | SortableJS                                          | dnd-kit                 |
 | Router        | n/a                                                 | TanStack Router         |
 | Authoring     | Astro (build tool only — `.astro` is never shipped) | React + Vite            |
+
+The HTML table is hand-rolled on Alpine and is the reference implementation. A
+second page on `@tanstack/table-core` lands in M4c under
+[RFC-001 D9](rfc/RFC-001-completing-clear-admin-v4.md), so a consumer can pick
+an approach; it only carries features the headless core makes materially easier.
 
 Shared across both: Tailwind CSS v4, TypeScript (strict), class-based dark mode,
 Motion for animation, Vite.
