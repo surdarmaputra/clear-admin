@@ -172,23 +172,37 @@ test.describe('auth pack', () => {
 });
 
 test.describe('dashboard overview', () => {
-  test('draws every chart with themed colours, not Apex defaults', async ({ page }) => {
+  test('draws every chart with themed colours, not library defaults', async ({ page }) => {
     const failures = watchForFailures(page);
     await page.goto('/');
 
-    // Four cards, four rendered SVGs — a chart that throws leaves the card up
-    // with an error state, so counting cards alone would not catch it.
-    await expect(page.locator('.apexcharts-canvas')).toHaveCount(4);
+    // Four cards, four canvases — a chart that throws leaves the card up with
+    // an error state, so counting cards alone would not catch it.
+    await expect(page.locator('canvas[data-chart-canvas]')).toHaveCount(4);
     await expect(page.locator('[data-chart-error]:not([hidden])')).toHaveCount(0);
     await expect(page.locator('[data-chart-skeleton]')).toHaveCount(0);
 
-    // The series colour comes from a CSS variable that Tailwind will drop if no
-    // utility references it; an empty token paints the marks black.
-    const stroke = await page
-      .locator('[data-chart] .apexcharts-line')
+    // The series colours come from CSS variables Tailwind will drop if no
+    // utility references them; an empty token paints the marks black. A canvas
+    // has no DOM to inspect, so the chart publishes what it actually applied.
+    await expect(page.locator('[data-chart]').first()).toHaveAttribute(
+      'data-chart-colors',
+      '#0f77ff,#eb6834',
+    );
+
+    // And it really painted: an empty canvas would pass every check above.
+    const painted = await page
+      .locator('canvas[data-chart-canvas]')
       .first()
-      .getAttribute('stroke');
-    expect(stroke).toMatch(/15,\s*119,\s*255/);
+      .evaluate((canvas: HTMLCanvasElement) => {
+        const pixels = canvas
+          .getContext('2d')!
+          .getImageData(0, 0, canvas.width, canvas.height).data;
+        let count = 0;
+        for (let i = 3; i < pixels.length; i += 4) if (pixels[i] > 0) count++;
+        return count;
+      });
+    expect(painted).toBeGreaterThan(1000);
 
     expect(failures).toEqual([]);
   });
@@ -196,13 +210,13 @@ test.describe('dashboard overview', () => {
   test('charts re-theme when the toggle flips', async ({ page }) => {
     await page.goto('/');
 
-    const line = page.locator('[data-chart] .apexcharts-line').first();
-    await expect(line).toHaveAttribute('stroke', /15,\s*119,\s*255/);
+    const chart = page.locator('[data-chart]').first();
+    await expect(chart).toHaveAttribute('data-chart-colors', '#0f77ff,#eb6834');
 
     await page.getByRole('button', { name: 'Switch to dark theme' }).click();
 
     // The dark palette is its own set of steps, not a filter over the light one.
-    await expect(line).toHaveAttribute('stroke', /58,\s*141,\s*245/);
+    await expect(chart).toHaveAttribute('data-chart-colors', '#3a8df5,#d95926');
   });
 
   test('table sorts, searches, pages, and empties', async ({ page }) => {
@@ -260,8 +274,10 @@ test.describe('dashboard on a phone', () => {
 
     for (const card of await page.locator('[data-chart]').all()) {
       const fits = await card.evaluate((el) => {
-        const svg = el.querySelector('svg');
-        return !svg || svg.getBoundingClientRect().width <= el.getBoundingClientRect().width + 1;
+        const canvas = el.querySelector('canvas');
+        return (
+          !canvas || canvas.getBoundingClientRect().width <= el.getBoundingClientRect().width + 1
+        );
       });
       expect(fits).toBe(true);
     }

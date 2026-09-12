@@ -22,7 +22,7 @@ not through a shared package.
 | Output        | `dist/` — plain HTML + CSS + JS                     | copyable source tree    |
 | Interactivity | Alpine.js                                           | React 19                |
 | Primitives    | hand-rolled + Alpine                                | shadcn/ui (Radix)       |
-| Charts        | ApexCharts                                          | Recharts                |
+| Charts        | Chart.js                                            | Recharts                |
 | Tables        | `@tanstack/table-core`                              | `@tanstack/react-table` |
 | Editor        | `lexical` (vanilla)                                 | `@lexical/react`        |
 | Drag & drop   | SortableJS                                          | dnd-kit                 |

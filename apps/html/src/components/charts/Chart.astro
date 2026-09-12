@@ -21,9 +21,13 @@ const { title, description, class: className = '', ...config } = Astro.props;
     {description && <p class="mt-0.5 text-caption text-ink-secondary">{description}</p>}
   </div>
 
-  <div data-chart-canvas></div>
+  {/* Chart.js sizes to its container, so the height lives here rather than in
+      the chart config. */}
+  <div style={`height:${config.height}px`}>
+    <canvas data-chart-canvas></canvas>
+  </div>
 
-  {/* Holds the layout until Apex paints, so the card does not jump. */}
+  {/* Holds the layout until the chart paints, so the card does not jump. */}
   <div
     data-chart-skeleton
     aria-hidden="true"

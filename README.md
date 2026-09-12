@@ -21,7 +21,7 @@ every component is built twice.
 | Authoring     | Astro (build tool only — `.astro` never ships) | React 19 + Vite         |
 | Interactivity | Alpine.js                                      | React                   |
 | Primitives    | hand-rolled + Alpine                           | shadcn/ui (Radix)       |
-| Charts        | ApexCharts                                     | Recharts                |
+| Charts        | Chart.js                                       | Recharts                |
 | Tables        | `@tanstack/table-core`                         | `@tanstack/react-table` |
 | Editor        | `lexical`                                      | `@lexical/react`        |
 | Router        | n/a                                            | TanStack Router         |

@@ -1,9 +1,14 @@
-import type { ApexOptions } from 'apexcharts';
+import type { Chart, ChartConfiguration, ChartOptions, ScriptableContext } from 'chart.js';
+
+export interface Series {
+  name: string;
+  data: number[];
+}
 
 export interface ChartConfig {
   type: 'line' | 'area' | 'bar' | 'donut';
   /** Axis series for line/area/bar; a flat number list for donut. */
-  series: NonNullable<ApexOptions['series']>;
+  series: Series[] | number[];
   categories?: string[];
   /** Series token slots, in fixed order. Never cycled; an extra series is a redesign. */
   slots: number[];
@@ -16,151 +21,256 @@ export interface ChartConfig {
 const token = (name: string) =>
   getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
-const isDark = () => document.documentElement.classList.contains('dark');
-
 /** Everything that changes when the theme does. Dark is re-derived, never flipped. */
-function themed(config: ChartConfig) {
-  const surface = token('--color-surface-card');
-  const ink = token('--color-ink-secondary');
+const palette = (config: ChartConfig) => ({
+  series: config.slots.map((slot) => token(`--color-series-${slot}`)),
+  ink: token('--color-ink-secondary'),
+  hairline: token('--color-hairline'),
+  surface: token('--color-surface-card'),
+});
 
+const phone = () => window.matchMedia('(max-width: 639px)').matches;
+
+/** Hex alpha suffix — the fill under an area line, at the same hue as the line. */
+const fade = (hex: string, alpha: number) =>
+  `${hex}${Math.round(alpha * 255)
+    .toString(16)
+    .padStart(2, '0')}`;
+
+/**
+ * The fill fades to nothing at the baseline, so a stack of area cards does not
+ * read as a wall of colour. Scriptable because the gradient needs the plot box,
+ * which does not exist until the first layout pass.
+ */
+const areaFill = (colour: string) => (context: ScriptableContext<'line'>) => {
+  const { ctx, chartArea } = context.chart;
+  if (!chartArea) return 'transparent';
+
+  const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+  gradient.addColorStop(0, fade(colour, 0.22));
+  gradient.addColorStop(1, fade(colour, 0));
+  return gradient;
+};
+
+function buildData(config: ChartConfig, colours: string[], surface: string) {
+  if (config.type === 'donut') {
+    return {
+      labels: config.labels,
+      datasets: [
+        {
+          data: config.series as number[],
+          backgroundColor: colours,
+          // A 2px gap between slices, drawn in the card colour.
+          borderColor: surface,
+          borderWidth: 2,
+        },
+      ],
+    };
+  }
+
+  const series = config.series as Series[];
   return {
-    colors: config.slots.map((slot) => token(`--color-series-${slot}`)),
-    grid: { borderColor: token('--color-hairline') },
-    tooltip: { theme: isDark() ? ('dark' as const) : ('light' as const) },
-    xaxis: { labels: { style: { colors: ink } } },
-    yaxis: { labels: { style: { colors: ink } } },
-    legend: { labels: { colors: ink } },
-    // The 2px gap between adjacent fills is drawn in the surface colour, so it
-    // has to be recomputed alongside the series — but only where there are
-    // fills to separate. On a line chart it would paint the line invisible.
-    ...(config.type === 'bar' || config.type === 'donut' ? { stroke: { colors: [surface] } } : {}),
+    labels: config.categories,
+    datasets: series.map((entry, index) => ({
+      label: entry.name,
+      data: entry.data,
+      borderColor: colours[index],
+      backgroundColor:
+        config.type === 'area'
+          ? areaFill(colours[index])
+          : config.type === 'bar'
+            ? colours[index]
+            : 'transparent',
+      fill: config.type === 'area',
+      borderWidth: config.type === 'bar' ? 0 : 2,
+      tension: 0.35,
+      // Invisible until hovered, then a target bigger than the mark.
+      pointRadius: 0,
+      pointHoverRadius: 5,
+      pointHoverBorderWidth: 2,
+      borderRadius: config.type === 'bar' ? 4 : 0,
+      borderSkipped: false,
+      barPercentage: 0.7,
+      categoryPercentage: 0.78,
+    })),
   };
 }
 
-function buildOptions(config: ChartConfig): ApexOptions {
-  const { type, series, categories, height, labels, valuePrefix = '' } = config;
-  const money = (v: number) => `${valuePrefix}${v.toLocaleString('en-US')}`;
+function buildOptions(config: ChartConfig): ChartOptions {
+  const { ink, hairline, surface } = palette(config);
+  const prefix = config.valuePrefix ?? '';
+  const money = (value: number) => `${prefix}${value.toLocaleString('en-US')}`;
   // Axis labels go compact ($71K) so the plot keeps its width on a phone; the
   // tooltip still carries the exact figure.
-  const axisMoney = (v: number) =>
-    `${valuePrefix}${v >= 10000 ? `${Math.round(v / 1000)}K` : v.toLocaleString('en-US')}`;
-  const multiSeries = Array.isArray(series) && series.length > 1;
-  const theme = themed(config);
+  const axisMoney = (value: number) =>
+    `${prefix}${value >= 10000 ? `${Math.round(value / 1000)}K` : value.toLocaleString('en-US')}`;
 
-  const base = {
-    chart: {
-      type,
-      height,
-      width: '100%',
-      fontFamily: token('--font-sans'),
-      background: 'transparent',
-      toolbar: { show: false },
-      parentHeightOffset: 0,
-      animations: { speed: 300 },
-    },
-    series,
-    colors: theme.colors,
-    // A number on every point is noise; the tooltip carries the detail instead.
-    dataLabels: { enabled: false },
-    grid: {
-      borderColor: theme.grid.borderColor,
-      strokeDashArray: 0,
-      xaxis: { lines: { show: false } },
-      padding: { left: 4, right: 4 },
-    },
-    legend: {
-      show: multiSeries,
-      position: 'bottom' as const,
-      horizontalAlign: 'left' as const,
-      fontSize: '12px',
-      markers: { size: 5 },
-      itemMargin: { horizontal: 10 },
-      labels: theme.legend.labels,
-    },
-    tooltip: { theme: theme.tooltip.theme, y: { formatter: money } },
-    xaxis: {
-      categories,
-      axisBorder: { show: false },
-      axisTicks: { show: false },
-      labels: {
-        style: { colors: theme.xaxis.labels.style.colors, fontSize: '12px' },
-        // Rotated labels get clipped in a short card; dropping every other one
-        // keeps them level and readable instead.
-        rotate: 0,
-        rotateAlways: false,
-        hideOverlappingLabels: true,
-      },
-      tooltip: { enabled: false },
-    },
-    yaxis: {
-      labels: {
-        style: { colors: theme.yaxis.labels.style.colors, fontSize: '12px' },
-        formatter: axisMoney,
-      },
-    },
-    responsive: [
-      {
-        breakpoint: 640,
-        options: {
-          // A legend beside a donut leaves it no room at phone width.
-          legend: { position: 'bottom' as const, horizontalAlign: 'left' as const },
-          plotOptions: { pie: { donut: { size: '68%' } } },
-          yaxis: { labels: { formatter: axisMoney } },
-          // Twelve month labels collide even unrotated; show roughly every
-          // other one and let the tooltip name the exact point.
-          xaxis: { tickAmount: 5 },
+  const multiSeries = config.type !== 'donut' && (config.series as Series[]).length > 1;
+  const font = { family: token('--font-sans'), size: 12 };
+
+  const base: ChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: { duration: 300 },
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: {
+        // A single-series chart needs no legend — the card title names it.
+        display: multiSeries,
+        position: 'bottom',
+        align: 'start',
+        labels: {
+          color: ink,
+          font,
+          boxWidth: 8,
+          boxHeight: 8,
+          usePointStyle: true,
+          pointStyle: 'circle',
         },
       },
-    ],
+      tooltip: {
+        backgroundColor: token('--color-ink-primary'),
+        titleColor: surface,
+        bodyColor: surface,
+        padding: 10,
+        cornerRadius: 8,
+        displayColors: true,
+        boxWidth: 8,
+        boxHeight: 8,
+        usePointStyle: true,
+        titleFont: font,
+        bodyFont: font,
+        callbacks: {
+          label: (item) => ` ${item.dataset.label ?? item.label}: ${money(item.parsed.y ?? 0)}`,
+        },
+      },
+    },
   };
 
-  if (type === 'line' || type === 'area') {
+  if (config.type === 'donut') {
+    // `cutout` lives on the doughnut options type only, so the branch is cast
+    // rather than annotated — annotating it fights the plugin generics.
     return {
       ...base,
-      stroke: { width: 2, curve: 'smooth' as const, lineCap: 'round' as const },
-      // Invisible until hovered, then a 10px target — bigger than the mark.
-      markers: { size: 0, strokeWidth: 2, hover: { size: 5 } },
-      fill:
-        type === 'area'
-          ? {
-              type: 'gradient',
-              gradient: { shadeIntensity: 0, opacityFrom: 0.22, opacityTo: 0, stops: [0, 100] },
-            }
-          : // Full opacity: the palette was validated at these exact values, and
-            // Apex otherwise paints lines at 0.85.
-            { type: 'solid', opacity: 1 },
-    };
-  }
-
-  if (type === 'bar') {
-    return {
-      ...base,
-      plotOptions: {
-        bar: {
-          horizontal: config.horizontal ?? false,
-          columnWidth: '55%',
-          borderRadius: 4,
-          // Rounded at the data end only — the baseline end stays square so the
-          // bar still reads as anchored to zero.
-          borderRadiusApplication: 'end' as const,
+      cutout: phone() ? '68%' : '72%',
+      plugins: {
+        ...base.plugins,
+        legend: {
+          ...base.plugins?.legend,
+          // Three light-mode series sit under 3:1 against the card, so the
+          // slices carry labels rather than relying on the fill alone.
+          display: true,
+          position: phone() ? 'bottom' : 'right',
+        },
+        tooltip: {
+          ...base.plugins?.tooltip,
+          callbacks: {
+            label: (item: { label: string; parsed: number }) =>
+              ` ${item.label}: ${money(item.parsed)}`,
+          },
         },
       },
-      stroke: { show: true, width: 2, colors: [token('--color-surface-card')] },
-    };
+    } as ChartOptions;
   }
+
+  const indexAxis = config.type === 'bar' && config.horizontal ? ('y' as const) : ('x' as const);
 
   return {
     ...base,
-    labels,
-    stroke: { width: 2, colors: [token('--color-surface-card')] },
-    plotOptions: { pie: { donut: { size: '72%' } } },
-    // Three of the light-mode series sit under 3:1 against white, so the slices
-    // carry visible labels rather than relying on the fill alone.
-    legend: { ...base.legend, show: true, position: 'right' as const },
-    xaxis: {},
-    yaxis: {},
-    tooltip: { theme: theme.tooltip.theme, y: { formatter: money } },
+    indexAxis,
+    plugins: {
+      ...base.plugins,
+      legend: {
+        ...base.plugins?.legend,
+        labels: {
+          ...base.plugins?.legend?.labels,
+          // A line dataset has no fill, so the default swatch comes out hollow.
+          // It has to carry the series colour, not outline it.
+          generateLabels: (chart) =>
+            chart.data.datasets.map((dataset, index) => ({
+              text: dataset.label ?? '',
+              fillStyle: (dataset.borderColor ?? dataset.backgroundColor) as string,
+              strokeStyle: (dataset.borderColor ?? dataset.backgroundColor) as string,
+              lineWidth: 0,
+              hidden: !chart.isDatasetVisible(index),
+              datasetIndex: index,
+            })),
+        },
+      },
+    },
+    scales: {
+      x: {
+        grid: { display: false },
+        border: { display: false },
+        ticks: {
+          color: ink,
+          font,
+          // Twelve month labels collide at phone width even unrotated. Thin
+          // them rather than rotating into a clip.
+          maxTicksLimit: phone() ? 5 : undefined,
+          maxRotation: 0,
+          autoSkipPadding: 12,
+          callback(value) {
+            const label = this.getLabelForValue(value as number);
+            return indexAxis === 'y' ? axisMoney(Number(label)) : label;
+          },
+        },
+      },
+      y: {
+        grid: { color: hairline },
+        border: { display: false },
+        ticks: {
+          color: ink,
+          font,
+          // Six gridlines is the most a 260px card reads as structure rather
+          // than as noise.
+          maxTicksLimit: 6,
+          callback(value) {
+            return indexAxis === 'y'
+              ? this.getLabelForValue(value as number)
+              : axisMoney(Number(value));
+          },
+        },
+      },
+    },
   };
+}
+
+/** Repaints a live chart against the current theme without rebuilding it. */
+function applyTheme(chart: Chart, config: ChartConfig) {
+  const { series, ink, hairline, surface } = palette(config);
+
+  if (config.type === 'donut') {
+    chart.data.datasets[0].backgroundColor = series;
+    chart.data.datasets[0].borderColor = surface;
+  } else {
+    chart.data.datasets.forEach((dataset, index) => {
+      dataset.borderColor = series[index];
+      dataset.backgroundColor =
+        config.type === 'area'
+          ? areaFill(series[index])
+          : config.type === 'bar'
+            ? series[index]
+            : 'transparent';
+    });
+  }
+
+  const options = chart.options as ChartOptions;
+  if (options.plugins?.legend?.labels) options.plugins.legend.labels.color = ink;
+  if (options.plugins?.tooltip) {
+    options.plugins.tooltip.backgroundColor = token('--color-ink-primary');
+    options.plugins.tooltip.titleColor = surface;
+    options.plugins.tooltip.bodyColor = surface;
+  }
+  for (const axis of ['x', 'y'] as const) {
+    const scale = options.scales?.[axis];
+    if (!scale) continue;
+    if (scale.ticks) scale.ticks.color = ink;
+    if (axis === 'y' && scale.grid) scale.grid.color = hairline;
+  }
+
+  chart.update('none');
+  return series;
 }
 
 /** Mounts every `[data-chart]` on the page and keeps them in step with the theme. */
@@ -168,27 +278,65 @@ export async function mountCharts() {
   const roots = document.querySelectorAll<HTMLElement>('[data-chart]');
   if (roots.length === 0) return;
 
-  // ApexCharts is by far the heaviest thing the bundle pulls in, so it is
+  // Charts are the heaviest thing the bundle pulls in, so the library is
   // fetched after first paint — the skeleton already holds the layout — and
   // pages without a chart never download it at all.
-  const { default: ApexCharts } = await import('apexcharts');
+  // Named imports only: the whole point of the swap is that the controllers
+  // nothing draws never reach the bundle.
+  const {
+    Chart: ChartJS,
+    LineController,
+    BarController,
+    DoughnutController,
+    LineElement,
+    PointElement,
+    BarElement,
+    ArcElement,
+    CategoryScale,
+    LinearScale,
+    Tooltip,
+    Legend,
+    Filler,
+  } = await import('chart.js');
+
+  ChartJS.register(
+    LineController,
+    BarController,
+    DoughnutController,
+    LineElement,
+    PointElement,
+    BarElement,
+    ArcElement,
+    CategoryScale,
+    LinearScale,
+    Tooltip,
+    Legend,
+    Filler,
+  );
 
   for (const root of roots) {
-    const canvas = root.querySelector<HTMLElement>('[data-chart-canvas]');
+    const canvas = root.querySelector<HTMLCanvasElement>('canvas[data-chart-canvas]');
     const raw = root.querySelector('[data-chart-config]')?.textContent;
     if (!canvas || !raw) continue;
 
     const config: ChartConfig = JSON.parse(raw);
+    const { series, surface } = palette(config);
 
     try {
-      const chart = new ApexCharts(canvas, buildOptions(config));
-      chart.render();
-      root.querySelector('[data-chart-skeleton]')?.remove();
+      const chart = new ChartJS(canvas, {
+        type: config.type === 'area' ? 'line' : config.type === 'donut' ? 'doughnut' : config.type,
+        data: buildData(config, series, surface),
+        options: buildOptions(config),
+      } as ChartConfiguration);
 
-      new MutationObserver(() => chart.updateOptions(themed(config), false, false)).observe(
-        document.documentElement,
-        { attributes: true, attributeFilter: ['class'] },
-      );
+      root.querySelector('[data-chart-skeleton]')?.remove();
+      // A canvas has no DOM to inspect, so the colours actually applied are
+      // published here — it is what the theme test reads.
+      root.dataset.chartColors = series.join(',');
+
+      new MutationObserver(() => {
+        root.dataset.chartColors = applyTheme(chart, config).join(',');
+      }).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
     } catch {
       root.querySelector('[data-chart-skeleton]')?.remove();
       canvas.hidden = true;
