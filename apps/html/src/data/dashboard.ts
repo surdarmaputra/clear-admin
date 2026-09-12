@@ -37,14 +37,14 @@ export const trafficSources = {
   series: [4820, 2140, 1360, 3210],
 };
 
-export interface Order {
+export type Order = {
   id: string;
   customer: string;
   plan: string;
   status: 'paid' | 'pending' | 'refunded';
   amount: number;
   date: string;
-}
+};
 
 export const orders: Order[] = [
   {

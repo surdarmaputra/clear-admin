@@ -66,10 +66,9 @@ artifact, deployed.
 | Chart — pie / donut                           | P1       | done | —     |
 | Data table — sortable, paginated              | P1       | done | —     |
 | Pagination                                    | P1       | done | —     |
-| Data table — server-side filter/sort/paginate | P2       | —    | —     |
-| Data table — resizable columns                | P2       | —    | —     |
-| Data table — edit in cell                     | P2       | —    | —     |
-| Spreadsheet-style table editing               | P2       | —    | —     |
+| Data table — server-side filter/sort/paginate | P2       | done | —     |
+| Data table — resizable columns                | P2       | done | —     |
+| Data table — edit in cell                     | P2       | done | —     |
 
 ## Feedback & state
 
@@ -138,6 +137,7 @@ artifact, deployed.
 | Components — forms    | P1       | done | —     |
 | Components — overlays | P1       | done | —     |
 | Components — feedback | P1       | done | —     |
+| Data — tables         | P2       | done | —     |
 | Dashboard — overview  | P1       | done | —     |
 | Login                 | P1       | done | —     |
 | Register              | P1       | done | —     |
@@ -150,6 +150,9 @@ artifact, deployed.
 
 ## Out of scope for v1
 
+- **Spreadsheet-style table editing** — descoped in
+  [RFC-001 D1](rfc/RFC-001-completing-clear-admin-v3.md). Cell edit and keyboard
+  navigation shipped instead; formulas, fill handle and multi-cell paste are out.
 - **Map** — cut. Heavy dependency, and provider choice (Leaflet vs Mapbox vs Google)
   pushes licensing decisions onto consumers.
 - **Astro / Vue / Angular bundles** — HTML and React only.

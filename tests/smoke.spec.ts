@@ -445,3 +445,138 @@ test.describe('mobile nav trap', () => {
     }
   });
 });
+
+test.describe('data pack', () => {
+  const firstCustomerCell = (page: Page) => page.locator('[data-cell$=":customer"]').first();
+
+  test('renders cleanly and pages through the endpoint', async ({ page }) => {
+    const failures = watchForFailures(page);
+    await page.goto('/data/tables');
+
+    const rows = page.locator('tbody tr');
+    await expect(rows).toHaveCount(8);
+    await expect(page.getByText('Showing 1–8 of 48 rows')).toBeVisible();
+
+    // The request line is the contract: every control writes to these params.
+    await expect(page.locator('pre')).toContainText('page=1&pageSize=8&sort=date&dir=desc');
+
+    await page.getByRole('button', { name: 'Next page' }).click();
+    await expect(page.getByText('Showing 9–16 of 48 rows')).toBeVisible();
+    await expect(page.locator('pre')).toContainText('page=2');
+
+    expect(failures).toEqual([]);
+  });
+
+  test('sorting and searching go to the endpoint, not the page', async ({ page }) => {
+    await page.goto('/data/tables');
+    await expect(page.locator('tbody tr')).toHaveCount(8);
+
+    await page.getByRole('columnheader', { name: 'Amount' }).getByRole('button').click();
+    await expect(page.locator('pre')).toContainText('sort=amount&dir=asc');
+    // Ascending across all 48 rows, not just the 8 on screen.
+    await expect(page.locator('tbody tr').first()).toContainText('$240');
+
+    await page.getByLabel('Search invoices').fill('turing');
+    await expect(page.getByText('Showing 1–4 of 4 rows')).toBeVisible();
+    await expect(page.locator('pre')).toContainText('q=turing');
+
+    await page.getByLabel('Search invoices').fill('nobody at all');
+    await expect(page.getByText('No invoices match')).toBeVisible();
+
+    await page.getByRole('button', { name: 'Clear search' }).click();
+    await expect(page.getByText('Showing 1–8 of 48 rows')).toBeVisible();
+  });
+
+  test('a failed request shows the error state and recovers', async ({ page }) => {
+    await page.goto('/data/tables');
+    await expect(page.locator('tbody tr')).toHaveCount(8);
+
+    await page.getByRole('button', { name: 'Break the endpoint' }).click();
+    await expect(page.getByText('Could not load invoices')).toBeVisible();
+
+    await page.getByRole('button', { name: 'Try again' }).click();
+    await expect(page.locator('tbody tr')).toHaveCount(8);
+  });
+
+  test('cells edit in place, commit, and cancel', async ({ page }) => {
+    await page.goto('/data/tables');
+    const cell = firstCustomerCell(page);
+    await expect(cell).toHaveAttribute('aria-label', /^Edit customer for INV-/);
+
+    await cell.click();
+    const editor = page.locator('input[data-editor$=":customer"]').first();
+    await expect(editor).toBeFocused();
+
+    await editor.fill('Edited Name');
+    await page.keyboard.press('Enter');
+    await expect(page.locator('[data-toast]')).toContainText('Saved.');
+    await expect(cell).toHaveText('Edited Name');
+    // Focus comes back to the cell, so the next arrow key still works.
+    await expect(cell).toBeFocused();
+
+    await cell.click();
+    await editor.fill('Discarded');
+    await page.keyboard.press('Escape');
+    await expect(cell).toHaveText('Edited Name');
+    await expect(cell).toBeFocused();
+  });
+
+  test('rejects a draft that the column cannot hold', async ({ page }) => {
+    await page.goto('/data/tables');
+
+    const amount = page.locator('[data-cell$=":amount"]').first();
+    const before = await amount.textContent();
+    await amount.click();
+
+    const editor = page.locator('input[data-editor$=":amount"]').first();
+    await editor.fill('not a number');
+    await page.keyboard.press('Enter');
+
+    await expect(page.locator('[data-toast]')).toContainText('That is not a number.');
+    // The editor stays open rather than discarding what was typed.
+    await expect(editor).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(amount).toHaveText(before!.trim());
+  });
+
+  test('arrow keys walk the editable cells', async ({ page }) => {
+    await page.goto('/data/tables');
+
+    const cell = firstCustomerCell(page);
+    await cell.focus();
+    const id = await cell.getAttribute('data-cell');
+    const row = id!.split(':')[0];
+
+    await page.keyboard.press('ArrowRight');
+    await expect(page.locator(`[data-cell="${row}:amount"]`)).toBeFocused();
+
+    await page.keyboard.press('ArrowDown');
+    const next = await page.evaluate(() => document.activeElement?.getAttribute('data-cell'));
+    expect(next).toMatch(/:amount$/);
+    expect(next).not.toBe(`${row}:amount`);
+
+    await page.keyboard.press('ArrowLeft');
+    await expect(
+      page.evaluate(() => document.activeElement?.getAttribute('data-cell')),
+    ).resolves.toMatch(/:customer$/);
+  });
+
+  test('columns resize from the keyboard and the width persists', async ({ page }) => {
+    await page.goto('/data/tables');
+    await expect(page.locator('tbody tr')).toHaveCount(8);
+
+    const column = page.locator('colgroup col').nth(1);
+    const width = () => column.evaluate((el) => Number.parseFloat(getComputedStyle(el).width));
+    const before = await width();
+
+    // A resizer only a mouse can reach is not a resizer for everyone.
+    await page.getByRole('separator', { name: 'Resize Customer' }).focus();
+    for (let i = 0; i < 3; i++) await page.keyboard.press('ArrowRight');
+    const after = await width();
+    expect(after).toBeGreaterThan(before);
+
+    await page.reload();
+    await expect(page.locator('tbody tr')).toHaveCount(8);
+    expect(await width()).toBe(after);
+  });
+});

@@ -1,5 +1,6 @@
 import Alpine from 'alpinejs';
 import collapse from '@alpinejs/collapse';
+import { serverTable } from './table';
 
 /** Anything a user can reach with Tab, minus what is hidden or disabled. */
 const FOCUSABLE =
@@ -122,6 +123,7 @@ const toast: ToastStore = {
 };
 
 Alpine.plugin(collapse);
+Alpine.data('serverTable', serverTable);
 Alpine.store('overlay', overlay);
 Alpine.store('toast', toast);
 

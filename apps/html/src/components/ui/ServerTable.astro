@@ -1,0 +1,173 @@
+---
+import Icon from '../Icon.astro';
+import Pagination from './Pagination.astro';
+import type { Row, ServerTableConfig } from '../../lib/table';
+
+export interface ServerColumn {
+  key: string;
+  label: string;
+  align?: 'left' | 'right';
+  sortable?: boolean;
+}
+
+interface Props {
+  columns: ServerColumn[];
+  rows: Row[];
+  sort: string;
+  dir?: 'asc' | 'desc';
+  pageSize?: number;
+  searchKeys?: string[];
+  editable?: string[];
+  idKey?: string;
+  /** Mock round-trip in ms, so the loading state is visible rather than theoretical. */
+  latency?: number;
+  storageKey?: string;
+  searchLabel?: string;
+  class?: string;
+}
+
+const {
+  columns,
+  rows,
+  sort,
+  dir = 'desc',
+  pageSize = 8,
+  searchKeys = [],
+  editable = [],
+  idKey = 'id',
+  latency = 400,
+  storageKey,
+  searchLabel = 'Search orders',
+  class: className = '',
+} = Astro.props;
+
+// The page hands the dataset to the mock endpoint inside `serverTable`. Give it
+// a `url` instead and the same markup talks to a real one.
+const config: ServerTableConfig = {
+  columns: columns.map((column) => column.key),
+  rows,
+  sort,
+  dir,
+  pageSize,
+  searchKeys,
+  editable,
+  idKey,
+  latency,
+  storageKey,
+};
+---
+
+<div
+  x-data={`serverTable(${JSON.stringify(config)})`}
+  class:list={['rounded-card border border-hairline bg-surface-card shadow-card', className]}
+>
+  <div class="flex flex-wrap items-center gap-3 border-b border-hairline px-4 py-3">
+    <div class="relative w-full max-w-xs">
+      <Icon
+        name="search"
+        size={16}
+        class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-ink-secondary"
+      />
+      <input
+        type="search"
+        x-model="q"
+        aria-label={searchLabel}
+        placeholder={searchLabel}
+        class="w-full rounded-control border border-hairline bg-surface-card py-1.5 pr-3 pl-9 text-caption placeholder:text-ink-secondary"
+      />
+    </div>
+
+    {/* Every request is a round trip, so the table says when one is in flight
+        rather than swapping the rows out from under a reader. */}
+    <p x-show="status === 'loading'" x-cloak class="text-micro text-ink-secondary">
+      Loading…
+    </p>
+    <p x-show="saving" x-cloak class="text-micro text-ink-secondary">
+      Saving…
+    </p>
+
+    <div class="ml-auto">
+      <slot name="actions" />
+    </div>
+  </div>
+
+  <div x-show="status !== 'error'" class="overflow-x-auto">
+    <table class="w-full min-w-[48rem] table-fixed border-collapse text-caption">
+      <colgroup>
+        {columns.map((column) => (
+          <col x-bind:style={`{ width: width('${column.key}') }`} />
+        ))}
+      </colgroup>
+      <thead>
+        <tr class="border-b border-hairline bg-surface-hover/40">
+          {columns.map((column) => (
+            <th
+              scope="col"
+              x-bind:aria-sort={column.sortable === false ? undefined : `ariaSort('${column.key}')`}
+              class:list={[
+                'relative px-4 py-2 text-micro font-semibold tracking-label text-ink-secondary uppercase',
+                column.align === 'right' ? 'text-right' : 'text-left',
+              ]}
+            >
+              {column.sortable === false ? (
+                column.label
+              ) : (
+                <button
+                  type="button"
+                  x-on:click={`sortBy('${column.key}')`}
+                  class:list={[
+                    'inline-flex max-w-full items-center gap-1 truncate rounded-control uppercase transition-colors hover:text-ink-primary',
+                    column.align === 'right' && 'flex-row-reverse',
+                  ]}
+                >
+                  {column.label}
+                  <span
+                    x-show={`sort === '${column.key}'`}
+                    x-cloak
+                    x-text="dir === 'asc' ? '↑' : '↓'"
+                  />
+                </button>
+              )}
+
+              {/* Drag to resize, or focus and use the arrow keys — a
+                  pointer-only resizer is unusable with a keyboard. */}
+              <span
+                role="separator"
+                aria-orientation="vertical"
+                tabindex="0"
+                aria-label={`Resize ${column.label}`}
+                x-on:pointerdown.prevent={`startResize($event, '${column.key}')`}
+                x-on:keydown={`nudge($event, '${column.key}')`}
+                x-on:dblclick={`delete widths['${column.key}']; storeWidths()`}
+                class="absolute top-0 right-0 h-full w-1.5 cursor-col-resize rounded-control hover:bg-accent/40 focus-visible:bg-accent/40"
+              ></span>
+            </th>
+          ))}
+        </tr>
+      </thead>
+
+      <tbody
+        x-on:keydown.arrow-left="move($event, -1, 0)"
+        x-on:keydown.arrow-right="move($event, 1, 0)"
+        x-on:keydown.arrow-up="move($event, 0, -1)"
+        x-on:keydown.arrow-down="move($event, 0, 1)"
+      >
+        <slot />
+      </tbody>
+    </table>
+  </div>
+
+  <div x-show="status === 'ready' && total === 0" x-cloak>
+    <slot name="empty" />
+  </div>
+
+  <div x-show="status === 'error'" x-cloak>
+    <slot name="error" />
+  </div>
+
+  <div x-show="status !== 'error'" class="border-t border-hairline">
+    <Pagination />
+  </div>
+
+  <slot name="footer" />
+</div>
