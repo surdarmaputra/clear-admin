@@ -1,0 +1,192 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import Button from '../../components/ui/Button.astro';
+import Card from '../../components/ui/Card.astro';
+import Drawer from '../../components/ui/Drawer.astro';
+import Dropdown from '../../components/ui/Dropdown.astro';
+import DropdownItem from '../../components/ui/DropdownItem.astro';
+import Icon from '../../components/Icon.astro';
+import Input from '../../components/ui/Input.astro';
+import Modal from '../../components/ui/Modal.astro';
+import TabPanel from '../../components/ui/TabPanel.astro';
+import Tabs from '../../components/ui/Tabs.astro';
+import Tooltip from '../../components/ui/Tooltip.astro';
+
+const breadcrumb = [{ label: 'Components' }, { label: 'Overlays' }];
+
+const tabs = [
+  { id: 'details', label: 'Details' },
+  { id: 'members', label: 'Members' },
+  { id: 'activity', label: 'Activity' },
+];
+---
+
+<DashboardLayout title="Overlays" breadcrumb={breadcrumb}>
+  <div class="flex max-w-4xl flex-col gap-6">
+    <div>
+      <h1 class="font-display text-title font-semibold tracking-display">Overlays</h1>
+      <p class="mt-1 text-caption text-ink-secondary">
+        Everything a CRUD screen layers over the page. Modal and drawer share one focus trap, so Tab
+        stays inside the panel and closing hands focus back to the control that opened it.
+      </p>
+    </div>
+
+    <Card title="Dropdown menu" description="Arrow keys move between items; Escape closes.">
+      <div class="flex flex-wrap gap-3">
+        <Dropdown label="Actions">
+          <DropdownItem icon="pencil" onSelect="$store.toast.show('Editing order #1042')">
+            Edit order
+          </DropdownItem>
+          <DropdownItem icon="copy" onSelect="$store.toast.show('Duplicated order #1042')">
+            Duplicate
+          </DropdownItem>
+          <div class="my-1 border-t border-hairline"></div>
+          <DropdownItem
+            icon="trash-2"
+            tone="danger"
+            onSelect="$store.toast.show('Order deleted', 'danger')"
+          >
+            Delete
+          </DropdownItem>
+        </Dropdown>
+
+        <Dropdown label="Export" align="right">
+          <DropdownItem icon="file-text" onSelect="$store.toast.show('Exporting CSV', 'success')">
+            CSV
+          </DropdownItem>
+          <DropdownItem icon="file-json" onSelect="$store.toast.show('Exporting JSON', 'success')">
+            JSON
+          </DropdownItem>
+        </Dropdown>
+      </div>
+    </Card>
+
+    <Card title="Tooltip" description="Reveals on hover and on keyboard focus, never hover alone.">
+      <div class="flex flex-wrap items-center gap-4">
+        <Tooltip text="Refresh the table without reloading the page">
+          <Button variant="secondary">
+            <Icon name="refresh-cw" size={16} /> Refresh
+          </Button>
+        </Tooltip>
+
+        <Tooltip text="Archived orders stay searchable for 90 days." placement="bottom">
+          <Button variant="ghost">
+            <Icon name="archive" size={16} /> Archive
+          </Button>
+        </Tooltip>
+
+        <Tooltip text="Gross revenue, before refunds" placement="right">
+          <span
+            tabindex="0"
+            class="inline-flex items-center gap-1 rounded-control text-caption text-ink-secondary"
+          >
+            Revenue <Icon name="circle-help" size={14} />
+          </span>
+        </Tooltip>
+      </div>
+    </Card>
+
+    <Card title="Modal" description="A dialog for a decision or a short form.">
+      <div class="flex flex-wrap gap-3">
+        <Button x-on:click="$store.overlay.open('confirm-delete')">Delete order</Button>
+        <Button variant="secondary" x-on:click="$store.overlay.open('new-customer')">
+          New customer
+        </Button>
+      </div>
+    </Card>
+
+    <Card title="Drawer" description="The same contract, anchored to an edge.">
+      <div class="flex flex-wrap gap-3">
+        <Button variant="secondary" x-on:click="$store.overlay.open('order-detail')">
+          Order details
+        </Button>
+        <Button variant="secondary" x-on:click="$store.overlay.open('filters')">
+          Filters
+        </Button>
+      </div>
+    </Card>
+
+    <Card title="Tabs" description="Roving tabindex — one Tab stop, arrow keys move between tabs.">
+      <Tabs tabs={tabs}>
+        <TabPanel id="details" class="text-caption text-ink-secondary">
+          <p>Order #1042 · placed 12 March · paid by card.</p>
+        </TabPanel>
+        <TabPanel id="members" class="text-caption text-ink-secondary">
+          <p>Ada Lovelace, Grace Hopper and 2 others can see this order.</p>
+        </TabPanel>
+        <TabPanel id="activity" class="text-caption text-ink-secondary">
+          <p>Refund requested 2 days ago, still awaiting review.</p>
+        </TabPanel>
+      </Tabs>
+    </Card>
+  </div>
+
+  <Modal
+    id="confirm-delete"
+    title="Delete this order?"
+    description="Order #1042 will be removed for everyone. This cannot be undone."
+    size="sm"
+  >
+    <p>Refunds already issued against this order are kept for accounting.</p>
+    <Fragment slot="footer">
+      <Button variant="secondary" x-on:click="$store.overlay.close()">
+        Cancel
+      </Button>
+      <Button x-on:click="$store.overlay.close(); $store.toast.show('Order deleted', 'danger')">
+        Delete order
+      </Button>
+    </Fragment>
+  </Modal>
+
+  <Modal id="new-customer" title="New customer" description="They get an invite by email.">
+    <div class="flex flex-col gap-4">
+      <Input id="customer-name" label="Full name" placeholder="Ada Lovelace" />
+      <Input id="customer-email" label="Email" type="email" placeholder="ada@example.com" />
+    </div>
+    <Fragment slot="footer">
+      <Button variant="secondary" x-on:click="$store.overlay.close()">
+        Cancel
+      </Button>
+      <Button x-on:click="$store.overlay.close(); $store.toast.show('Customer added', 'success')">
+        Add customer
+      </Button>
+    </Fragment>
+  </Modal>
+
+  <Drawer id="order-detail" title="Order #1042">
+    <dl class="flex flex-col gap-3">
+      <div class="flex justify-between gap-4">
+        <dt>Customer</dt>
+        <dd class="text-ink-primary">Ada Lovelace</dd>
+      </div>
+      <div class="flex justify-between gap-4">
+        <dt>Plan</dt>
+        <dd class="text-ink-primary">Scale</dd>
+      </div>
+      <div class="flex justify-between gap-4">
+        <dt>Amount</dt>
+        <dd class="tabular text-ink-primary">$1,240</dd>
+      </div>
+    </dl>
+    <Fragment slot="footer">
+      <Button variant="secondary" x-on:click="$store.overlay.close()">
+        Close
+      </Button>
+    </Fragment>
+  </Drawer>
+
+  <Drawer id="filters" title="Filters" side="left">
+    <div class="flex flex-col gap-4">
+      <Input id="filter-customer" label="Customer" placeholder="Any" />
+      <Input id="filter-min" label="Minimum amount" type="number" placeholder="0" />
+    </div>
+    <Fragment slot="footer">
+      <Button variant="secondary" x-on:click="$store.overlay.close()">
+        Cancel
+      </Button>
+      <Button x-on:click="$store.overlay.close(); $store.toast.show('Filters applied')">
+        Apply
+      </Button>
+    </Fragment>
+  </Drawer>
+</DashboardLayout>

@@ -1,0 +1,190 @@
+---
+import Field from './Field.astro';
+import Icon from '../Icon.astro';
+import { controlClass, describedBy } from './control';
+
+interface Props {
+  id: string;
+  label: string;
+  name?: string;
+  /** ISO `YYYY-MM-DD`. */
+  value?: string;
+  hint?: string;
+  error?: string;
+  required?: boolean;
+}
+
+const { id, label, name = id, value = '', hint, error, required = false } = Astro.props;
+
+// Arrow keys walk the grid, PageUp/PageDown change month, Enter picks, Escape
+// closes — the calendar is unusable with a keyboard without all four. The
+// listener sits on the window because moving the cursor moves focus between day
+// buttons, and a key pressed mid-move would otherwise land on the body and be
+// swallowed. It is inert unless this picker is the open one.
+const state = `{
+  open: false,
+  value: ${JSON.stringify(value)},
+  cursor: new Date(${JSON.stringify(value)} || Date.now()),
+  get month() { return this.cursor.getMonth() },
+  get year() { return this.cursor.getFullYear() },
+  get monthLabel() {
+    return this.cursor.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  },
+  get days() {
+    const first = new Date(this.year, this.month, 1);
+    const cells = [];
+    for (let i = 0; i < first.getDay(); i++) cells.push(null);
+    const last = new Date(this.year, this.month + 1, 0).getDate();
+    for (let day = 1; day <= last; day++) cells.push(this.iso(new Date(this.year, this.month, day)));
+    return cells;
+  },
+  iso(date) {
+    const pad = (n) => String(n).padStart(2, '0');
+    return date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate());
+  },
+  get cursorIso() { return this.iso(this.cursor) },
+  dayNumber(iso) { return Number(iso.slice(8)) },
+  display(iso) {
+    if (!iso) return '';
+    const [y, m, d] = iso.split('-').map(Number);
+    return new Date(y, m - 1, d).toLocaleDateString('en-US', {
+      day: 'numeric', month: 'short', year: 'numeric',
+    });
+  },
+  toggle() {
+    this.open = !this.open;
+    if (this.open) this.$nextTick(() => this.focusCursor());
+  },
+  close(refocus = true) {
+    this.open = false;
+    if (refocus) this.$refs.trigger.focus();
+  },
+  shift(days) {
+    const next = new Date(this.cursor);
+    next.setDate(next.getDate() + days);
+    this.cursor = next;
+    this.$nextTick(() => this.focusCursor());
+  },
+  shiftMonth(months) {
+    const next = new Date(this.year, this.month + months, 1);
+    this.cursor = next;
+    this.$nextTick(() => this.focusCursor());
+  },
+  focusCursor() {
+    this.$refs.grid?.querySelector('[data-date="' + this.cursorIso + '"]')?.focus();
+  },
+  key(event) {
+    if (!this.open) return;
+    const days = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 };
+    const months = { PageUp: -1, PageDown: 1 };
+    if (event.key in days) {
+      event.preventDefault();
+      this.shift(days[event.key]);
+    } else if (event.key in months) {
+      event.preventDefault();
+      this.shiftMonth(months[event.key]);
+    } else if (event.key === 'Escape') {
+      event.preventDefault();
+      this.close();
+    } else if (event.key === 'Enter') {
+      // Preventing the default also cancels the click the browser would
+      // synthesise on the focused day — which may still be the previous one,
+      // since focus follows the cursor a tick behind.
+      event.preventDefault();
+      this.select(this.cursorIso);
+    }
+  },
+  select(iso) {
+    this.value = iso;
+    const [y, m, d] = iso.split('-').map(Number);
+    this.cursor = new Date(y, m - 1, d);
+    this.close();
+  },
+}`;
+---
+
+<Field id={id} label={label} hint={hint} error={error} required={required}>
+  <div x-data={state} x-on:keydown.window="key($event)" class="relative">
+    <input
+      id={id}
+      type="text"
+      readonly
+      x-ref="trigger"
+      x-bind:value="display(value)"
+      x-on:click="toggle()"
+      x-on:keydown.enter="open || toggle()"
+      x-bind:aria-expanded="open"
+      aria-haspopup="dialog"
+      placeholder="Pick a date"
+      aria-invalid={error ? 'true' : undefined}
+      aria-describedby={describedBy(id, hint, error)}
+      class:list={[controlClass, 'cursor-pointer pr-9', error && 'border-danger']}
+    />
+    <Icon
+      name="calendar"
+      size={16}
+      class="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-ink-secondary"
+    />
+
+    {/* The value the form posts is the ISO one, never the display string. */}
+    <input type="hidden" name={name} x-bind:value="value" />
+
+    <div
+      x-show="open"
+      x-on:click.outside="open && close(false)"
+      x-transition.opacity.duration.150ms
+      x-cloak
+      role="dialog"
+      aria-label={`${label} calendar`}
+      class="absolute z-30 mt-2 w-72 rounded-card border border-hairline bg-surface-card p-3 shadow-raised"
+    >
+      <div class="flex items-center justify-between gap-2">
+        <button
+          type="button"
+          x-on:click="shiftMonth(-1)"
+          aria-label="Previous month"
+          class="grid size-8 place-items-center rounded-control text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink-primary"
+        >
+          <Icon name="chevron-left" size={16} />
+        </button>
+        <p class="text-caption font-semibold" x-text="monthLabel" aria-live="polite"></p>
+        <button
+          type="button"
+          x-on:click="shiftMonth(1)"
+          aria-label="Next month"
+          class="grid size-8 place-items-center rounded-control text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink-primary"
+        >
+          <Icon name="chevron-right" size={16} />
+        </button>
+      </div>
+
+      <div class="mt-2 grid grid-cols-7 gap-1 text-center">
+        {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((day) => (
+          <span class="text-micro tracking-label text-ink-secondary uppercase">{day}</span>
+        ))}
+      </div>
+
+      <div x-ref="grid" class="mt-1 grid grid-cols-7 gap-1">
+        {/* `date` rather than `iso`: a loop variable named after a method on the
+            component would shadow it inside this scope. */}
+        <template x-for="(date, index) in days" x-bind:key="index">
+          <div>
+            <button
+              x-show="date"
+              type="button"
+              x-bind:data-date="date"
+              x-bind:tabindex="date === cursorIso ? 0 : -1"
+              x-bind:aria-current="date === value ? 'date' : false"
+              x-on:click="select(date)"
+              x-bind:class="date === value
+                ? 'bg-accent text-paper'
+                : 'text-ink-secondary hover:bg-surface-hover hover:text-ink-primary'"
+              class="tabular grid size-9 w-full place-items-center rounded-control text-caption transition-colors"
+              x-text="date && dayNumber(date)"
+            ></button>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+</Field>

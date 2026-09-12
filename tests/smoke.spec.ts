@@ -267,3 +267,181 @@ test.describe('dashboard on a phone', () => {
     }
   });
 });
+
+test.describe('interaction pack', () => {
+  test('overlays, feedback and forms pages render cleanly', async ({ page }) => {
+    for (const path of ['/components/overlays', '/components/feedback', '/components/forms']) {
+      const failures = watchForFailures(page);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+      expect(failures, `${path} is clean`).toEqual([]);
+    }
+  });
+
+  test('modal traps Tab, closes on escape, and restores focus', async ({ page }) => {
+    await page.goto('/components/overlays');
+
+    const trigger = page.getByRole('button', { name: 'Delete order', exact: true });
+    await trigger.click();
+
+    const dialog = page.getByRole('dialog', { name: 'Delete this order?' });
+    await expect(dialog).toBeVisible();
+
+    // Focus starts inside the panel and Tab never leaves it — the drawer
+    // shipping untrapped is the bug this directive exists to prevent.
+    for (let i = 0; i < 8; i++) {
+      const inside = await dialog.evaluate((el) => el.contains(document.activeElement));
+      expect(inside, `focus stayed in the dialog after ${i} tabs`).toBe(true);
+      await page.keyboard.press('Tab');
+    }
+
+    await page.keyboard.press('Escape');
+    await expect(dialog).toBeHidden();
+    await expect(trigger).toBeFocused();
+  });
+
+  test('drawer opens from either edge and closes on the backdrop', async ({ page }) => {
+    await page.goto('/components/overlays');
+
+    await page.getByRole('button', { name: 'Order details' }).click();
+    const drawer = page.getByRole('dialog', { name: 'Order #1042' });
+    await expect(drawer).toBeVisible();
+    await expect(drawer).toContainText('Ada Lovelace');
+
+    await page.keyboard.press('Escape');
+    await expect(drawer).toBeHidden();
+
+    await page.getByRole('button', { name: 'Filters' }).click();
+    await expect(page.getByRole('dialog', { name: 'Filters' })).toBeVisible();
+  });
+
+  test('dropdown walks with the arrow keys and raises the selected action', async ({ page }) => {
+    await page.goto('/components/overlays');
+
+    const menu = page.getByRole('menu', { name: 'Actions' });
+    await page.getByRole('button', { name: 'Actions' }).click();
+    await expect(menu).toBeVisible();
+    await expect(menu.getByRole('menuitem').first()).toBeFocused();
+
+    await page.keyboard.press('ArrowDown');
+    await expect(menu.getByRole('menuitem').nth(1)).toBeFocused();
+
+    await page.keyboard.press('End');
+    await expect(menu.getByRole('menuitem').last()).toBeFocused();
+
+    await page.keyboard.press('Enter');
+    await expect(menu).toBeHidden();
+    await expect(page.locator('[data-toast]')).toContainText('Order deleted');
+  });
+
+  test('tooltip answers the keyboard, not just the pointer', async ({ page }) => {
+    await page.goto('/components/overlays');
+
+    const tip = page.getByRole('tooltip').filter({ hasText: 'Refresh the table' });
+    await expect(tip).toBeHidden();
+
+    const trigger = page.getByRole('button', { name: 'Refresh' });
+    await trigger.focus();
+    await expect(tip).toBeVisible();
+
+    // The trigger has to point at the tooltip, or a screen reader never hears it.
+    const describedBy = await trigger.getAttribute('aria-describedby');
+    expect(describedBy).toBe(await tip.getAttribute('id'));
+
+    await page.keyboard.press('Escape');
+    await expect(tip).toBeHidden();
+  });
+
+  test('tabs move with the arrow keys and swap panels', async ({ page }) => {
+    await page.goto('/components/overlays');
+
+    const details = page.getByRole('tab', { name: 'Details' });
+    await expect(details).toHaveAttribute('aria-selected', 'true');
+    await expect(page.getByRole('tabpanel')).toContainText('placed 12 March');
+
+    await details.focus();
+    await page.keyboard.press('ArrowRight');
+    await expect(page.getByRole('tab', { name: 'Members' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+    await expect(page.getByRole('tabpanel')).toContainText('Grace Hopper');
+
+    // One Tab stop for the whole tablist: the unselected tabs are skipped.
+    await expect(details).toHaveAttribute('tabindex', '-1');
+
+    await page.keyboard.press('ArrowLeft');
+    await expect(details).toHaveAttribute('aria-selected', 'true');
+  });
+
+  test('toast stacks, announces politely, and dismisses', async ({ page }) => {
+    await page.goto('/components/feedback');
+
+    const toasts = page.locator('[data-toast]');
+    await page.getByRole('button', { name: 'Success' }).click();
+    await expect(toasts).toHaveCount(1);
+    await expect(toasts.first()).toContainText('Changes saved.');
+
+    await page.getByRole('button', { name: 'Persistent' }).click();
+    await expect(toasts).toHaveCount(2);
+
+    await toasts.last().getByRole('button', { name: 'Dismiss notification' }).click();
+    await expect(toasts).toHaveCount(1);
+
+    // The auto-dismissing one clears itself; the persistent one would not have.
+    await expect(toasts).toHaveCount(0, { timeout: 6000 });
+  });
+
+  test('switch reports its state and posts a value', async ({ page }) => {
+    await page.goto('/components/forms');
+
+    const toggle = page.getByRole('switch', { name: 'Auto-renew' });
+    await expect(toggle).toHaveAttribute('aria-checked', 'true');
+    const value = page.locator('input[name="auto-renew"]');
+    await expect(value).toHaveValue('on');
+
+    await toggle.click();
+    await expect(toggle).toHaveAttribute('aria-checked', 'false');
+    await expect(value).toHaveValue('off');
+
+    await expect(page.getByRole('switch', { name: 'Sandbox mode' })).toBeDisabled();
+  });
+
+  test('date picker walks the grid and posts an ISO value', async ({ page }) => {
+    await page.goto('/components/forms');
+
+    const input = page.getByRole('textbox', { name: 'Period start' });
+    await expect(input).toHaveValue('Sep 1, 2026');
+
+    await input.click();
+    const calendar = page.getByRole('dialog', { name: 'Period start calendar' });
+    await expect(calendar).toBeVisible();
+    await expect(calendar.getByText('September 2026')).toBeVisible();
+
+    // Right moves a day, down moves a week: the 1st plus 8 days is the 9th.
+    await page.keyboard.press('ArrowRight');
+    await page.keyboard.press('ArrowDown');
+    await page.keyboard.press('Enter');
+
+    await expect(calendar).toBeHidden();
+    await expect(input).toHaveValue('Sep 9, 2026');
+    await expect(page.locator('input[name="period-start"]')).toHaveValue('2026-09-09');
+  });
+});
+
+test.describe('mobile nav trap', () => {
+  test.skip(({ isMobile }) => !isMobile, 'the off-canvas drawer is mobile-only');
+
+  test('keeps focus inside the open drawer', async ({ page }) => {
+    await page.goto('/');
+
+    await page.getByRole('button', { name: 'Open navigation' }).click();
+    const sidebar = page.locator('aside');
+
+    for (let i = 0; i < 6; i++) {
+      await page.keyboard.press('Tab');
+      const inside = await sidebar.evaluate((el) => el.contains(document.activeElement));
+      expect(inside, `focus stayed in the drawer after ${i + 1} tabs`).toBe(true);
+    }
+  });
+});

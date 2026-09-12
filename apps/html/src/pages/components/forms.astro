@@ -1,0 +1,112 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import Button from '../../components/ui/Button.astro';
+import Card from '../../components/ui/Card.astro';
+import Checkbox from '../../components/ui/Checkbox.astro';
+import DatePicker from '../../components/ui/DatePicker.astro';
+import Input from '../../components/ui/Input.astro';
+import Radio from '../../components/ui/Radio.astro';
+import Select from '../../components/ui/Select.astro';
+import Switch from '../../components/ui/Switch.astro';
+import Textarea from '../../components/ui/Textarea.astro';
+
+const breadcrumb = [{ label: 'Components' }, { label: 'Forms' }];
+---
+
+<DashboardLayout title="Forms" breadcrumb={breadcrumb}>
+  <div class="flex max-w-4xl flex-col gap-6">
+    <div>
+      <h1 class="font-display text-title font-semibold tracking-display">Forms</h1>
+      <p class="mt-1 text-caption text-ink-secondary">
+        Every control carries a label, and a hint or error is wired to it by id. The switch and the
+        date picker post their value through a hidden input, so a plain form submit still works.
+      </p>
+    </div>
+
+    <form
+      class="flex flex-col gap-6"
+      x-on:submit.prevent="$store.toast.show('Settings saved', 'success')"
+    >
+      <Card title="Text controls">
+        <div class="grid gap-4 sm:grid-cols-2">
+          <Input id="company" label="Company" placeholder="Analytical Engines Ltd" required />
+          <Input
+            id="billing-email"
+            label="Billing email"
+            type="email"
+            placeholder="billing@example.com"
+            hint="Invoices and receipts go here."
+          />
+          <Input
+            id="vat"
+            label="VAT number"
+            value="GB-0000"
+            error="That does not look like a VAT number."
+          />
+          <Select id="country" label="Country">
+            <option>United Kingdom</option>
+            <option>Indonesia</option>
+            <option>United States</option>
+          </Select>
+          <div class="sm:col-span-2">
+            <Textarea
+              id="notes"
+              label="Invoice notes"
+              placeholder="Printed at the bottom of every invoice"
+            />
+          </div>
+        </div>
+      </Card>
+
+      <Card title="Date picker" description="Arrow keys walk the grid, PageUp/PageDown the month.">
+        <div class="grid gap-4 sm:grid-cols-2">
+          <DatePicker id="period-start" label="Period start" value="2026-09-01" />
+          <DatePicker id="period-end" label="Period end" hint="Leave empty for an open period." />
+        </div>
+      </Card>
+
+      <Card title="Choice controls">
+        <div class="grid gap-6 sm:grid-cols-2">
+          <fieldset class="flex flex-col gap-3">
+            <legend class="mb-1 text-caption font-medium">Billing cycle</legend>
+            <Radio id="cycle-monthly" name="cycle" value="monthly" label="Monthly" checked />
+            <Radio
+              id="cycle-yearly"
+              name="cycle"
+              value="yearly"
+              label="Yearly"
+              hint="Two months free."
+            />
+          </fieldset>
+
+          <fieldset class="flex flex-col gap-3">
+            <legend class="mb-1 text-caption font-medium">Email me about</legend>
+            <Checkbox id="notify-invoices" label="New invoices" checked />
+            <Checkbox id="notify-failures" label="Failed payments" />
+            <Checkbox id="notify-product" label="Product updates" hint="At most once a month." />
+          </fieldset>
+        </div>
+      </Card>
+
+      <Card title="Switch" description="An immediate setting, not a form field waiting on submit.">
+        <div class="flex flex-col gap-4">
+          <Switch
+            id="auto-renew"
+            label="Auto-renew"
+            hint="Charge the card on file each cycle."
+            checked
+          />
+          <Switch id="usage-alerts" label="Usage alerts" hint="Warn me at 80% of the plan limit." />
+          <Switch id="sandbox" label="Sandbox mode" hint="Not available on this plan." disabled />
+        </div>
+      </Card>
+
+      <div class="flex flex-wrap justify-end gap-3">
+        <Button variant="ghost" type="reset">
+          Reset
+        </Button>
+        <Button type="submit">Save settings</Button>
+      </div>
+    </form>
+  </div>
+</DashboardLayout>

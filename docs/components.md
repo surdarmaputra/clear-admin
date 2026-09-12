@@ -76,7 +76,7 @@ artifact, deployed.
 | Component                | Priority | HTML | React |
 | ------------------------ | -------- | ---- | ----- |
 | Alert                    | P1       | done | —     |
-| Toast / notification     | P1       | —    | —     |
+| Toast / notification     | P1       | done | —     |
 | Empty state              | P1       | done | —     |
 | Error state              | P1       | done | —     |
 | Loading state / skeleton | P1       | done | —     |
@@ -88,17 +88,17 @@ artifact, deployed.
 
 | Component     | Priority | HTML | React |
 | ------------- | -------- | ---- | ----- |
-| Dropdown menu | P0       | —    | —     |
-| Tooltip       | P1       | —    | —     |
-| Modal         | P1       | —    | —     |
-| Drawer        | P1       | —    | —     |
+| Dropdown menu | P0       | done | —     |
+| Tooltip       | P1       | done | —     |
+| Modal         | P1       | done | —     |
+| Drawer        | P1       | done | —     |
 
 ## Navigation
 
 | Component  | Priority | HTML | React |
 | ---------- | -------- | ---- | ----- |
 | Breadcrumb | P0       | done | —     |
-| Tabs       | P1       | —    | —     |
+| Tabs       | P1       | done | —     |
 
 ## Forms
 
@@ -110,8 +110,8 @@ artifact, deployed.
 | Select                               | P0       | done | —     |
 | Checkbox                             | P0       | done | —     |
 | Radio                                | P0       | done | —     |
-| Switch                               | P1       | —    | —     |
-| Date picker                          | P1       | —    | —     |
+| Switch                               | P1       | done | —     |
+| Date picker                          | P1       | done | —     |
 | Rich text editor — Lexical, markdown | P2       | —    | —     |
 
 ## Files & media
@@ -132,16 +132,19 @@ artifact, deployed.
 
 ## Pages
 
-| Page                 | Priority | HTML | React |
-| -------------------- | -------- | ---- | ----- |
-| Blank page template  | P0       | done | —     |
-| Dashboard — overview | P1       | done | —     |
-| Login                | P1       | done | —     |
-| Register             | P1       | done | —     |
-| Password reset       | P1       | done | —     |
-| 404                  | P1       | done | —     |
-| Profile              | P2       | —    | —     |
-| Settings             | P2       | —    | —     |
+| Page                  | Priority | HTML | React |
+| --------------------- | -------- | ---- | ----- |
+| Blank page template   | P0       | done | —     |
+| Components — forms    | P1       | done | —     |
+| Components — overlays | P1       | done | —     |
+| Components — feedback | P1       | done | —     |
+| Dashboard — overview  | P1       | done | —     |
+| Login                 | P1       | done | —     |
+| Register              | P1       | done | —     |
+| Password reset        | P1       | done | —     |
+| 404                   | P1       | done | —     |
+| Profile               | P2       | —    | —     |
+| Settings              | P2       | —    | —     |
 
 ---
 

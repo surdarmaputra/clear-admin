@@ -12,6 +12,7 @@ const groupOpen = (children?: { href?: string }[]) =>
 ---
 
 <aside
+  x-focus-trap="mobileOpen"
   class="fixed inset-y-0 left-0 z-40 flex shrink-0 flex-col bg-surface-sidebar transition-[width,transform] duration-200 ease-out lg:static lg:translate-x-0"
   x-bind:class="[
     collapsed ? 'w-16' : 'w-64',
