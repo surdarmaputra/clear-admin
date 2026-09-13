@@ -86,6 +86,11 @@ jobs:
           fi
           echo "base path applied to all links and assets"
 
+      - name: Build React for Pages
+        env:
+          BASE_PATH: /${{ github.event.repository.name }}/react
+        run: pnpm build:react
+
       - name: Assemble site
         run: |
           mkdir -p _site/fonts
@@ -93,6 +98,7 @@ jobs:
           cp apps/html/public/favicon.svg _site/
           cp apps/html/node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2 _site/fonts/
           cp -r apps/html/dist _site/html
+          cp -r apps/react/dist _site/react
 
       - uses: actions/upload-pages-artifact@v3
         if: github.ref == 'refs/heads/main'
