@@ -58,11 +58,11 @@ artifact, deployed.
 
 | Component                                     | Priority | HTML | React |
 | --------------------------------------------- | -------- | ---- | ----- |
-| App shell / page wrapper                      | P0       | done | —     |
-| Sidebar — collapsible, nested nav             | P0       | done | —     |
-| Topbar — breadcrumb, notifications, user menu | P0       | done | —     |
-| Theme toggle (light/dark)                     | P0       | done | —     |
-| Responsive behaviour — mobile drawer nav      | P0       | done | —     |
+| App shell / page wrapper                      | P0       | done | done  |
+| Sidebar — collapsible, nested nav             | P0       | done | done  |
+| Topbar — breadcrumb, notifications, user menu | P0       | done | done  |
+| Theme toggle (light/dark)                     | P0       | done | done  |
+| Responsive behaviour — mobile drawer nav      | P0       | done | done  |
 
 ## Data display
 
@@ -87,7 +87,7 @@ artifact, deployed.
 
 | Component                | Priority | HTML | React |
 | ------------------------ | -------- | ---- | ----- |
-| Alert                    | P1       | done | —     |
+| Alert                    | P1       | done | done  |
 | Toast / notification     | P1       | done | —     |
 | Empty state              | P1       | done | —     |
 | Error state              | P1       | done | —     |
@@ -109,18 +109,18 @@ artifact, deployed.
 
 | Component  | Priority | HTML | React |
 | ---------- | -------- | ---- | ----- |
-| Breadcrumb | P0       | done | —     |
+| Breadcrumb | P0       | done | done  |
 | Tabs       | P1       | done | —     |
 
 ## Forms
 
 | Component                            | Priority | HTML | React |
 | ------------------------------------ | -------- | ---- | ----- |
-| Button                               | P0       | done | —     |
-| Input                                | P0       | done | —     |
+| Button                               | P0       | done | done  |
+| Input                                | P0       | done | done  |
 | Textarea                             | P0       | done | —     |
 | Select                               | P0       | done | —     |
-| Checkbox                             | P0       | done | —     |
+| Checkbox                             | P0       | done | done  |
 | Radio                                | P0       | done | —     |
 | Switch                               | P1       | done | —     |
 | Date picker                          | P1       | done | —     |
@@ -146,17 +146,17 @@ artifact, deployed.
 
 | Page                  | Priority | HTML | React |
 | --------------------- | -------- | ---- | ----- |
-| Blank page template   | P0       | done | —     |
+| Blank page template   | P0       | done | done  |
 | Components — forms    | P1       | done | —     |
 | Components — overlays | P1       | done | —     |
 | Components — feedback | P1       | done | —     |
 | Data — tables         | P2       | done | —     |
 | Data — headless table | P2       | done | —     |
 | Dashboard — overview  | P1       | done | —     |
-| Login                 | P1       | done | —     |
-| Register              | P1       | done | —     |
-| Password reset        | P1       | done | —     |
-| 404                   | P1       | done | —     |
+| Login                 | P1       | done | done  |
+| Register              | P1       | done | done  |
+| Password reset        | P1       | done | done  |
+| 404                   | P1       | done | done  |
 | Profile               | P2       | done | —     |
 | Settings              | P2       | done | —     |
 | Editor                | P2       | done | —     |

@@ -10,12 +10,14 @@
   },
   "scripts": {
     "dev:html": "pnpm --filter @clear-admin/html dev",
+    "dev:react": "pnpm --filter @clear-admin/react dev",
     "build:html": "pnpm --filter @clear-admin/html build",
+    "build:react": "pnpm --filter @clear-admin/react build",
     "build": "pnpm -r build",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "typecheck": "pnpm --filter @clear-admin/html check",
+    "typecheck": "pnpm --filter @clear-admin/html check && pnpm --filter @clear-admin/react typecheck",
     "guard:tokens": "node scripts/token-guard.mjs",
     "test": "playwright test"
   },
