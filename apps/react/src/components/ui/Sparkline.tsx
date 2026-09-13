@@ -33,10 +33,7 @@ export function Sparkline({ points, tone, className = '' }: SparklineProps) {
           <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
         </linearGradient>
       </defs>
-      <polygon
-        points={`0,${HEIGHT} ${coords.join(' ')} ${WIDTH},${HEIGHT}`}
-        fill={`url(#${id})`}
-      />
+      <polygon points={`0,${HEIGHT} ${coords.join(' ')} ${WIDTH},${HEIGHT}`} fill={`url(#${id})`} />
       <polyline
         points={coords.join(' ')}
         fill="none"

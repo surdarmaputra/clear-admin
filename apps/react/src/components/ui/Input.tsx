@@ -25,7 +25,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
         name={rest.name ?? id}
         aria-invalid={error ? 'true' : undefined}
         aria-describedby={describedBy(id, hint, error)}
-        className={`${controlClass}${error ? ' border-danger' : ''} ${className}`}
+        className={`${controlClass}${error ? 'border-danger' : ''} ${className}`}
         required={required}
         {...rest}
       />

@@ -36,7 +36,7 @@ export function StatCard({
   const good = rising === higherIsBetter;
 
   return (
-    <div className="group relative overflow-hidden rounded-card border border-hairline bg-surface-card shadow-card transition-shadow hover:shadow-raised">
+    <div className="group rounded-card border-hairline bg-surface-card shadow-card hover:shadow-raised relative overflow-hidden border transition-shadow">
       <div
         aria-hidden="true"
         className={`pointer-events-none absolute inset-0 bg-gradient-to-br to-transparent ${wash}`}
@@ -45,23 +45,23 @@ export function StatCard({
 
       <div className="relative p-5">
         <div className="flex items-start justify-between gap-3">
-          <p className="text-micro font-medium tracking-label text-ink-secondary uppercase">
+          <p className="text-micro tracking-label text-ink-secondary font-medium uppercase">
             {label}
           </p>
           {icon && (
-            <span className={`grid size-8 shrink-0 place-items-center rounded-control ${chip}`}>
+            <span className={`rounded-control grid size-8 shrink-0 place-items-center ${chip}`}>
               {icon}
             </span>
           )}
         </div>
 
-        <p className="tabular font-display mt-3 text-heading-sm font-semibold tracking-display">
+        <p className="tabular font-display text-heading-sm tracking-display mt-3 font-semibold">
           {value}
         </p>
 
         <div className="mt-2 flex items-end justify-between gap-3">
           {(change || caption) && (
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-micro">
+            <div className="text-micro flex flex-wrap items-center gap-x-2 gap-y-1">
               {change && (
                 <span
                   className={`inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 font-medium ${

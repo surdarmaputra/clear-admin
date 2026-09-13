@@ -42,20 +42,29 @@ function fmt(value: unknown, prefix?: string) {
   return `${prefix ?? ''}${(value as number).toLocaleString('en-US')}`;
 }
 
-export default function ChartImpl({ type, series, categories, labels, colors, valuePrefix }: ChartImplProps) {
+export default function ChartImpl({
+  type,
+  series,
+  categories,
+  labels,
+  colors,
+  valuePrefix,
+}: ChartImplProps) {
   if (type === 'donut') {
     const nums = series as number[];
     return (
       <Doughnut
         data={{
           labels: nums.map((_, i) => labels?.[i] ?? `Series ${i + 1}`),
-          datasets: [{
-            data: nums,
-            backgroundColor: colors,
-            borderColor: 'var(--color-surface-card)',
-            borderWidth: 2,
-            hoverOffset: 4,
-          }],
+          datasets: [
+            {
+              data: nums,
+              backgroundColor: colors,
+              borderColor: 'var(--color-surface-card)',
+              borderWidth: 2,
+              hoverOffset: 4,
+            },
+          ],
         }}
         options={{
           responsive: true,

@@ -59,16 +59,13 @@ function NavGroup({
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
-        className="flex w-full items-center gap-3 rounded-control px-3 py-2 text-caption text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink-primary"
+        className="rounded-control text-caption text-ink-secondary hover:bg-surface-hover hover:text-ink-primary flex w-full items-center gap-3 px-3 py-2 transition-colors"
       >
         {item.icon && <NavIcon name={item.icon} />}
         {!collapsed && (
           <>
             <span className="flex-1 text-left">{item.label}</span>
-            <ChevronRight
-              size={14}
-              className={`transition-transform${open ? ' rotate-90' : ''}`}
-            />
+            <ChevronRight size={14} className={`transition-transform${open ? 'rotate-90' : ''}`} />
           </>
         )}
       </button>
@@ -82,10 +79,10 @@ function NavGroup({
                 <Link
                   to={child.href ?? '#'}
                   aria-current={active ? 'page' : undefined}
-                  className={`block rounded-control px-3 py-1.5 text-caption transition-colors${
+                  className={`rounded-control text-caption block px-3 py-1.5 transition-colors${
                     active
-                      ? ' bg-accent/10 font-semibold text-accent'
-                      : ' text-ink-secondary hover:bg-surface-hover hover:text-ink-primary'
+                      ? 'bg-accent/10 text-accent font-semibold'
+                      : 'text-ink-secondary hover:bg-surface-hover hover:text-ink-primary'
                   }`}
                 >
                   {child.label}
@@ -99,17 +96,25 @@ function NavGroup({
   );
 }
 
-function NavLink({ item, collapsed, pathname }: { item: NavItem; collapsed: boolean; pathname: string }) {
+function NavLink({
+  item,
+  collapsed,
+  pathname,
+}: {
+  item: NavItem;
+  collapsed: boolean;
+  pathname: string;
+}) {
   const active = item.href ? norm(item.href) === norm(pathname) : false;
   return (
     <li>
       <Link
         to={item.href ?? '#'}
         aria-current={active ? 'page' : undefined}
-        className={`flex items-center gap-3 rounded-control px-3 py-2 text-caption transition-colors${
+        className={`rounded-control text-caption flex items-center gap-3 px-3 py-2 transition-colors${
           active
-            ? ' bg-accent/10 font-semibold text-accent'
-            : ' text-ink-secondary hover:bg-surface-hover hover:text-ink-primary'
+            ? 'bg-accent/10 text-accent font-semibold'
+            : 'text-ink-secondary hover:bg-surface-hover hover:text-ink-primary'
         }`}
       >
         {item.icon && <NavIcon name={item.icon} />}
@@ -125,16 +130,16 @@ export function Sidebar({ collapsed, mobileOpen, onToggleCollapse }: SidebarProp
 
   return (
     <aside
-      className={`fixed inset-y-0 left-0 z-40 flex shrink-0 flex-col bg-surface-sidebar transition-[width,transform] duration-200 ease-out lg:static lg:translate-x-0 ${
+      className={`bg-surface-sidebar fixed inset-y-0 left-0 z-40 flex shrink-0 flex-col transition-[width,transform] duration-200 ease-out lg:static lg:translate-x-0 ${
         collapsed ? 'w-16' : 'w-64'
       } ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}
     >
       <div className="flex h-14 items-center gap-2 px-4">
-        <span className="grid size-7 shrink-0 place-items-center rounded-control bg-cobalt text-paper">
+        <span className="rounded-control bg-cobalt text-paper grid size-7 shrink-0 place-items-center">
           <LayoutDashboard size={16} />
         </span>
         {!collapsed && (
-          <span className="font-display text-subheading font-semibold tracking-display">
+          <span className="font-display text-subheading tracking-display font-semibold">
             Clear Admin
           </span>
         )}
@@ -157,11 +162,11 @@ export function Sidebar({ collapsed, mobileOpen, onToggleCollapse }: SidebarProp
           type="button"
           onClick={onToggleCollapse}
           aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          className="hidden w-full items-center gap-3 rounded-control px-3 py-2 text-caption text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink-primary lg:flex"
+          className="rounded-control text-caption text-ink-secondary hover:bg-surface-hover hover:text-ink-primary hidden w-full items-center gap-3 px-3 py-2 transition-colors lg:flex"
         >
           <ChevronsLeft
             size={18}
-            className={`shrink-0 transition-transform${collapsed ? ' rotate-180' : ''}`}
+            className={`shrink-0 transition-transform${collapsed ? 'rotate-180' : ''}`}
           />
           {!collapsed && <span>Collapse</span>}
         </button>

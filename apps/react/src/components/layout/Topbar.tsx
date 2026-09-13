@@ -17,7 +17,7 @@ interface TopbarProps {
 function Breadcrumb({ items }: { items: BreadcrumbItem[] }) {
   return (
     <nav aria-label="Breadcrumb">
-      <ol className="flex items-center gap-1 text-caption">
+      <ol className="text-caption flex items-center gap-1">
         {items.map((item, i) => (
           <li key={i} className="flex items-center gap-1">
             {i > 0 && <span className="text-ink-secondary">/</span>}
@@ -26,7 +26,7 @@ function Breadcrumb({ items }: { items: BreadcrumbItem[] }) {
                 {item.label}
               </Link>
             ) : (
-              <span className="font-medium text-ink-primary" aria-current="page">
+              <span className="text-ink-primary font-medium" aria-current="page">
                 {item.label}
               </span>
             )}
@@ -39,12 +39,12 @@ function Breadcrumb({ items }: { items: BreadcrumbItem[] }) {
 
 export function Topbar({ title, breadcrumb = [], onMobileMenuOpen }: TopbarProps) {
   return (
-    <header className="sticky top-0 z-20 flex h-14 items-center gap-3 bg-surface-page px-4">
+    <header className="bg-surface-page sticky top-0 z-20 flex h-14 items-center gap-3 px-4">
       <button
         type="button"
         onClick={onMobileMenuOpen}
         aria-label="Open navigation"
-        className="grid size-9 place-items-center rounded-control text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink-primary lg:hidden"
+        className="rounded-control text-ink-secondary hover:bg-surface-hover hover:text-ink-primary grid size-9 place-items-center transition-colors lg:hidden"
       >
         <Menu size={18} />
       </button>
@@ -53,7 +53,7 @@ export function Topbar({ title, breadcrumb = [], onMobileMenuOpen }: TopbarProps
         {breadcrumb.length > 0 ? (
           <Breadcrumb items={breadcrumb} />
         ) : (
-          <h1 className="font-display truncate text-subheading font-semibold tracking-display">
+          <h1 className="font-display text-subheading tracking-display truncate font-semibold">
             {title}
           </h1>
         )}
@@ -62,10 +62,10 @@ export function Topbar({ title, breadcrumb = [], onMobileMenuOpen }: TopbarProps
       <button
         type="button"
         aria-label="Notifications"
-        className="relative grid size-9 place-items-center rounded-control text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink-primary"
+        className="rounded-control text-ink-secondary hover:bg-surface-hover hover:text-ink-primary relative grid size-9 place-items-center transition-colors"
       >
         <Bell size={18} />
-        <span className="absolute right-2 top-2 size-1.5 rounded-full bg-electric-blue" />
+        <span className="bg-electric-blue absolute top-2 right-2 size-1.5 rounded-full" />
       </button>
 
       <ThemeToggle />
@@ -75,9 +75,9 @@ export function Topbar({ title, breadcrumb = [], onMobileMenuOpen }: TopbarProps
           <button
             type="button"
             aria-label="Account"
-            className="flex items-center gap-2 rounded-control p-1 transition-colors hover:bg-surface-hover"
+            className="rounded-control hover:bg-surface-hover flex items-center gap-2 p-1 transition-colors"
           >
-            <span className="grid size-7 place-items-center rounded-full bg-surface-hover text-micro font-semibold text-ink-primary">
+            <span className="bg-surface-hover text-micro text-ink-primary grid size-7 place-items-center rounded-full font-semibold">
               SD
             </span>
             <ChevronDown size={14} className="text-ink-secondary" />
@@ -88,12 +88,12 @@ export function Topbar({ title, breadcrumb = [], onMobileMenuOpen }: TopbarProps
           <DropdownMenu.Content
             align="end"
             sideOffset={4}
-            className="z-50 min-w-40 rounded-card border border-hairline bg-surface-card p-1 shadow-card"
+            className="rounded-card border-hairline bg-surface-card shadow-card z-50 min-w-40 border p-1"
           >
             <DropdownMenu.Item asChild>
               <Link
                 to="/profile"
-                className="flex items-center gap-2 rounded-control px-3 py-2 text-caption text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink-primary outline-none cursor-default"
+                className="rounded-control text-caption text-ink-secondary hover:bg-surface-hover hover:text-ink-primary flex cursor-default items-center gap-2 px-3 py-2 transition-colors outline-none"
               >
                 <User size={16} /> Profile
               </Link>
@@ -101,16 +101,16 @@ export function Topbar({ title, breadcrumb = [], onMobileMenuOpen }: TopbarProps
             <DropdownMenu.Item asChild>
               <Link
                 to="/settings"
-                className="flex items-center gap-2 rounded-control px-3 py-2 text-caption text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink-primary outline-none cursor-default"
+                className="rounded-control text-caption text-ink-secondary hover:bg-surface-hover hover:text-ink-primary flex cursor-default items-center gap-2 px-3 py-2 transition-colors outline-none"
               >
                 <Settings size={16} /> Settings
               </Link>
             </DropdownMenu.Item>
-            <DropdownMenu.Separator className="my-1 border-t border-hairline" />
+            <DropdownMenu.Separator className="border-hairline my-1 border-t" />
             <DropdownMenu.Item asChild>
               <Link
                 to="/login"
-                className="flex items-center gap-2 rounded-control px-3 py-2 text-caption text-danger transition-colors hover:bg-danger/10 outline-none cursor-default"
+                className="rounded-control text-caption text-danger hover:bg-danger/10 flex cursor-default items-center gap-2 px-3 py-2 transition-colors outline-none"
               >
                 <LogOut size={16} /> Sign out
               </Link>

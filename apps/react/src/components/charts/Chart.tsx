@@ -19,27 +19,24 @@ export function Chart({ title, description, height, className = '', ...config }:
 
   return (
     <section
-      className={`rounded-card border border-hairline bg-surface-card p-5 shadow-card ${className}`}
+      className={`rounded-card border-hairline bg-surface-card shadow-card border p-5 ${className}`}
     >
       <div className="mb-4">
-        <h3 className="font-display text-subheading font-semibold tracking-display">{title}</h3>
-        {description && <p className="mt-0.5 text-caption text-ink-secondary">{description}</p>}
+        <h3 className="font-display text-subheading tracking-display font-semibold">{title}</h3>
+        {description && <p className="text-caption text-ink-secondary mt-0.5">{description}</p>}
       </div>
 
       <div style={{ height }}>
         {colors.length > 0 ? (
           <Suspense
             fallback={
-              <div
-                className="animate-pulse rounded-control bg-surface-hover"
-                style={{ height }}
-              />
+              <div className="rounded-control bg-surface-hover animate-pulse" style={{ height }} />
             }
           >
             <ChartImpl {...config} height={height} colors={colors} />
           </Suspense>
         ) : (
-          <div className="animate-pulse rounded-control bg-surface-hover" style={{ height }} />
+          <div className="rounded-control bg-surface-hover animate-pulse" style={{ height }} />
         )}
       </div>
     </section>

@@ -31,7 +31,7 @@ export function Avatar({ name, src, size = 'md', className = '' }: AvatarProps) 
   return (
     <span
       title={name}
-      className={`grid shrink-0 place-items-center rounded-full bg-surface-hover font-medium text-ink-secondary ${sizes[size]} ${className}`}
+      className={`bg-surface-hover text-ink-secondary grid shrink-0 place-items-center rounded-full font-medium ${sizes[size]} ${className}`}
     >
       <span aria-hidden="true">{initials}</span>
       <span className="sr-only">{name}</span>

@@ -15,9 +15,7 @@ interface DashboardLayoutProps {
 }
 
 export function DashboardLayout({ title, breadcrumb = [], children }: DashboardLayoutProps) {
-  const [collapsed, setCollapsed] = useState(
-    () => localStorage.getItem('sidebar') === 'collapsed',
-  );
+  const [collapsed, setCollapsed] = useState(() => localStorage.getItem('sidebar') === 'collapsed');
   const [mobileOpen, setMobileOpen] = useState(false);
 
   function toggleCollapse() {
@@ -48,7 +46,7 @@ export function DashboardLayout({ title, breadcrumb = [], children }: DashboardL
       {mobileOpen && (
         <div
           onClick={() => setMobileOpen(false)}
-          className="fixed inset-0 z-30 bg-graphite/50 lg:hidden"
+          className="bg-graphite/50 fixed inset-0 z-30 lg:hidden"
           aria-hidden="true"
         />
       )}

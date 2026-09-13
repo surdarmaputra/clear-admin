@@ -10,7 +10,7 @@ export function LoginPage() {
       heading="Sign in"
       subheading="Welcome back. Enter your details."
       footer={
-        <p className="mt-6 text-center text-caption text-ink-secondary">
+        <p className="text-caption text-ink-secondary mt-6 text-center">
           No account?{' '}
           <Link to="/register" className="text-accent hover:underline">
             Create one

@@ -22,12 +22,12 @@ export function Alert({ variant = 'info', title, className = '', children }: Ale
   return (
     <div
       role={variant === 'danger' ? 'alert' : 'status'}
-      className={`flex gap-3 rounded-control p-4 ${tone} ${className}`}
+      className={`rounded-control flex gap-3 p-4 ${tone} ${className}`}
     >
       <Icon size={20} className="mt-0.5 shrink-0" />
-      <div className="min-w-0 text-caption">
+      <div className="text-caption min-w-0">
         {title && <p className="font-semibold">{title}</p>}
-        <div className={`text-ink-secondary${title ? ' mt-1' : ''}`}>{children}</div>
+        <div className={`text-ink-secondary${title ? 'mt-1' : ''}`}>{children}</div>
       </div>
     </div>
   );

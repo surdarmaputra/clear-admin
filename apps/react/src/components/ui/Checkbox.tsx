@@ -14,11 +14,11 @@ export function Checkbox({ id, label, hint, disabled = false, ...rest }: Checkbo
         type="checkbox"
         disabled={disabled}
         aria-describedby={hint ? `${id}-hint` : undefined}
-        className="mt-0.5 size-4 shrink-0 cursor-pointer rounded-[4px] border border-hairline bg-surface-card text-accent accent-accent disabled:cursor-not-allowed disabled:opacity-60"
+        className="border-hairline bg-surface-card text-accent accent-accent mt-0.5 size-4 shrink-0 cursor-pointer rounded-[4px] border disabled:cursor-not-allowed disabled:opacity-60"
         {...rest}
       />
       <div className="min-w-0">
-        <label htmlFor={id} className="cursor-pointer text-caption">
+        <label htmlFor={id} className="text-caption cursor-pointer">
           {label}
         </label>
         {hint && (

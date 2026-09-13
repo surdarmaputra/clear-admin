@@ -10,7 +10,7 @@ export function RegisterPage() {
       heading="Create account"
       subheading="Set up your workspace in a minute."
       footer={
-        <p className="mt-6 text-center text-caption text-ink-secondary">
+        <p className="text-caption text-ink-secondary mt-6 text-center">
           Already registered?{' '}
           <Link to="/login" className="text-accent hover:underline">
             Sign in

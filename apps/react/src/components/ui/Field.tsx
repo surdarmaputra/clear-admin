@@ -10,7 +10,15 @@ interface FieldProps {
   children: ReactNode;
 }
 
-export function Field({ id, label, hint, error, required = false, className = '', children }: FieldProps) {
+export function Field({
+  id,
+  label,
+  hint,
+  error,
+  required = false,
+  className = '',
+  children,
+}: FieldProps) {
   return (
     <div className={`flex flex-col gap-1.5 ${className}`}>
       <label htmlFor={id} className="text-caption font-medium">

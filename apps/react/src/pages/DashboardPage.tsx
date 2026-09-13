@@ -32,8 +32,8 @@ export function DashboardPage() {
     <DashboardLayout title="Dashboard" breadcrumb={[{ label: 'Dashboard' }]}>
       <div className="flex flex-col gap-6">
         <div>
-          <h1 className="font-display text-title font-semibold tracking-display">Overview</h1>
-          <p className="mt-1 text-caption text-ink-secondary">
+          <h1 className="font-display text-title tracking-display font-semibold">Overview</h1>
+          <p className="text-caption text-ink-secondary mt-1">
             Revenue, traffic and orders for the current period.
           </p>
         </div>
@@ -123,35 +123,38 @@ export function DashboardPage() {
         </div>
 
         {/* Orders table */}
-        <div className="rounded-card border border-hairline bg-surface-card shadow-card overflow-hidden">
-          <div className="p-5 border-b border-hairline">
+        <div className="rounded-card border-hairline bg-surface-card shadow-card overflow-hidden border">
+          <div className="border-hairline border-b p-5">
             <h2 className="text-title-sm font-semibold">Recent orders</h2>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full text-caption">
+            <table className="text-caption w-full">
               <thead>
-                <tr className="border-b border-hairline bg-surface-sidebar">
-                  <th className="px-4 py-2 text-left font-medium text-ink-secondary">Invoice</th>
-                  <th className="px-4 py-2 text-left font-medium text-ink-secondary">Customer</th>
-                  <th className="px-4 py-2 text-left font-medium text-ink-secondary">Plan</th>
-                  <th className="px-4 py-2 text-left font-medium text-ink-secondary">Status</th>
-                  <th className="px-4 py-2 text-right font-medium text-ink-secondary">Amount</th>
-                  <th className="px-4 py-2 text-right font-medium text-ink-secondary">Date</th>
+                <tr className="border-hairline bg-surface-sidebar border-b">
+                  <th className="text-ink-secondary px-4 py-2 text-left font-medium">Invoice</th>
+                  <th className="text-ink-secondary px-4 py-2 text-left font-medium">Customer</th>
+                  <th className="text-ink-secondary px-4 py-2 text-left font-medium">Plan</th>
+                  <th className="text-ink-secondary px-4 py-2 text-left font-medium">Status</th>
+                  <th className="text-ink-secondary px-4 py-2 text-right font-medium">Amount</th>
+                  <th className="text-ink-secondary px-4 py-2 text-right font-medium">Date</th>
                 </tr>
               </thead>
               <tbody>
                 {orders.slice(0, 6).map((row) => (
-                  <tr key={row.id} className="border-b border-hairline last:border-0 hover:bg-surface-hover">
+                  <tr
+                    key={row.id}
+                    className="border-hairline hover:bg-surface-hover border-b last:border-0"
+                  >
                     <td className="tabular px-4 py-2 font-medium">{row.id}</td>
                     <td className="px-4 py-2">{row.customer}</td>
-                    <td className="px-4 py-2 text-ink-secondary">{row.plan}</td>
+                    <td className="text-ink-secondary px-4 py-2">{row.plan}</td>
                     <td className="px-4 py-2">
                       <Badge tone={statusTone[row.status]}>{row.status}</Badge>
                     </td>
                     <td className="tabular px-4 py-2 text-right">
                       ${row.amount.toLocaleString('en-US')}
                     </td>
-                    <td className="tabular px-4 py-2 text-right text-ink-secondary">{row.date}</td>
+                    <td className="tabular text-ink-secondary px-4 py-2 text-right">{row.date}</td>
                   </tr>
                 ))}
               </tbody>
@@ -160,12 +163,12 @@ export function DashboardPage() {
         </div>
 
         <Card title="Top customers" description="By revenue this quarter">
-          <ul className="flex flex-col divide-y divide-hairline">
+          <ul className="divide-hairline flex flex-col divide-y">
             {topCustomers.map((customer) => (
               <li key={customer.name} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
                 <Avatar name={customer.name} size="sm" />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-caption font-medium">{customer.name}</p>
+                  <p className="text-caption truncate font-medium">{customer.name}</p>
                   <p className="text-micro text-ink-secondary">{customer.plan}</p>
                 </div>
                 <p className="tabular text-caption font-medium">{customer.revenue}</p>
