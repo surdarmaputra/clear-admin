@@ -42,7 +42,7 @@ function fmt(value: unknown, prefix?: string) {
   return `${prefix ?? ''}${(value as number).toLocaleString('en-US')}`;
 }
 
-export default function ChartImpl({ type, series, categories, labels, height, colors, valuePrefix }: ChartImplProps) {
+export default function ChartImpl({ type, series, categories, labels, colors, valuePrefix }: ChartImplProps) {
   if (type === 'donut') {
     const nums = series as number[];
     return (

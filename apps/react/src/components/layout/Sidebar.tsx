@@ -119,7 +119,7 @@ function NavLink({ item, collapsed, pathname }: { item: NavItem; collapsed: bool
   );
 }
 
-export function Sidebar({ collapsed, mobileOpen, onToggleCollapse, onCloseMobile }: SidebarProps) {
+export function Sidebar({ collapsed, mobileOpen, onToggleCollapse }: SidebarProps) {
   const location = useLocation();
   const pathname = location.pathname;
 
