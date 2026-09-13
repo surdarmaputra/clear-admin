@@ -22,7 +22,7 @@ not through a shared package.
 | Output        | `dist/` — plain HTML + CSS + JS                     | copyable source tree    |
 | Interactivity | Alpine.js                                           | React 19                |
 | Primitives    | hand-rolled + Alpine                                | shadcn/ui (Radix)       |
-| Charts        | Chart.js                                            | Recharts                |
+| Charts        | Chart.js                                            | Chart.js (D12)          |
 | Tables        | hand-rolled on Alpine + `@tanstack/table-core` page | `@tanstack/react-table` |
 | Editor        | `lexical` (vanilla, editor page only)               | `@lexical/react`        |
 | Drag & drop   | SortableJS (kanban page only)                       | dnd-kit                 |
@@ -68,15 +68,15 @@ artifact, deployed.
 
 | Component                                     | Priority | HTML | React |
 | --------------------------------------------- | -------- | ---- | ----- |
-| Card                                          | P0       | done | —     |
-| Stat card / KPI tile                          | P1       | done | —     |
-| Sparkline                                     | P2       | done | —     |
-| Badge                                         | P0       | done | —     |
-| Avatar                                        | P0       | done | —     |
-| Chart — line                                  | P1       | done | —     |
-| Chart — bar                                   | P1       | done | —     |
-| Chart — area                                  | P1       | done | —     |
-| Chart — pie / donut                           | P1       | done | —     |
+| Card                                          | P0       | done | done  |
+| Stat card / KPI tile                          | P1       | done | done  |
+| Sparkline                                     | P2       | done | done  |
+| Badge                                         | P0       | done | done  |
+| Avatar                                        | P0       | done | done  |
+| Chart — line                                  | P1       | done | done  |
+| Chart — bar                                   | P1       | done | done  |
+| Chart — area                                  | P1       | done | done  |
+| Chart — pie / donut                           | P1       | done | done  |
 | Data table — sortable, paginated              | P1       | done | —     |
 | Pagination                                    | P1       | done | —     |
 | Data table — server-side filter/sort/paginate | P2       | done | —     |

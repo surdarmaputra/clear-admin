@@ -77,13 +77,16 @@ Unchanged from v4.
 
 ## 5. Decisions
 
-D1–D5 stand as written in v2, D6–D8 as in v3, D9 as in v4, D10 as in v5. v6 adds one.
+D1–D5 stand as written in v2, D6–D8 as in v3, D9 as in v4, D10 as in v5. v6 adds two.
 
 | #       | Decision                                                                                                                                                              | Consequence                                                                                                                                                                                                     |
 | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **D11** | **The lightbox is built on the overlay store and `x-focus-trap` this bundle already ships, not on a library.** PhotoSwipe was measured at 17.0 KB gz and not adopted. | The files page transfers 34.0 KB gz — 2.5 KB above the plain-page baseline, for upload, preview, gallery and lightbox together. The cost is that zoom, pinch and swipe gestures are not there and are not free. |
+| **D12** | **The React bundle uses Chart.js + react-chartjs-2, not Recharts 3.x.** Recharts 3.x was kill-tested at 122.97 KB gz for the lazy ChartImpl chunk — dashboard total 267 KB gz, 17 KB over ceiling. Chart.js measures 64.71 KB gz for the same chunk — dashboard total 209 KB gz. | The React chart API matches the HTML bundle's Chart.js API in spirit but uses react-chartjs-2 wrappers. The 8 KB saving over Recharts 2.x is a bonus; the decision is that Recharts 3.x simply does not fit. |
 
 **Why D11 is a decision and not an implementation note:** the alternative is one import and a 17.0 KB gz chunk, and it buys gestures a mouse-and-keyboard admin template does not use. The primitives it would replace — a dialog over one overlay store, Escape and arrow keys, a focus trap — shipped in M3 and are already under test. Adopting a second modal system to show an image would leave the bundle with two.
+
+**Why D12 is a decision and not an implementation note:** Recharts is the dominant React charting library and is the obvious default. The kill test is the reason it was not adopted: 122.97 KB gz for the lazy chart chunk, against a budget that the dashboard page otherwise stays under comfortably. Chart.js is already the HTML bundle's charting library; matching it across both bundles is a consistency bonus, not the reason. The consequence is that Chart.js's canvas-first API is less idiomatic in React than Recharts' SVG-first approach, which shows in the `ChartImpl.tsx` imperative registration call.
 
 ### 5.1 What Q4's kill test returned
 

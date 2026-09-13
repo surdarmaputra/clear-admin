@@ -147,12 +147,18 @@ importers:
       '@tanstack/react-router':
         specifier: ^1.120.0
         version: 1.170.35(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      chart.js:
+        specifier: ^4.5.1
+        version: 4.5.1
       lucide-react:
         specifier: ^0.509.0
         version: 0.509.0(react@19.3.0)
       react:
         specifier: ^19.1.0
         version: 19.3.0
+      react-chartjs-2:
+        specifier: ^5.3.1
+        version: 5.3.1(chart.js@4.5.1)(react@19.3.0)
       react-dom:
         specifier: ^19.1.0
         version: 19.3.0(react@19.3.0)
@@ -3065,6 +3071,12 @@ packages:
 
   radix3@1.1.2:
     resolution: {integrity: sha512-b484I/7b8rDEdSDKckSSBA8knMpcdsXudlE/LNL639wFoHKwLbEkQFZHWEYwDC0wa0FKUcCY+GAF73Z7wxNVFA==}
+
+  react-chartjs-2@5.3.1:
+    resolution: {integrity: sha512-h5IPXKg9EXpjoBzUfyWJvllMjG2mQ4EiuHQFhms/AjUm0XSZHhyRy2xVmLXHKrtcdrPO4mnGqRtYoD0vp95A0A==}
+    peerDependencies:
+      chart.js: ^4.1.1
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
   react-dom@19.3.0:
     resolution: {integrity: sha512-JDk8dgif51OjFoDE70+OT9ICyYr+69HlmihNwp1+Nsfbna3t5sIiCa9ZJktDmQ4/1b/rn26hIAR2uYXDMr5r0Q==}
@@ -6729,6 +6741,11 @@ snapshots:
       hookified: 2.2.0
 
   radix3@1.1.2: {}
+
+  react-chartjs-2@5.3.1(chart.js@4.5.1)(react@19.3.0):
+    dependencies:
+      chart.js: 4.5.1
+      react: 19.3.0
 
   react-dom@19.3.0(react@19.3.0):
     dependencies:
