@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { Sidebar } from './Sidebar';
 import { Topbar } from './Topbar';
+import { ToastRegion } from '@/components/ui/Toast';
 
 interface BreadcrumbItem {
   label: string;
@@ -59,6 +60,7 @@ export function DashboardLayout({ title, breadcrumb = [], children }: DashboardL
         />
         <main className="flex-1 p-6">{children}</main>
       </div>
+      <ToastRegion />
     </div>
   );
 }

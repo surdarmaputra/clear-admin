@@ -127,12 +127,22 @@ const dataKanbanRoute = createRoute({
   ),
 });
 
+const ComponentsFormsPage = lazy(() =>
+  import('./pages/ComponentsFormsPage').then((m) => ({ default: m.ComponentsFormsPage })),
+);
+const ComponentsOverlaysPage = lazy(() =>
+  import('./pages/ComponentsOverlaysPage').then((m) => ({ default: m.ComponentsOverlaysPage })),
+);
+const ComponentsFeedbackPage = lazy(() =>
+  import('./pages/ComponentsFeedbackPage').then((m) => ({ default: m.ComponentsFeedbackPage })),
+);
+
 const componentsFormsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/components/forms',
   component: () => (
     <Lazy>
-      <PlaceholderPage title="Forms" />
+      <ComponentsFormsPage />
     </Lazy>
   ),
 });
@@ -142,7 +152,7 @@ const componentsOverlaysRoute = createRoute({
   path: '/components/overlays',
   component: () => (
     <Lazy>
-      <PlaceholderPage title="Overlays" />
+      <ComponentsOverlaysPage />
     </Lazy>
   ),
 });
@@ -152,7 +162,7 @@ const componentsFeedbackRoute = createRoute({
   path: '/components/feedback',
   component: () => (
     <Lazy>
-      <PlaceholderPage title="Feedback" />
+      <ComponentsFeedbackPage />
     </Lazy>
   ),
 });
