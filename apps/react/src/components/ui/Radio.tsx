@@ -14,7 +14,7 @@ export function Radio({ id, label, hint, disabled = false, ...rest }: RadioProps
         type="radio"
         disabled={disabled}
         aria-describedby={hint ? `${id}-hint` : undefined}
-        className="accent-accent mt-0.5 size-4 shrink-0 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
+        className="border-hairline bg-surface-card accent-accent mt-0.5 size-4 shrink-0 cursor-pointer border disabled:cursor-not-allowed disabled:opacity-60"
         {...rest}
       />
       <div className="min-w-0">
