@@ -114,7 +114,6 @@ export function richEditor(config: RichEditorConfig) {
   const history = createEmptyHistoryState();
 
   return component({
-    ready: false,
     canUndo: false,
     canRedo: false,
     /** Which inline formats the caret currently sits in. */
@@ -154,7 +153,6 @@ export function richEditor(config: RichEditorConfig) {
       );
 
       editor.update(() => $convertFromMarkdownString(config.markdown, transformers));
-      this.ready = true;
     },
 
     /** Runs inside a read: projects the selection into what the toolbar binds to. */

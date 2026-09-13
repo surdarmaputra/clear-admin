@@ -25,7 +25,7 @@ export interface FileItem {
   /** Object URL for an image, or null for anything without a thumbnail. */
   url: string | null;
   progress: number;
-  status: 'uploading' | 'done' | 'error';
+  status: 'uploading' | 'done';
 }
 
 export interface SeedFile {
