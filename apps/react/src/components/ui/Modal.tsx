@@ -32,21 +32,21 @@ export function Modal({
   return (
     <RDialog.Root open={open} onOpenChange={(o) => !o && onClose()}>
       <RDialog.Portal>
-        <RDialog.Overlay className="fixed inset-0 z-50 bg-graphite/50" />
+        <RDialog.Overlay className="bg-graphite/50 fixed inset-0 z-50" />
         <RDialog.Content
           className={
-            'fixed inset-x-4 bottom-4 z-50 w-auto rounded-card border border-hairline ' +
-            'bg-surface-card shadow-raised sm:inset-auto sm:left-1/2 sm:top-1/2 ' +
-            `sm:-translate-x-1/2 sm:-translate-y-1/2 sm:w-full ${widths[size]}`
+            'rounded-card border-hairline fixed inset-x-4 bottom-4 z-50 w-auto border ' +
+            'bg-surface-card shadow-raised sm:inset-auto sm:top-1/2 sm:left-1/2 ' +
+            `sm:w-full sm:-translate-x-1/2 sm:-translate-y-1/2 ${widths[size]}`
           }
         >
           <div className="flex items-start gap-4 p-6 pb-0">
             <div className="min-w-0 flex-1">
-              <RDialog.Title className="font-display text-title-sm font-semibold tracking-display">
+              <RDialog.Title className="font-display text-title-sm tracking-display font-semibold">
                 {title}
               </RDialog.Title>
               {description && (
-                <RDialog.Description className="mt-1 text-caption text-ink-secondary">
+                <RDialog.Description className="text-caption text-ink-secondary mt-1">
                   {description}
                 </RDialog.Description>
               )}
@@ -55,16 +55,16 @@ export function Modal({
               type="button"
               onClick={onClose}
               aria-label="Close dialog"
-              className="grid size-8 shrink-0 place-items-center rounded-control text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink-primary"
+              className="rounded-control text-ink-secondary hover:bg-surface-hover hover:text-ink-primary grid size-8 shrink-0 place-items-center transition-colors"
             >
               <X size={16} />
             </button>
           </div>
 
-          <div className="p-6 text-caption text-ink-secondary">{children}</div>
+          <div className="text-caption text-ink-secondary p-6">{children}</div>
 
           {footer && (
-            <div className="flex justify-end gap-2 border-t border-hairline p-4">{footer}</div>
+            <div className="border-hairline flex justify-end gap-2 border-t p-4">{footer}</div>
           )}
         </RDialog.Content>
       </RDialog.Portal>

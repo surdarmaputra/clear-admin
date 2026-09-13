@@ -19,12 +19,12 @@ export function ErrorState({
       role="alert"
       className={`flex flex-col items-center gap-3 px-6 py-12 text-center ${className}`}
     >
-      <span className="grid size-11 place-items-center rounded-full bg-danger/10 text-danger">
+      <span className="bg-danger/10 text-danger grid size-11 place-items-center rounded-full">
         <TriangleAlert size={20} />
       </span>
       <div>
         <p className="text-caption font-semibold">{title}</p>
-        <p className="mt-1 text-caption text-ink-secondary">{description}</p>
+        <p className="text-caption text-ink-secondary mt-1">{description}</p>
       </div>
       {children}
     </div>

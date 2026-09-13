@@ -39,7 +39,7 @@ export function Progress({
       <RProgress.Root
         value={percent}
         aria-label={label}
-        className="h-2 w-full overflow-hidden rounded-full bg-surface-hover"
+        className="bg-surface-hover h-2 w-full overflow-hidden rounded-full"
       >
         <RProgress.Indicator
           className={`h-full rounded-full transition-[width] duration-300 ${tones[tone]}`}

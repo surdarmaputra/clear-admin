@@ -16,7 +16,7 @@ export function Dropdown({ label = 'Options', align = 'start', trigger, children
         {trigger ?? (
           <button
             type="button"
-            className="inline-flex items-center gap-2 rounded-control border border-hairline bg-surface-card px-3 py-2 text-caption font-medium transition-colors hover:bg-surface-hover"
+            className="rounded-control border-hairline bg-surface-card text-caption hover:bg-surface-hover inline-flex items-center gap-2 border px-3 py-2 font-medium transition-colors"
           >
             {label}
             <ChevronDown size={14} className="text-ink-secondary" />
@@ -28,7 +28,7 @@ export function Dropdown({ label = 'Options', align = 'start', trigger, children
         <RDropdown.Content
           align={align}
           sideOffset={4}
-          className="z-30 w-52 rounded-card border border-hairline bg-surface-card p-1 shadow-raised"
+          className="rounded-card border-hairline bg-surface-card shadow-raised z-30 w-52 border p-1"
         >
           {children}
         </RDropdown.Content>
@@ -44,17 +44,12 @@ interface DropdownItemProps {
   children: ReactNode;
 }
 
-export function DropdownItem({
-  icon,
-  tone = 'default',
-  onClick,
-  children,
-}: DropdownItemProps) {
+export function DropdownItem({ icon, tone = 'default', onClick, children }: DropdownItemProps) {
   return (
     <RDropdown.Item
       onClick={onClick}
       className={
-        'flex cursor-default select-none items-center gap-2 rounded-control px-3 py-2 text-caption outline-none ' +
+        'rounded-control text-caption flex cursor-default items-center gap-2 px-3 py-2 outline-none select-none ' +
         (tone === 'danger'
           ? 'text-danger data-[highlighted]:bg-danger/10'
           : 'text-ink-secondary data-[highlighted]:bg-surface-hover data-[highlighted]:text-ink-primary')
@@ -67,5 +62,5 @@ export function DropdownItem({
 }
 
 export function DropdownSeparator() {
-  return <RDropdown.Separator className="my-1 border-t border-hairline" />;
+  return <RDropdown.Separator className="border-hairline my-1 border-t" />;
 }

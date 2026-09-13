@@ -62,9 +62,7 @@ export function ProgressCircle({
           className={`transition-[stroke-dashoffset] duration-300 ${tones[tone]}`}
         />
       </svg>
-      {showValue && (
-        <span className="tabular absolute text-caption font-semibold">{percent}%</span>
-      )}
+      {showValue && <span className="tabular text-caption absolute font-semibold">{percent}%</span>}
     </div>
   );
 }

@@ -60,9 +60,9 @@ export function Select({
           <RSelect.Content
             position="popper"
             sideOffset={4}
-            className="z-50 w-[var(--radix-select-trigger-width)] overflow-hidden rounded-card border border-hairline bg-surface-card shadow-raised"
+            className="rounded-card border-hairline bg-surface-card shadow-raised z-50 w-[var(--radix-select-trigger-width)] overflow-hidden border"
           >
-            <RSelect.ScrollUpButton className="flex h-6 items-center justify-center text-ink-secondary">
+            <RSelect.ScrollUpButton className="text-ink-secondary flex h-6 items-center justify-center">
               <ChevronUp size={14} />
             </RSelect.ScrollUpButton>
 
@@ -71,7 +71,7 @@ export function Select({
                 <RSelect.Item
                   key={opt.value}
                   value={opt.value}
-                  className="flex cursor-default select-none items-center justify-between rounded-control px-3 py-2 text-caption text-ink-secondary outline-none data-[highlighted]:bg-surface-hover data-[highlighted]:text-ink-primary"
+                  className="rounded-control text-caption text-ink-secondary data-[highlighted]:bg-surface-hover data-[highlighted]:text-ink-primary flex cursor-default items-center justify-between px-3 py-2 outline-none select-none"
                 >
                   <RSelect.ItemText>{opt.label}</RSelect.ItemText>
                   <RSelect.ItemIndicator>
@@ -81,7 +81,7 @@ export function Select({
               ))}
             </RSelect.Viewport>
 
-            <RSelect.ScrollDownButton className="flex h-6 items-center justify-center text-ink-secondary">
+            <RSelect.ScrollDownButton className="text-ink-secondary flex h-6 items-center justify-center">
               <ChevronDown size={14} />
             </RSelect.ScrollDownButton>
           </RSelect.Content>

@@ -19,20 +19,20 @@ const toasts = [
 
 export function ComponentsFeedbackPage() {
   return (
-    <DashboardLayout
-      title="Feedback"
-      breadcrumb={[{ label: 'Components' }, { label: 'Feedback' }]}
-    >
+    <DashboardLayout title="Feedback" breadcrumb={[{ label: 'Components' }, { label: 'Feedback' }]}>
       <div className="flex max-w-4xl flex-col gap-6">
         <div>
-          <h1 className="font-display text-title font-semibold tracking-display">Feedback</h1>
-          <p className="mt-1 text-caption text-ink-secondary">
+          <h1 className="font-display text-title tracking-display font-semibold">Feedback</h1>
+          <p className="text-caption text-ink-secondary mt-1">
             What the interface says back. Every tint is paired with an icon, so colour never carries
             the meaning alone.
           </p>
         </div>
 
-        <Card title="Toast" description="Raise one from anywhere with toast.show(message, variant).">
+        <Card
+          title="Toast"
+          description="Raise one from anywhere with toast.show(message, variant)."
+        >
           <div className="flex flex-wrap gap-3">
             {toasts.map(({ variant, label, message }) => (
               <Button
@@ -43,7 +43,10 @@ export function ComponentsFeedbackPage() {
                 {label}
               </Button>
             ))}
-            <Button variant="ghost" onClick={() => toast.show('This one stays until dismissed.', 'info', 0)}>
+            <Button
+              variant="ghost"
+              onClick={() => toast.show('This one stays until dismissed.', 'info', 0)}
+            >
               Persistent
             </Button>
           </div>
@@ -91,17 +94,17 @@ export function ComponentsFeedbackPage() {
             </div>
           </Card>
 
-          <Card title="Loading — spinner" description="For a wait too short to be worth a skeleton.">
-            <div className="flex items-center gap-3 py-6 text-caption text-ink-secondary">
+          <Card
+            title="Loading — spinner"
+            description="For a wait too short to be worth a skeleton."
+          >
+            <div className="text-caption text-ink-secondary flex items-center gap-3 py-6">
               <Spinner label="Loading orders" />
               Loading orders…
             </div>
           </Card>
 
-          <Card
-            title="Progress — bar"
-            description="For work with a known end."
-          >
+          <Card title="Progress — bar" description="For work with a known end.">
             <div className="flex flex-col gap-4">
               <Progress label="Seats used" value={34} max={50} showLabel />
               <Progress label="Storage used" value={78} tone="warning" showLabel />

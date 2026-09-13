@@ -42,18 +42,18 @@ function ToastItem({
       onOpenChange={(open) => {
         if (!open) toast.dismiss(id);
       }}
-      className="flex w-full items-start gap-3 rounded-card border border-hairline bg-surface-card p-3 shadow-raised sm:w-80"
+      className="rounded-card border-hairline bg-surface-card shadow-raised flex w-full items-start gap-3 border p-3 sm:w-80"
     >
       <span className={`mt-0.5 shrink-0 ${tones[variant]}`}>
         <Icon size={18} aria-hidden />
       </span>
-      <RToast.Description className="min-w-0 flex-1 text-caption">{message}</RToast.Description>
+      <RToast.Description className="text-caption min-w-0 flex-1">{message}</RToast.Description>
       <RToast.Action altText="Dismiss" asChild>
         <button
           type="button"
           onClick={() => toast.dismiss(id)}
           aria-label="Dismiss notification"
-          className="grid size-6 shrink-0 place-items-center rounded-control text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink-primary"
+          className="rounded-control text-ink-secondary hover:bg-surface-hover hover:text-ink-primary grid size-6 shrink-0 place-items-center transition-colors"
         >
           <X size={14} />
         </button>

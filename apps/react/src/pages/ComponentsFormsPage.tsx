@@ -23,14 +23,11 @@ export function ComponentsFormsPage() {
   const [usageAlerts, setUsageAlerts] = useState(false);
 
   return (
-    <DashboardLayout
-      title="Forms"
-      breadcrumb={[{ label: 'Components' }, { label: 'Forms' }]}
-    >
+    <DashboardLayout title="Forms" breadcrumb={[{ label: 'Components' }, { label: 'Forms' }]}>
       <div className="flex max-w-4xl flex-col gap-6">
         <div>
-          <h1 className="font-display text-title font-semibold tracking-display">Forms</h1>
-          <p className="mt-1 text-caption text-ink-secondary">
+          <h1 className="font-display text-title tracking-display font-semibold">Forms</h1>
+          <p className="text-caption text-ink-secondary mt-1">
             Every control carries a label, and a hint or error is wired to it by id.
           </p>
         </div>
@@ -78,7 +75,7 @@ export function ComponentsFormsPage() {
           <Card title="Choice controls">
             <div className="grid gap-6 sm:grid-cols-2">
               <fieldset className="flex flex-col gap-3">
-                <legend className="mb-1 text-caption font-medium">Billing cycle</legend>
+                <legend className="text-caption mb-1 font-medium">Billing cycle</legend>
                 <Radio
                   id="cycle-monthly"
                   name="cycle"
@@ -99,10 +96,14 @@ export function ComponentsFormsPage() {
               </fieldset>
 
               <fieldset className="flex flex-col gap-3">
-                <legend className="mb-1 text-caption font-medium">Email me about</legend>
+                <legend className="text-caption mb-1 font-medium">Email me about</legend>
                 <Checkbox id="notify-invoices" label="New invoices" defaultChecked />
                 <Checkbox id="notify-failures" label="Failed payments" />
-                <Checkbox id="notify-product" label="Product updates" hint="At most once a month." />
+                <Checkbox
+                  id="notify-product"
+                  label="Product updates"
+                  hint="At most once a month."
+                />
               </fieldset>
             </div>
           </Card>

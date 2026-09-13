@@ -22,7 +22,7 @@ export function Switch({
   return (
     <div className={`flex items-start justify-between gap-4 ${className}`}>
       <div className="min-w-0">
-        <label htmlFor={id} className="text-caption font-medium cursor-pointer">
+        <label htmlFor={id} className="text-caption cursor-pointer font-medium">
           {label}
         </label>
         {hint && (
@@ -38,9 +38,9 @@ export function Switch({
         onCheckedChange={onCheckedChange}
         disabled={disabled}
         aria-describedby={hint ? `${id}-hint` : undefined}
-        className="relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border border-hairline transition-colors disabled:cursor-not-allowed disabled:opacity-60 data-[state=checked]:bg-accent data-[state=unchecked]:bg-surface-hover"
+        className="border-hairline data-[state=checked]:bg-accent data-[state=unchecked]:bg-surface-hover relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border transition-colors disabled:cursor-not-allowed disabled:opacity-60"
       >
-        <RSwitch.Thumb className="block size-5 rounded-full bg-paper shadow-card transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0.5" />
+        <RSwitch.Thumb className="bg-paper shadow-card block size-5 rounded-full transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0.5" />
       </RSwitch.Root>
     </div>
   );

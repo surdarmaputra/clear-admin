@@ -18,17 +18,29 @@ const tabItems = [
   {
     id: 'details',
     label: 'Details',
-    content: <p className="text-caption text-ink-secondary">Order #1042 · placed 12 March · paid by card.</p>,
+    content: (
+      <p className="text-caption text-ink-secondary">
+        Order #1042 · placed 12 March · paid by card.
+      </p>
+    ),
   },
   {
     id: 'members',
     label: 'Members',
-    content: <p className="text-caption text-ink-secondary">Ada Lovelace, Grace Hopper and 2 others can see this order.</p>,
+    content: (
+      <p className="text-caption text-ink-secondary">
+        Ada Lovelace, Grace Hopper and 2 others can see this order.
+      </p>
+    ),
   },
   {
     id: 'activity',
     label: 'Activity',
-    content: <p className="text-caption text-ink-secondary">Refund requested 2 days ago, still awaiting review.</p>,
+    content: (
+      <p className="text-caption text-ink-secondary">
+        Refund requested 2 days ago, still awaiting review.
+      </p>
+    ),
   },
 ];
 
@@ -37,14 +49,11 @@ export function ComponentsOverlaysPage() {
   const [drawer, setDrawer] = useState<DrawerId>(null);
 
   return (
-    <DashboardLayout
-      title="Overlays"
-      breadcrumb={[{ label: 'Components' }, { label: 'Overlays' }]}
-    >
+    <DashboardLayout title="Overlays" breadcrumb={[{ label: 'Components' }, { label: 'Overlays' }]}>
       <div className="flex max-w-4xl flex-col gap-6">
         <div>
-          <h1 className="font-display text-title font-semibold tracking-display">Overlays</h1>
-          <p className="mt-1 text-caption text-ink-secondary">
+          <h1 className="font-display text-title tracking-display font-semibold">Overlays</h1>
+          <p className="text-caption text-ink-secondary mt-1">
             Everything a CRUD screen layers over the page. Modal and drawer trap focus and return it
             to the trigger on close.
           </p>
@@ -53,10 +62,16 @@ export function ComponentsOverlaysPage() {
         <Card title="Dropdown menu" description="Arrow keys move between items; Escape closes.">
           <div className="flex flex-wrap gap-3">
             <Dropdown label="Actions">
-              <DropdownItem icon={<Pencil size={16} />} onClick={() => toast.show('Editing order #1042')}>
+              <DropdownItem
+                icon={<Pencil size={16} />}
+                onClick={() => toast.show('Editing order #1042')}
+              >
                 Edit order
               </DropdownItem>
-              <DropdownItem icon={<Copy size={16} />} onClick={() => toast.show('Duplicated order #1042')}>
+              <DropdownItem
+                icon={<Copy size={16} />}
+                onClick={() => toast.show('Duplicated order #1042')}
+              >
                 Duplicate
               </DropdownItem>
               <DropdownSeparator />
@@ -70,17 +85,26 @@ export function ComponentsOverlaysPage() {
             </Dropdown>
 
             <Dropdown label="Export" align="end">
-              <DropdownItem icon={<FileText size={16} />} onClick={() => toast.show('Exporting CSV', 'success')}>
+              <DropdownItem
+                icon={<FileText size={16} />}
+                onClick={() => toast.show('Exporting CSV', 'success')}
+              >
                 CSV
               </DropdownItem>
-              <DropdownItem icon={<FileJson size={16} />} onClick={() => toast.show('Exporting JSON', 'success')}>
+              <DropdownItem
+                icon={<FileJson size={16} />}
+                onClick={() => toast.show('Exporting JSON', 'success')}
+              >
                 JSON
               </DropdownItem>
             </Dropdown>
           </div>
         </Card>
 
-        <Card title="Tooltip" description="Reveals on hover and on keyboard focus, never hover alone.">
+        <Card
+          title="Tooltip"
+          description="Reveals on hover and on keyboard focus, never hover alone."
+        >
           <div className="flex flex-wrap items-center gap-4">
             <Tooltip text="Refresh the table without reloading the page">
               <Button variant="secondary">
@@ -116,7 +140,10 @@ export function ComponentsOverlaysPage() {
           </div>
         </Card>
 
-        <Card title="Tabs" description="Roving tabindex — one Tab stop, arrow keys move between tabs.">
+        <Card
+          title="Tabs"
+          description="Roving tabindex — one Tab stop, arrow keys move between tabs."
+        >
           <Tabs tabs={tabItems} />
         </Card>
       </div>

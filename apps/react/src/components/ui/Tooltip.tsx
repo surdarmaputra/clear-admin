@@ -17,7 +17,7 @@ export function Tooltip({ text, placement = 'top', children }: TooltipProps) {
         <RTooltip.Content
           side={placement}
           sideOffset={6}
-          className="z-40 max-w-56 rounded-control bg-ink-primary px-2 py-1 text-micro text-surface-page"
+          className="rounded-control bg-ink-primary text-micro text-surface-page z-40 max-w-56 px-2 py-1"
         >
           {text}
         </RTooltip.Content>
