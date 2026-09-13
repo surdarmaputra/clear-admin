@@ -27,7 +27,7 @@ export function Alert({ variant = 'info', title, className = '', children }: Ale
       <Icon size={20} className="mt-0.5 shrink-0" />
       <div className="text-caption min-w-0">
         {title && <p className="font-semibold">{title}</p>}
-        <div className={`text-ink-secondary${title ? 'mt-1' : ''}`}>{children}</div>
+        <div className={'text-ink-secondary' + (title ? ' mt-1' : '')}>{children}</div>
       </div>
     </div>
   );

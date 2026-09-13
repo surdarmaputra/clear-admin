@@ -65,7 +65,10 @@ function NavGroup({
         {!collapsed && (
           <>
             <span className="flex-1 text-left">{item.label}</span>
-            <ChevronRight size={14} className={`transition-transform${open ? 'rotate-90' : ''}`} />
+            <ChevronRight
+              size={14}
+              className={'transition-transform' + (open ? ' rotate-90' : '')}
+            />
           </>
         )}
       </button>
@@ -79,11 +82,12 @@ function NavGroup({
                 <Link
                   to={child.href ?? '#'}
                   aria-current={active ? 'page' : undefined}
-                  className={`rounded-control text-caption block px-3 py-1.5 transition-colors${
-                    active
+                  className={
+                    'rounded-control text-caption block px-3 py-1.5 transition-colors ' +
+                    (active
                       ? 'bg-accent/10 text-accent font-semibold'
-                      : 'text-ink-secondary hover:bg-surface-hover hover:text-ink-primary'
-                  }`}
+                      : 'text-ink-secondary hover:bg-surface-hover hover:text-ink-primary')
+                  }
                 >
                   {child.label}
                 </Link>
@@ -111,11 +115,12 @@ function NavLink({
       <Link
         to={item.href ?? '#'}
         aria-current={active ? 'page' : undefined}
-        className={`rounded-control text-caption flex items-center gap-3 px-3 py-2 transition-colors${
-          active
+        className={
+          'rounded-control text-caption flex items-center gap-3 px-3 py-2 transition-colors ' +
+          (active
             ? 'bg-accent/10 text-accent font-semibold'
-            : 'text-ink-secondary hover:bg-surface-hover hover:text-ink-primary'
-        }`}
+            : 'text-ink-secondary hover:bg-surface-hover hover:text-ink-primary')
+        }
       >
         {item.icon && <NavIcon name={item.icon} />}
         {!collapsed && <span>{item.label}</span>}
@@ -166,7 +171,7 @@ export function Sidebar({ collapsed, mobileOpen, onToggleCollapse }: SidebarProp
         >
           <ChevronsLeft
             size={18}
-            className={`shrink-0 transition-transform${collapsed ? 'rotate-180' : ''}`}
+            className={'shrink-0 transition-transform' + (collapsed ? ' rotate-180' : '')}
           />
           {!collapsed && <span>Collapse</span>}
         </button>
