@@ -88,29 +88,29 @@ artifact, deployed.
 | Component                | Priority | HTML | React |
 | ------------------------ | -------- | ---- | ----- |
 | Alert                    | P1       | done | done  |
-| Toast / notification     | P1       | done | —     |
-| Empty state              | P1       | done | —     |
-| Error state              | P1       | done | —     |
-| Loading state / skeleton | P1       | done | —     |
-| Spinner                  | P1       | done | —     |
-| Progress — bar           | P1       | done | —     |
-| Progress — circle        | P1       | done | —     |
+| Toast / notification     | P1       | done | done  |
+| Empty state              | P1       | done | done  |
+| Error state              | P1       | done | done  |
+| Loading state / skeleton | P1       | done | done  |
+| Spinner                  | P1       | done | done  |
+| Progress — bar           | P1       | done | done  |
+| Progress — circle        | P1       | done | done  |
 
 ## Overlay
 
 | Component     | Priority | HTML | React |
 | ------------- | -------- | ---- | ----- |
-| Dropdown menu | P0       | done | —     |
-| Tooltip       | P1       | done | —     |
-| Modal         | P1       | done | —     |
-| Drawer        | P1       | done | —     |
+| Dropdown menu | P0       | done | done  |
+| Tooltip       | P1       | done | done  |
+| Modal         | P1       | done | done  |
+| Drawer        | P1       | done | done  |
 
 ## Navigation
 
 | Component  | Priority | HTML | React |
 | ---------- | -------- | ---- | ----- |
 | Breadcrumb | P0       | done | done  |
-| Tabs       | P1       | done | —     |
+| Tabs       | P1       | done | done  |
 
 ## Forms
 
@@ -118,11 +118,11 @@ artifact, deployed.
 | ------------------------------------ | -------- | ---- | ----- |
 | Button                               | P0       | done | done  |
 | Input                                | P0       | done | done  |
-| Textarea                             | P0       | done | —     |
-| Select                               | P0       | done | —     |
+| Textarea                             | P0       | done | done  |
+| Select                               | P0       | done | done  |
 | Checkbox                             | P0       | done | done  |
-| Radio                                | P0       | done | —     |
-| Switch                               | P1       | done | —     |
+| Radio                                | P0       | done | done  |
+| Switch                               | P1       | done | done  |
 | Date picker                          | P1       | done | —     |
 | Rich text editor — Lexical, markdown | P2       | done | —     |
 
@@ -147,9 +147,9 @@ artifact, deployed.
 | Page                  | Priority | HTML | React |
 | --------------------- | -------- | ---- | ----- |
 | Blank page template   | P0       | done | done  |
-| Components — forms    | P1       | done | —     |
-| Components — overlays | P1       | done | —     |
-| Components — feedback | P1       | done | —     |
+| Components — forms    | P1       | done | done  |
+| Components — overlays | P1       | done | done  |
+| Components — feedback | P1       | done | done  |
 | Data — tables         | P2       | done | —     |
 | Data — headless table | P2       | done | —     |
 | Dashboard — overview  | P1       | done | —     |
