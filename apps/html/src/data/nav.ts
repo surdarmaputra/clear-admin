@@ -14,7 +14,6 @@ export const navigation: NavItem[] = [
     children: [
       { label: 'Tables', href: '/data/tables' },
       { label: 'Headless table', href: '/data/headless' },
-      { label: 'Spreadsheet', href: '/data/spreadsheet' },
       { label: 'Kanban', href: '/data/kanban' },
     ],
   },
@@ -23,7 +22,6 @@ export const navigation: NavItem[] = [
     icon: 'component',
     children: [
       { label: 'Forms', href: '/components/forms' },
-      { label: 'Charts', href: '/components/charts' },
       { label: 'Overlays', href: '/components/overlays' },
       { label: 'Feedback', href: '/components/feedback' },
     ],

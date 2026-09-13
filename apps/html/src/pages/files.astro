@@ -1,0 +1,253 @@
+---
+import DashboardLayout from '../layouts/DashboardLayout.astro';
+import Card from '../components/ui/Card.astro';
+import EmptyState from '../components/ui/EmptyState.astro';
+import Icon from '../components/Icon.astro';
+import type { FileDropConfig } from '../lib/files';
+import { withBase } from '../lib/url';
+
+const breadcrumb = [{ label: 'Files' }];
+
+const config: FileDropConfig = {
+  maxBytes: 8 * 1024 * 1024,
+  accept: ['image/', 'application/pdf', '.csv', '.zip'],
+  seed: [
+    {
+      name: 'storefront.svg',
+      bytes: 738,
+      type: 'image/svg+xml',
+      url: withBase('/samples/storefront.svg'),
+    },
+    { name: 'ledger.svg', bytes: 730, type: 'image/svg+xml', url: withBase('/samples/ledger.svg') },
+    {
+      name: 'warehouse.svg',
+      bytes: 736,
+      type: 'image/svg+xml',
+      url: withBase('/samples/warehouse.svg'),
+    },
+    {
+      name: 'receipts.svg',
+      bytes: 734,
+      type: 'image/svg+xml',
+      url: withBase('/samples/receipts.svg'),
+    },
+    { name: 'q3-invoices.csv', bytes: 184_320, type: 'text/csv' },
+    { name: 'contract-2026.pdf', bytes: 1_260_000, type: 'application/pdf' },
+  ],
+};
+---
+
+<DashboardLayout title="Files" breadcrumb={breadcrumb}>
+  {/* The attribute is the signal: the Alpine bundle only fetches this page's
+      chunk when a page on screen actually asks for it. */}
+  <div data-file-drop x-data={`fileDrop(${JSON.stringify(config)})`} class="flex flex-col gap-6">
+    <div>
+      <h1 class="font-display text-title font-semibold tracking-display">Files</h1>
+      <p class="mt-1 max-w-3xl text-caption text-ink-secondary">
+        Drag files onto the zone, or pick them with the keyboard — the input behind the label is a
+        real one. Images get a thumbnail and open in the lightbox; everything else gets an icon by
+        type. Uploads are simulated in the browser, so nothing leaves the page.
+      </p>
+    </div>
+
+    <div
+      x-on:dragenter.prevent="onDragEnter()"
+      x-on:dragover.prevent
+      x-on:dragleave.prevent="onDragLeave()"
+      x-on:drop.prevent="onDrop($event)"
+      x-bind:class="dragging ? 'border-accent bg-surface-hover' : 'border-hairline bg-surface-card'"
+      class="flex flex-col items-center gap-3 rounded-card border-2 border-dashed px-6 py-10 text-center transition-colors"
+    >
+      <span class="grid size-11 place-items-center rounded-full bg-surface-hover text-ink-secondary">
+        <Icon name="upload" size={20} />
+      </span>
+      <div>
+        <p class="text-caption font-semibold">Drop files here</p>
+        <p class="mt-1 text-caption text-ink-secondary">
+          Images, PDF, CSV or ZIP. Up to 8 MB each.
+        </p>
+      </div>
+
+      {/* A label wrapping a visually hidden input keeps the control keyboard
+          reachable — a div with a click handler would not be. */}
+      <label class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-control bg-accent px-4 py-2 text-caption font-medium text-paper transition-colors hover:bg-cobalt focus-within:shadow-focus">
+        <Icon name="paperclip" size={16} />
+        Choose files
+        <input
+          type="file"
+          multiple
+          accept="image/*,application/pdf,.csv,.zip"
+          class="sr-only"
+          x-on:change="onPick($event)"
+        />
+      </label>
+    </div>
+
+    <Card title="Uploads" description="Progress, type and size for everything the zone accepted.">
+      <template x-if="items.length === 0">
+        <div>
+          <EmptyState
+            title="No files yet"
+            description="Drop something onto the zone above to see the preview and progress states."
+            icon="folder"
+          />
+        </div>
+      </template>
+
+      <ul data-file-list class="flex flex-col divide-y divide-hairline">
+        <template x-for="item in items" x-bind:key="item.id">
+          <li class="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
+            {/* Thumbnail for an image, icon for anything else. */}
+            <template x-if="item.url">
+              <button
+                type="button"
+                x-on:click="open(item.id)"
+                x-bind:aria-label="`Preview ${item.name}`"
+                class="size-11 shrink-0 overflow-hidden rounded-control border border-hairline"
+              >
+                <img x-bind:src="item.url" x-bind:alt="item.name" class="size-full object-cover" />
+              </button>
+            </template>
+            {/* Icons are inlined at build time, so every candidate ships and the
+                matching one is shown — there is no runtime icon lookup. */}
+            <template x-if="!item.url">
+              <span class="grid size-11 shrink-0 place-items-center rounded-control bg-surface-hover text-ink-secondary">
+                <span x-show="icon(item) === 'file-text'">
+                  <Icon name="file-text" size={18} />
+                </span>
+                <span x-show="icon(item) === 'table-2'">
+                  <Icon name="table-2" size={18} />
+                </span>
+                <span x-show="icon(item) === 'file-archive'">
+                  <Icon name="file-archive" size={18} />
+                </span>
+                <span x-show="icon(item) === 'file'">
+                  <Icon name="file" size={18} />
+                </span>
+              </span>
+            </template>
+
+            <div class="min-w-0 flex-1">
+              <p class="truncate text-caption font-medium" x-text="item.name"></p>
+              <p class="text-micro text-ink-secondary">
+                <span class="tabular" x-text="size(item.bytes)"></span>
+                <span x-show="item.status === 'uploading'"> · uploading</span>
+              </p>
+              <div
+                x-cloak
+                x-show="item.status === 'uploading'"
+                role="progressbar"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                x-bind:aria-valuenow="Math.round(item.progress)"
+                x-bind:aria-label="`Uploading ${item.name}`"
+                class="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-surface-hover"
+              >
+                <div
+                  class="h-full rounded-full bg-accent transition-[width] duration-300"
+                  x-bind:style="`width: ${item.progress}%`"
+                ></div>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              x-on:click="remove(item.id)"
+              x-bind:aria-label="`Remove ${item.name}`"
+              class="grid size-8 shrink-0 place-items-center rounded-control text-ink-secondary transition-colors hover:bg-surface-hover hover:text-danger"
+            >
+              <Icon name="trash-2" size={16} />
+            </button>
+          </li>
+        </template>
+      </ul>
+    </Card>
+
+    <Card
+      title="Gallery"
+      description="Every image in the list. Click a tile, then walk the set with the arrow keys."
+    >
+      <div data-gallery class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        <template x-for="image in images" x-bind:key="image.id">
+          <button
+            type="button"
+            x-on:click="open(image.id)"
+            x-bind:aria-label="`Open ${image.name}`"
+            class="group relative aspect-video overflow-hidden rounded-control border border-hairline"
+          >
+            <img
+              x-bind:src="image.url"
+              x-bind:alt="image.name"
+              class="size-full object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+            <span class="absolute inset-0 grid place-items-center bg-graphite/40 text-paper opacity-0 transition-opacity group-hover:opacity-100">
+              <Icon name="maximize-2" size={18} />
+            </span>
+          </button>
+        </template>
+      </div>
+    </Card>
+
+    {/* Lightbox. Same overlay store and focus trap as the modal and drawer —
+        RFC-001 D11 measured a library at 17.0 KB gz to replace this. */}
+    <div
+      x-cloak
+      x-show="$store.overlay.is('lightbox')"
+      x-on:keydown.escape.window="close()"
+      x-on:keydown.arrow-right.window="step(1)"
+      x-on:keydown.arrow-left.window="step(-1)"
+      class="fixed inset-0 z-50 flex items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Image preview"
+    >
+      <div
+        x-on:click="close()"
+        x-transition.opacity
+        class="absolute inset-0 bg-graphite/80"
+        aria-hidden="true"
+      ></div>
+
+      <div
+        x-focus-trap="$store.overlay.is('lightbox')"
+        class="relative flex max-h-full w-full max-w-3xl flex-col gap-3"
+      >
+        <div class="flex items-center justify-between gap-3">
+          <p class="truncate text-caption font-medium text-paper" x-text="current?.name"></p>
+          <button
+            type="button"
+            x-on:click="close()"
+            aria-label="Close preview"
+            class="grid size-9 shrink-0 place-items-center rounded-control text-paper transition-colors hover:bg-paper/10"
+          >
+            <Icon name="x" size={18} />
+          </button>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button
+            type="button"
+            x-on:click="step(-1)"
+            aria-label="Previous image"
+            class="grid size-9 shrink-0 place-items-center rounded-control text-paper transition-colors hover:bg-paper/10"
+          >
+            <Icon name="chevron-left" size={18} />
+          </button>
+          <img
+            x-bind:src="current?.url"
+            x-bind:alt="current?.name"
+            class="max-h-[70vh] min-w-0 flex-1 rounded-card bg-surface-card object-contain"
+          />
+          <button
+            type="button"
+            x-on:click="step(1)"
+            aria-label="Next image"
+            class="grid size-9 shrink-0 place-items-center rounded-control text-paper transition-colors hover:bg-paper/10"
+          >
+            <Icon name="chevron-right" size={18} />
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</DashboardLayout>

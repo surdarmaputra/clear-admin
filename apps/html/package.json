@@ -13,16 +13,26 @@
     "@alpinejs/collapse": "^3.17.2",
     "@fontsource-variable/bricolage-grotesque": "^5.3.0",
     "@fontsource-variable/inter": "^5.1.0",
+    "@lexical/history": "^0.50.0",
+    "@lexical/link": "^0.50.0",
+    "@lexical/list": "^0.50.0",
+    "@lexical/markdown": "^0.50.0",
+    "@lexical/rich-text": "^0.50.0",
+    "@lexical/selection": "^0.50.0",
+    "@lexical/utils": "^0.50.0",
     "@tanstack/table-core": "^9.2.4",
     "alpinejs": "^3.14.0",
     "chart.js": "^4.5.1",
-    "lucide-static": "^1.44.0"
+    "lexical": "^0.50.0",
+    "lucide-static": "^1.44.0",
+    "sortablejs": "^1.15.7"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
     "@tailwindcss/vite": "^4.0.0",
     "@types/alpinejs": "^3.13.10",
     "@types/node": "^22.20.2",
+    "@types/sortablejs": "^1.15.9",
     "astro": "^5.0.0",
     "tailwindcss": "^4.0.0",
     "typescript": "^5.7.0"
