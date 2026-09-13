@@ -24,8 +24,8 @@ not through a shared package.
 | Primitives    | hand-rolled + Alpine                                | shadcn/ui (Radix)       |
 | Charts        | Chart.js                                            | Recharts                |
 | Tables        | hand-rolled on Alpine + `@tanstack/table-core` page | `@tanstack/react-table` |
-| Editor        | `lexical` (vanilla)                                 | `@lexical/react`        |
-| Drag & drop   | SortableJS                                          | dnd-kit                 |
+| Editor        | `lexical` (vanilla, editor page only)               | `@lexical/react`        |
+| Drag & drop   | SortableJS (kanban page only)                       | dnd-kit                 |
 | Router        | n/a                                                 | TanStack Router         |
 | Authoring     | Astro (build tool only — `.astro` is never shipped) | React + Vite            |
 
@@ -42,6 +42,12 @@ Motion for animation, Vite.
 Pages stay router-agnostic: navigation goes through a `Link` component and a
 `useNav()` shim, so swapping TanStack Router for React Router is a one-file change
 rather than an edit to every page.
+
+Lexical, SortableJS and `@tanstack/table-core` are fetched by dynamic import,
+keyed on an attribute the page carries, so only the page using one pays for it
+([RFC-001 D10](rfc/RFC-001-completing-clear-admin-v6.md)). The lightbox has no
+dependency at all: it is a dialog over the same overlay store and focus trap the
+modal and drawer use, which measured 17.0 KB gz cheaper than PhotoSwipe (D11).
 
 The HTML bundle's `astro build` output doubles as the live demo site — same
 artifact, deployed.
@@ -118,21 +124,21 @@ artifact, deployed.
 | Radio                                | P0       | done | —     |
 | Switch                               | P1       | done | —     |
 | Date picker                          | P1       | done | —     |
-| Rich text editor — Lexical, markdown | P2       | —    | —     |
+| Rich text editor — Lexical, markdown | P2       | done | —     |
 
 ## Files & media
 
 | Component                 | Priority | HTML | React |
 | ------------------------- | -------- | ---- | ----- |
-| File upload — drag & drop | P2       | —    | —     |
-| File preview              | P2       | —    | —     |
-| Image preview / lightbox  | P2       | —    | —     |
+| File upload — drag & drop | P2       | done | —     |
+| File preview              | P2       | done | —     |
+| Image preview / lightbox  | P2       | done | —     |
 
 ## Interaction
 
 | Component                  | Priority | HTML | React |
 | -------------------------- | -------- | ---- | ----- |
-| Kanban board — drag & drop | P2       | —    | —     |
+| Kanban board — drag & drop | P2       | done | —     |
 
 ---
 
@@ -153,6 +159,9 @@ artifact, deployed.
 | 404                   | P1       | done | —     |
 | Profile               | P2       | done | —     |
 | Settings              | P2       | done | —     |
+| Editor                | P2       | done | —     |
+| Files                 | P2       | done | —     |
+| Data — kanban         | P2       | done | —     |
 
 ---
 

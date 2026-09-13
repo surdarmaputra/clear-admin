@@ -13,7 +13,11 @@ export type Row = Record<string, string | number>;
 /** The Alpine magics these methods reach for. Kept here so `this` is typed. */
 interface Magics {
   $el: HTMLElement;
-  $store: { toast: { show(message: string, variant?: string): void } };
+  $refs: Record<string, HTMLElement>;
+  $store: {
+    toast: { show(message: string, variant?: string): void };
+    overlay: { is(id: string): boolean; open(id: string): void; close(): void };
+  };
   $nextTick(callback: () => void): void;
   $watch(property: string, callback: () => void): void;
 }

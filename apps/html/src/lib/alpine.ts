@@ -125,13 +125,29 @@ const toast: ToastStore = {
 Alpine.plugin(collapse);
 Alpine.data('serverTable', serverTable);
 
-// The headless table carries `@tanstack/table-core`, and one page uses it. A
-// static import would put it in this bundle and charge every page for it, so
-// it is fetched here — before `start()`, because `Alpine.data` registered after
-// that never reaches markup already on the page.
+// Each of these carries a dependency one page uses — `@tanstack/table-core`,
+// Lexical, SortableJS. A static import would put all three in this bundle and
+// charge the login screen for them (RFC-001 D10), so each is fetched only when
+// a page on screen asks for it by attribute — and before `start()`, because
+// `Alpine.data` registered after that never reaches markup already on the page.
 if (document.querySelector('[data-headless-table]')) {
   const { headlessTable } = await import('./headless-table');
   Alpine.data('headlessTable', headlessTable);
+}
+
+if (document.querySelector('[data-rich-editor]')) {
+  const { richEditor } = await import('./editor');
+  Alpine.data('richEditor', richEditor);
+}
+
+if (document.querySelector('[data-file-drop]')) {
+  const { fileDrop } = await import('./files');
+  Alpine.data('fileDrop', fileDrop);
+}
+
+if (document.querySelector('[data-kanban]')) {
+  const { kanbanBoard } = await import('./kanban');
+  Alpine.data('kanbanBoard', kanbanBoard);
 }
 
 Alpine.store('overlay', overlay);

@@ -55,7 +55,7 @@ test.describe('dashboard shell', () => {
     // drawer is open.
     if (isMobile) await page.getByRole('button', { name: 'Open navigation' }).click();
 
-    const submenu = page.getByRole('link', { name: 'Spreadsheet' });
+    const submenu = page.getByRole('link', { name: 'Headless table' });
     await expect(submenu).toBeHidden();
 
     await page.getByRole('button', { name: 'Data' }).click();
@@ -768,4 +768,280 @@ test.describe('headless table', () => {
 
     expect(requests.length, 'nothing was fetched to sort or search').toBe(before);
   });
+});
+
+test.describe('rich text editor', () => {
+  const surface = (page: Page) => page.getByRole('textbox', { name: 'Document body' });
+
+  test('renders the seed markdown as formatted blocks', async ({ page }) => {
+    const failures = watchForFailures(page);
+    await page.goto('/editor');
+
+    // Lexical parsed the markdown rather than printing it: a heading element,
+    // a list and a quote, none of which exist in the source string as markup.
+    await expect(surface(page).locator('h2')).toContainText('Release notes');
+    await expect(surface(page).locator('ul li')).toHaveCount(3);
+    await expect(surface(page).locator('blockquote')).toContainText('no migration');
+    await expect(surface(page).locator('strong')).toContainText('tax column');
+
+    expect(failures).toEqual([]);
+  });
+
+  test('typing round-trips back to markdown', async ({ page }) => {
+    await page.goto('/editor');
+
+    const output = page.locator('pre');
+    await expect(output).toContainText('## Release notes');
+
+    // Clicking the last block rather than the surface: a click on the padding
+    // leaves the caret wherever Lexical last had it, which is nowhere on load.
+    await surface(page).locator('blockquote').click();
+    await page.keyboard.press('End');
+    await page.keyboard.press('Enter');
+    await page.keyboard.type('Shipped on a Friday.');
+
+    await expect(output).toContainText('Shipped on a Friday.');
+    await expect(page.getByText('words', { exact: false })).toBeVisible();
+  });
+
+  test('the toolbar reports the block the caret sits in', async ({ page }) => {
+    await page.goto('/editor');
+
+    const heading = page.getByRole('button', { name: 'Heading 2' });
+    const quote = page.getByRole('button', { name: 'Quote' });
+
+    await surface(page).locator('h2').click();
+    await expect(heading).toHaveAttribute('aria-pressed', 'true');
+    await expect(quote).toHaveAttribute('aria-pressed', 'false');
+
+    await surface(page).locator('blockquote').click();
+    await expect(quote).toHaveAttribute('aria-pressed', 'true');
+    await expect(heading).toHaveAttribute('aria-pressed', 'false');
+  });
+
+  test('a toolbar button formats the selection, and undo takes it back', async ({ page }) => {
+    await page.goto('/editor');
+
+    const undo = page.getByRole('button', { name: 'Undo' });
+    await surface(page).locator('h2').click();
+    await page.keyboard.press('ControlOrMeta+A');
+    await page.getByRole('button', { name: 'Bold' }).click();
+
+    await expect(page.locator('pre')).toContainText('**');
+    await expect(undo).toBeEnabled();
+
+    await undo.click();
+    await expect(page.locator('pre')).toContainText('## Release notes — 4.2');
+  });
+
+  test('markdown shortcuts format as you type', async ({ page }) => {
+    await page.goto('/editor');
+
+    await surface(page).locator('blockquote').click();
+    await page.keyboard.press('End');
+    await page.keyboard.press('Enter');
+    await page.keyboard.type('# Typed heading');
+
+    await expect(surface(page).locator('h1')).toContainText('Typed heading');
+  });
+
+  test('Lexical is fetched here and nowhere else', async ({ page }) => {
+    const chunks: string[] = [];
+    page.on('request', (request) => chunks.push(request.url()));
+
+    await page.goto('/login');
+    await expect(page.getByRole('heading', { name: 'Sign in' })).toBeVisible();
+    expect(chunks.filter((url) => /editor.*\.js$/.test(url))).toEqual([]);
+
+    await page.goto('/editor');
+    await expect(surface(page).locator('h2')).toBeVisible();
+    expect(chunks.filter((url) => /editor.*\.js$/.test(url)).length).toBeGreaterThan(0);
+  });
+});
+
+test.describe('files', () => {
+  test('renders the seeded uploads with previews and sizes', async ({ page }) => {
+    const failures = watchForFailures(page);
+    await page.goto('/files');
+
+    await expect(page.getByRole('heading', { name: 'Files', level: 1 })).toBeVisible();
+    await expect(page.locator('[data-file-list] > li')).toHaveCount(6);
+    // Four images get a thumbnail; the CSV and the PDF get an icon instead.
+    await expect(page.locator('[data-gallery] button')).toHaveCount(4);
+    await expect(page.getByText('180 KB')).toBeVisible();
+
+    expect(failures).toEqual([]);
+  });
+
+  test('accepts a dropped file, shows progress, then settles', async ({ page }) => {
+    await page.goto('/files');
+
+    await page
+      .locator('input[type=file]')
+      .setInputFiles({ name: 'ledger.csv', mimeType: 'text/csv', buffer: Buffer.from('a,b\n1,2') });
+
+    const row = page.locator('[data-file-list] > li').filter({ hasText: 'ledger.csv' });
+    await expect(row).toBeVisible();
+    await expect(row.getByRole('progressbar')).toBeVisible();
+
+    await expect(page.locator('[data-toast]')).toContainText('ledger.csv uploaded.');
+    await expect(row.getByRole('progressbar')).toBeHidden();
+  });
+
+  test('rejects a type the zone does not accept', async ({ page }) => {
+    await page.goto('/files');
+
+    await page.locator('input[type=file]').setInputFiles({
+      name: 'payload.exe',
+      mimeType: 'application/x-msdownload',
+      buffer: Buffer.from('nope'),
+    });
+
+    await expect(page.locator('[data-toast]')).toContainText('not a supported type');
+    await expect(page.locator('[data-file-list] > li')).toHaveCount(6);
+  });
+
+  test('the lightbox opens, walks the set with the keyboard, and closes', async ({ page }) => {
+    await page.goto('/files');
+
+    await page.getByRole('button', { name: 'Open storefront.svg' }).click();
+    const dialog = page.getByRole('dialog', { name: 'Image preview' });
+    await expect(dialog).toBeVisible();
+    await expect(dialog).toContainText('storefront.svg');
+
+    // Arrow keys, not just the buttons — a viewer only a mouse can page is
+    // the failure this page exists to not demonstrate.
+    await page.keyboard.press('ArrowRight');
+    await expect(dialog).toContainText('ledger.svg');
+    await page.keyboard.press('ArrowLeft');
+    await expect(dialog).toContainText('storefront.svg');
+
+    // Wraps rather than dead-ending at the first image.
+    await page.keyboard.press('ArrowLeft');
+    await expect(dialog).toContainText('receipts.svg');
+
+    await page.keyboard.press('Escape');
+    await expect(dialog).toBeHidden();
+  });
+
+  test('removing a file drops it from the gallery too', async ({ page }) => {
+    await page.goto('/files');
+
+    await page.getByRole('button', { name: 'Remove storefront.svg' }).click();
+    await expect(page.locator('[data-file-list] > li')).toHaveCount(5);
+    await expect(page.getByRole('button', { name: 'Open storefront.svg' })).toHaveCount(0);
+  });
+});
+
+test.describe('kanban', () => {
+  const card = (page: Page, id: string) => page.locator(`[data-card="${id}"]`);
+  const column = (page: Page, id: string) => page.locator(`[data-column="${id}"]`);
+
+  test('renders every column with its count', async ({ page }) => {
+    const failures = watchForFailures(page);
+    await page.goto('/data/kanban');
+
+    await expect(page.locator('[data-kanban-list]')).toHaveCount(4);
+    await expect(column(page, 'backlog').locator('[data-card]')).toHaveCount(3);
+    await expect(column(page, 'review').locator('[data-card]')).toHaveCount(1);
+
+    expect(failures).toEqual([]);
+  });
+
+  test('arrow keys move a card between columns and keep its focus', async ({ page }) => {
+    await page.goto('/data/kanban');
+
+    await card(page, 'c1').focus();
+    await page.keyboard.press('ArrowRight');
+
+    await expect(column(page, 'progress').locator('[data-card="c1"]')).toHaveCount(1);
+    await expect(column(page, 'backlog').locator('[data-card]')).toHaveCount(2);
+    // The card is re-rendered by the move, so focus has to be put back on it.
+    await expect(card(page, 'c1')).toBeFocused();
+    await expect(page.locator('[data-kanban-status]')).toContainText('moved to In progress');
+
+    await page.keyboard.press('ArrowLeft');
+    await expect(column(page, 'backlog').locator('[data-card="c1"]')).toHaveCount(1);
+  });
+
+  test('arrow keys reorder within a column', async ({ page }) => {
+    await page.goto('/data/kanban');
+
+    const order = () =>
+      column(page, 'backlog')
+        .locator('[data-card]')
+        .evaluateAll((cards) => cards.map((node) => (node as HTMLElement).dataset.card));
+    expect(await order()).toEqual(['c1', 'c2', 'c3']);
+
+    await card(page, 'c1').focus();
+    await page.keyboard.press('ArrowDown');
+    expect(await order()).toEqual(['c2', 'c1', 'c3']);
+    await expect(page.locator('[data-kanban-status]')).toContainText('position 2 in Backlog');
+  });
+
+  test('a move at the edge of the board is refused, not wrapped', async ({ page }) => {
+    await page.goto('/data/kanban');
+
+    await card(page, 'c1').focus();
+    await page.keyboard.press('ArrowLeft');
+    await expect(column(page, 'backlog').locator('[data-card="c1"]')).toHaveCount(1);
+
+    await card(page, 'c7').focus();
+    await page.keyboard.press('ArrowRight');
+    await expect(column(page, 'done').locator('[data-card="c7"]')).toHaveCount(1);
+  });
+
+  test('a pointer drag moves the card exactly once', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'SortableJS uses touch events on a phone; the keyboard path covers it');
+    await page.goto('/data/kanban');
+
+    const from = (await card(page, 'c1').boundingBox())!;
+    const to = (await column(page, 'progress').boundingBox())!;
+
+    await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(to.x + to.width / 2, to.y + 30, { steps: 12 });
+    await page.mouse.move(to.x + to.width / 2, to.y + 60, { steps: 12 });
+    await page.mouse.up();
+
+    await expect(column(page, 'progress').locator('[data-card="c1"]')).toHaveCount(1);
+    // One node, not two: the library's DOM move is reverted and the board
+    // re-renders from state, so a card cannot end up in both columns.
+    await expect(page.locator('[data-card="c1"]')).toHaveCount(1);
+    await expect(column(page, 'backlog').locator('[data-card]')).toHaveCount(2);
+  });
+
+  test('SortableJS is fetched here and nowhere else', async ({ page }) => {
+    const chunks: string[] = [];
+    page.on('request', (request) => chunks.push(request.url()));
+
+    await page.goto('/data/tables');
+    await expect(page.locator('tbody tr')).toHaveCount(8);
+    expect(chunks.filter((url) => /kanban.*\.js$/.test(url))).toEqual([]);
+
+    await page.goto('/data/kanban');
+    await expect(page.locator('[data-kanban-list]')).toHaveCount(4);
+    expect(chunks.filter((url) => /kanban.*\.js$/.test(url)).length).toBeGreaterThan(0);
+  });
+});
+
+test.describe('page budget', () => {
+  // RFC-001 §6 is a measurement, not a projection. These are the numbers it
+  // reports, asserted so a dependency cannot quietly breach the ceiling.
+  const CEILING = 250 * 1024;
+
+  for (const path of ['/', '/editor', '/files', '/data/kanban', '/data/headless', '/login']) {
+    test(`${path} transfers less than 250 KB gz`, async ({ page }) => {
+      let bytes = 0;
+      page.on('response', async (response) => {
+        // Fonts are excluded by the same rule the RFC's table uses.
+        if (/fontsource|\.woff2?$/.test(response.url())) return;
+        const length = response.headers()['content-length'];
+        if (length) bytes += Number(length);
+      });
+
+      await page.goto(path, { waitUntil: 'networkidle' });
+      expect(bytes, `${path} is ${(bytes / 1024).toFixed(1)} KB`).toBeLessThan(CEILING);
+    });
+  }
 });

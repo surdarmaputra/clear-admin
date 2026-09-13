@@ -1,0 +1,130 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import Icon from '../../components/Icon.astro';
+import type { KanbanConfig } from '../../lib/kanban';
+
+const breadcrumb = [{ label: 'Data' }, { label: 'Kanban' }];
+
+const config: KanbanConfig = {
+  columns: [
+    {
+      id: 'backlog',
+      title: 'Backlog',
+      cards: [
+        { id: 'c1', title: 'Dunning emails for failed cards', owner: 'Ada L.', tag: 'Billing' },
+        { id: 'c2', title: 'Audit log retention policy', owner: 'Grace H.', tag: 'Compliance' },
+        { id: 'c3', title: 'Split the invoice export job', owner: 'Alan T.', tag: 'Platform' },
+      ],
+    },
+    {
+      id: 'progress',
+      title: 'In progress',
+      cards: [
+        { id: 'c4', title: 'Tax column in CSV export', owner: 'Ada L.', tag: 'Billing' },
+        {
+          id: 'c5',
+          title: 'Retry partial reconciliations',
+          owner: 'Katherine J.',
+          tag: 'Platform',
+        },
+      ],
+    },
+    {
+      id: 'review',
+      title: 'In review',
+      cards: [
+        { id: 'c6', title: 'Idempotency keys on POST /v2/invoices', owner: 'Alan T.', tag: 'API' },
+      ],
+    },
+    {
+      id: 'done',
+      title: 'Done',
+      cards: [
+        { id: 'c7', title: 'Seat count webhook', owner: 'Grace H.', tag: 'API' },
+        {
+          id: 'c8',
+          title: 'Remove the legacy price table',
+          owner: 'Katherine J.',
+          tag: 'Platform',
+        },
+      ],
+    },
+  ],
+};
+---
+
+<DashboardLayout title="Kanban" breadcrumb={breadcrumb}>
+  {/* The attribute is the signal: the Alpine bundle only fetches SortableJS
+      when a page on screen actually asks for it. */}
+  <div data-kanban x-data={`kanbanBoard(${JSON.stringify(config)})`} class="flex flex-col gap-6">
+    <div>
+      <h1 class="font-display text-title font-semibold tracking-display">Kanban</h1>
+      <p id="kanban-help" class="mt-1 max-w-3xl text-caption text-ink-secondary">
+        Drag a card with the pointer, or focus one and move it with the arrow keys — left and right
+        change column, up and down change position. SortableJS handles the drag; the board's state
+        is the only thing either path writes to.
+      </p>
+    </div>
+
+    {/* A keyboard move redraws the board silently without this. */}
+    <p
+      data-kanban-status
+      class="sr-only"
+      role="status"
+      aria-live="polite"
+      x-text="announcement"
+    ></p>
+
+    <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <template x-for="column in columns" x-bind:key="column.id">
+        <section class="flex flex-col rounded-card border border-hairline bg-surface-card shadow-card">
+          <header class="flex items-center justify-between gap-2 border-b border-hairline px-4 py-3">
+            <h2 class="text-caption font-semibold" x-text="column.title"></h2>
+            <span
+              class="tabular rounded-full bg-surface-hover px-2 py-0.5 text-micro text-ink-secondary"
+              x-text="column.cards.length"
+            ></span>
+          </header>
+
+          <ul
+            data-kanban-list
+            x-bind:data-column="column.id"
+            x-bind:aria-label="`${column.title} cards`"
+            class="flex min-h-24 flex-1 flex-col gap-2 p-3"
+          >
+            <template x-for="card in column.cards" x-bind:key="card.id">
+              <li
+                x-bind:data-card="card.id"
+                tabindex="0"
+                x-effect="if (focusId === card.id) { $el.focus(); focusId = null }"
+                aria-describedby="kanban-help"
+                x-bind:aria-label="`${card.title}, ${column.title}`"
+                x-on:keydown.arrow-left.prevent="moveTo(card.id, -1)"
+                x-on:keydown.arrow-right.prevent="moveTo(card.id, 1)"
+                x-on:keydown.arrow-up.prevent="reorder(card.id, -1)"
+                x-on:keydown.arrow-down.prevent="reorder(card.id, 1)"
+                class="cursor-grab rounded-control border border-hairline bg-surface-page p-3 transition-colors hover:bg-surface-hover active:cursor-grabbing"
+              >
+                <div class="flex items-start gap-2">
+                  <span class="mt-0.5 shrink-0 text-ink-secondary" aria-hidden="true">
+                    <Icon name="grip-vertical" size={16} />
+                  </span>
+                  <p class="min-w-0 flex-1 text-caption font-medium" x-text="card.title"></p>
+                </div>
+                <div class="mt-3 flex items-center justify-between gap-2 pl-6">
+                  <span class="truncate text-micro text-ink-secondary" x-text="card.owner"></span>
+                  {/* Badge's own neutral markup, bound rather than imported: the
+                      tag is per-card data, and an Astro prop is decided at build. */}
+                  <span
+                    class="inline-flex shrink-0 items-center rounded-full bg-surface-hover px-2.5 py-0.5 text-micro font-medium text-ink-secondary"
+                    x-text="card.tag"
+                  ></span>
+                </div>
+              </li>
+            </template>
+          </ul>
+        </section>
+      </template>
+    </div>
+  </div>
+</DashboardLayout>

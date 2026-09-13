@@ -1,0 +1,163 @@
+---
+import DashboardLayout from '../layouts/DashboardLayout.astro';
+import Button from '../components/ui/Button.astro';
+import Card from '../components/ui/Card.astro';
+import Icon from '../components/Icon.astro';
+import type { RichEditorConfig } from '../lib/editor';
+
+const breadcrumb = [{ label: 'Editor' }];
+
+const config: RichEditorConfig = {
+  markdown: [
+    '## Release notes — 4.2',
+    '',
+    'Billing exports now carry the **tax column** every finance team asked for, and',
+    'the reconciliation job retries on a *partial* failure instead of starting over.',
+    '',
+    '- Tax column in CSV and XLSX exports',
+    '- Retry with backoff on partial failures',
+    '- `POST /v2/invoices` accepts idempotency keys',
+    '',
+    '> Upgrading from 4.1 needs no migration. The export columns are additive.',
+  ].join('\n'),
+};
+
+/** Inline marks. `kind` is the Lexical format name the button dispatches. */
+const formats = [
+  { kind: 'bold', icon: 'bold', label: 'Bold' },
+  { kind: 'italic', icon: 'italic', label: 'Italic' },
+  { kind: 'strikethrough', icon: 'strikethrough', label: 'Strikethrough' },
+  { kind: 'code', icon: 'code', label: 'Inline code' },
+];
+
+/** Block types. Pressing the active one returns the block to a paragraph. */
+const blocks = [
+  { kind: 'h1', icon: 'heading-1', label: 'Heading 1' },
+  { kind: 'h2', icon: 'heading-2', label: 'Heading 2' },
+  { kind: 'quote', icon: 'text-quote', label: 'Quote' },
+  { kind: 'ul', icon: 'list', label: 'Bulleted list' },
+  { kind: 'ol', icon: 'list-ordered', label: 'Numbered list' },
+];
+---
+
+<DashboardLayout title="Editor" breadcrumb={breadcrumb}>
+  <div class="flex max-w-4xl flex-col gap-6">
+    <div>
+      <h1 class="font-display text-title font-semibold tracking-display">Rich text editor</h1>
+      <p class="mt-1 max-w-3xl text-caption text-ink-secondary">
+        Lexical with no framework glue — the toolbar is Alpine, the document is Lexical, and
+        markdown is both the input and the output. Typing <code class="text-micro">## </code> or
+        <code class="text-micro">- </code> at the start of a line formats it as you go.
+      </p>
+    </div>
+
+    {/* The attribute is the signal: the Alpine bundle only fetches Lexical when
+        a page on screen actually asks for it. The markdown panel below shares
+        this scope, which is why it is inside it. */}
+    <div
+      data-rich-editor
+      x-data={`richEditor(${JSON.stringify(config)})`}
+      class="flex flex-col gap-6"
+    >
+      <div class="overflow-hidden rounded-card border border-hairline bg-surface-card shadow-card">
+        <div
+          role="toolbar"
+          aria-label="Formatting"
+          class="flex flex-wrap items-center gap-1 border-b border-hairline px-3 py-2"
+        >
+          {formats.map((format) => (
+            <button
+              type="button"
+              title={format.label}
+              aria-label={format.label}
+              x-bind:aria-pressed={`formats.${format.kind} ? 'true' : 'false'`}
+              x-on:click={`format('${format.kind}')`}
+              class="grid size-8 place-items-center rounded-control text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink-primary aria-pressed:bg-surface-hover aria-pressed:text-ink-primary"
+            >
+              <Icon name={format.icon} size={16} />
+            </button>
+          ))}
+
+          <span class="mx-1 h-5 w-px bg-hairline" aria-hidden="true"></span>
+
+          {blocks.map((item) => (
+            <button
+              type="button"
+              title={item.label}
+              aria-label={item.label}
+              x-bind:aria-pressed={`block === '${item.kind}' ? 'true' : 'false'`}
+              x-on:click={`setBlock('${item.kind}')`}
+              class="grid size-8 place-items-center rounded-control text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink-primary aria-pressed:bg-surface-hover aria-pressed:text-ink-primary"
+            >
+              <Icon name={item.icon} size={16} />
+            </button>
+          ))}
+
+          <span class="mx-1 h-5 w-px bg-hairline" aria-hidden="true"></span>
+
+          <button
+            type="button"
+            title="Undo"
+            aria-label="Undo"
+            x-on:click="undo()"
+            x-bind:disabled="!canUndo"
+            class="grid size-8 place-items-center rounded-control text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink-primary disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            <Icon name="undo-2" size={16} />
+          </button>
+          <button
+            type="button"
+            title="Redo"
+            aria-label="Redo"
+            x-on:click="redo()"
+            x-bind:disabled="!canRedo"
+            class="grid size-8 place-items-center rounded-control text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink-primary disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            <Icon name="redo-2" size={16} />
+          </button>
+        </div>
+
+        {/* Lexical takes this element over on init; everything inside it after
+          that is the document, not markup this page controls. */}
+        <div
+          x-ref="surface"
+          contenteditable="true"
+          role="textbox"
+          aria-multiline="true"
+          aria-label="Document body"
+          spellcheck="true"
+          class="min-h-72 px-5 py-4 text-body focus-visible:outline-none"
+        ></div>
+
+        <div class="flex flex-wrap items-center justify-between gap-3 border-t border-hairline px-4 py-2.5">
+          <p class="text-micro text-ink-secondary">
+            <span class="tabular" x-text="words">
+              0
+            </span>{' '}
+            words
+          </p>
+          <Button variant="ghost" x-on:click="copyMarkdown()">
+            <span x-show="!copied" class="inline-flex items-center gap-2">
+              <Icon name="copy" size={16} />
+              Copy markdown
+            </span>
+            <span x-cloak x-show="copied" class="inline-flex items-center gap-2 text-success">
+              <Icon name="check" size={16} />
+              Copied
+            </span>
+          </Button>
+        </div>
+      </div>
+
+      <Card
+        title="Markdown output"
+        description="What the editor would send. It updates on every keystroke, so the round trip is visible rather than promised."
+      >
+        <pre
+          class="overflow-x-auto rounded-control bg-surface-hover p-4 text-micro text-ink-secondary"
+          x-text="markdown"
+        ></pre>
+      </Card>
+    </div>
+  </div>
+</DashboardLayout>
