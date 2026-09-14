@@ -29,6 +29,10 @@ Chart.register(
 interface ChartImplProps extends ChartConfig {
   height: number;
   colors: string[];
+  surface: string;
+  ink: string;
+  hairline: string;
+  tooltipBg: string;
 }
 
 const font = { family: 'var(--font-sans)', size: 12 } as const;
@@ -69,14 +73,14 @@ export default function ChartImpl({
   categories,
   labels,
   colors,
+  surface,
+  ink,
+  hairline,
+  tooltipBg,
   valuePrefix,
 }: ChartImplProps) {
-  const surface = 'var(--color-surface-card)';
-  const ink = 'var(--color-ink-secondary)';
-  const hairline = 'var(--color-hairline)';
-
   const tooltipBase = {
-    backgroundColor: 'var(--color-ink-primary)',
+    backgroundColor: tooltipBg,
     titleColor: surface,
     bodyColor: surface,
     padding: 10,
