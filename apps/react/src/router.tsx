@@ -14,9 +14,7 @@ const ForgotPasswordPage = lazy(() =>
 const NotFoundPage = lazy(() =>
   import('./pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage })),
 );
-const PlaceholderPage = lazy(() =>
-  import('./pages/PlaceholderPage').then((m) => ({ default: m.PlaceholderPage })),
-);
+
 const ProfilePage = lazy(() =>
   import('./pages/ProfilePage').then((m) => ({ default: m.ProfilePage })),
 );
