@@ -116,7 +116,10 @@ export function DataTablesPage() {
     };
     const onMove = (ev: MouseEvent) => {
       if (!resizeRef.current) return;
-      const newWidth = Math.max(80, resizeRef.current.startWidth + ev.clientX - resizeRef.current.startX);
+      const newWidth = Math.max(
+        80,
+        resizeRef.current.startWidth + ev.clientX - resizeRef.current.startX,
+      );
       setColWidths((w) => ({ ...w, [resizeRef.current!.colId]: newWidth }));
     };
     const onUp = () => {
@@ -252,10 +255,10 @@ export function DataTablesPage() {
       <div className="flex flex-col gap-6">
         <div>
           <h1 className="font-display text-title tracking-display font-semibold">Data table</h1>
-          <p className="mt-1 max-w-3xl text-caption text-ink-secondary">
-            48 invoices behind a paged endpoint. Sorting, searching and paging are the server's
-            job — the table holds one page at a time. Drag a column edge to resize it. Customer,
-            amount and date edit in place: click to edit, Enter confirms, Escape cancels.
+          <p className="text-caption text-ink-secondary mt-1 max-w-3xl">
+            48 invoices behind a paged endpoint. Sorting, searching and paging are the server's job
+            — the table holds one page at a time. Drag a column edge to resize it. Customer, amount
+            and date edit in place: click to edit, Enter confirms, Escape cancels.
           </p>
         </div>
 
@@ -328,10 +331,7 @@ export function DataTablesPage() {
                                 </button>
                               ) : (
                                 <span className="truncate">
-                                  {flexRender(
-                                    header.column.columnDef.header,
-                                    header.getContext(),
-                                  )}
+                                  {flexRender(header.column.columnDef.header, header.getContext())}
                                 </span>
                               )}
                             </div>
@@ -359,7 +359,7 @@ export function DataTablesPage() {
                           <button
                             type="button"
                             onClick={() => setGlobalFilter('')}
-                            className="text-caption font-medium text-accent hover:underline"
+                            className="text-caption text-accent font-medium hover:underline"
                           >
                             Clear search
                           </button>
@@ -419,7 +419,7 @@ export function DataTablesPage() {
                 <p className="text-micro tracking-label text-ink-secondary uppercase">
                   Next request
                 </p>
-                <pre className="tabular mt-1 overflow-x-auto text-micro text-ink-secondary">
+                <pre className="tabular text-micro text-ink-secondary mt-1 overflow-x-auto">
                   {`GET /api/invoices?page=${pageIndex + 1}&pageSize=${PAGE_SIZE}&sort=${sortCol?.id ?? ''}&dir=${sortCol?.desc ? 'desc' : 'asc'}&q=${encodeURIComponent(globalFilter)}`}
                 </pre>
               </div>

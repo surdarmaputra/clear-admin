@@ -74,13 +74,10 @@ export function DatePicker({
   const cursorIso = dateToIso(cursor);
   const monthLabel = cursor.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
-  const close = useCallback(
-    (refocus = true) => {
-      setOpen(false);
-      if (refocus) triggerRef.current?.focus();
-    },
-    [],
-  );
+  const close = useCallback((refocus = true) => {
+    setOpen(false);
+    if (refocus) triggerRef.current?.focus();
+  }, []);
 
   const select = useCallback(
     (iso: string) => {
@@ -180,21 +177,21 @@ export function DatePicker({
         <Calendar
           size={16}
           aria-hidden
-          className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-ink-secondary"
+          className="text-ink-secondary pointer-events-none absolute top-1/2 right-3 -translate-y-1/2"
         />
 
         {open && (
           <div
             role="dialog"
             aria-label={`${label} calendar`}
-            className="absolute z-30 mt-2 w-72 rounded-card border border-hairline bg-surface-card p-3 shadow-raised"
+            className="rounded-card border-hairline bg-surface-card shadow-raised absolute z-30 mt-2 w-72 border p-3"
           >
             <div className="flex items-center justify-between gap-2">
               <button
                 type="button"
                 aria-label="Previous month"
                 onClick={() => shiftMonths(-1)}
-                className="grid size-8 place-items-center rounded-control text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink-primary"
+                className="rounded-control text-ink-secondary hover:bg-surface-hover hover:text-ink-primary grid size-8 place-items-center transition-colors"
               >
                 <ChevronLeft size={16} />
               </button>
@@ -205,7 +202,7 @@ export function DatePicker({
                 type="button"
                 aria-label="Next month"
                 onClick={() => shiftMonths(1)}
-                className="grid size-8 place-items-center rounded-control text-ink-secondary transition-colors hover:bg-surface-hover hover:text-ink-primary"
+                className="rounded-control text-ink-secondary hover:bg-surface-hover hover:text-ink-primary grid size-8 place-items-center transition-colors"
               >
                 <ChevronRight size={16} />
               </button>
@@ -230,7 +227,7 @@ export function DatePicker({
                       aria-current={iso === value ? 'date' : undefined}
                       onClick={() => select(iso)}
                       className={
-                        'tabular grid size-9 w-full place-items-center rounded-control text-caption transition-colors ' +
+                        'tabular rounded-control text-caption grid size-9 w-full place-items-center transition-colors ' +
                         (iso === value
                           ? 'bg-accent text-paper'
                           : 'text-ink-secondary hover:bg-surface-hover hover:text-ink-primary')

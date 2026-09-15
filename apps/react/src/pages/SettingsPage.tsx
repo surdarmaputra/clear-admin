@@ -101,10 +101,7 @@ export function SettingsPage() {
             </div>
           </Card>
 
-          <Card
-            title="Locale"
-            description="Dates and money everywhere in the app follow these."
-          >
+          <Card title="Locale" description="Dates and money everywhere in the app follow these.">
             <div className="grid gap-4 sm:grid-cols-2">
               <Select
                 id="language"
@@ -219,7 +216,7 @@ export function SettingsPage() {
       <div className="flex max-w-4xl flex-col gap-6">
         <div>
           <h1 className="font-display text-title tracking-display font-semibold">Settings</h1>
-          <p className="mt-1 text-caption text-ink-secondary">
+          <p className="text-caption text-ink-secondary mt-1">
             Workspace preferences. Nothing here posts anywhere — the forms raise a toast so the
             interaction is complete without a backend.
           </p>

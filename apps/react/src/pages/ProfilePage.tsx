@@ -32,12 +32,14 @@ export function ProfilePage() {
           <Avatar name={user.name} size="lg" />
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
-              <h1 className="font-display text-title tracking-display font-semibold">{user.name}</h1>
+              <h1 className="font-display text-title tracking-display font-semibold">
+                {user.name}
+              </h1>
               <span className="text-micro bg-accent/12 text-accent inline-flex items-center rounded-full px-2.5 py-0.5 font-medium">
                 Owner
               </span>
             </div>
-            <p className="mt-1 text-caption text-ink-secondary">{user.email}</p>
+            <p className="text-caption text-ink-secondary mt-1">{user.email}</p>
           </div>
         </div>
 
