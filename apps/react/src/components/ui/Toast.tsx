@@ -42,7 +42,7 @@ function ToastItem({
       onOpenChange={(open) => {
         if (!open) toast.dismiss(id);
       }}
-      className="rounded-card border-hairline bg-surface-card shadow-raised flex w-full items-start gap-3 border p-3 sm:w-80 data-[state=open]:animate-[toast-show_200ms_ease-out] data-[state=closed]:animate-[toast-hide_150ms_ease-in_forwards]"
+      className="rounded-card border-hairline bg-surface-card shadow-raised flex w-full items-start gap-3 border p-3 data-[state=closed]:animate-[toast-hide_150ms_ease-in_forwards] data-[state=open]:animate-[toast-show_200ms_ease-out] sm:w-80"
     >
       <span className={`mt-0.5 shrink-0 ${tones[variant]}`}>
         <Icon size={18} aria-hidden />

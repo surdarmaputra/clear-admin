@@ -32,12 +32,12 @@ export function Modal({
   return (
     <RDialog.Root open={open} onOpenChange={(o) => !o && onClose()}>
       <RDialog.Portal>
-        <RDialog.Overlay className="bg-graphite/50 fixed inset-0 z-50 data-[state=open]:animate-[overlay-show_200ms_ease-out] data-[state=closed]:animate-[overlay-hide_200ms_ease-in_forwards]" />
+        <RDialog.Overlay className="bg-graphite/50 fixed inset-0 z-50 data-[state=closed]:animate-[overlay-hide_200ms_ease-in_forwards] data-[state=open]:animate-[overlay-show_200ms_ease-out]" />
         <RDialog.Content
           className={
             'rounded-card border-hairline fixed inset-x-4 bottom-4 z-50 w-auto border ' +
             'bg-surface-card shadow-raised sm:inset-auto sm:top-1/2 sm:left-1/2 ' +
-            'data-[state=open]:animate-[modal-show_200ms_ease-out] data-[state=closed]:animate-[modal-hide_200ms_ease-in_forwards] ' +
+            'data-[state=closed]:animate-[modal-hide_200ms_ease-in_forwards] data-[state=open]:animate-[modal-show_200ms_ease-out] ' +
             `sm:w-full sm:-translate-x-1/2 sm:-translate-y-1/2 ${widths[size]}`
           }
         >
