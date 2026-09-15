@@ -17,6 +17,15 @@ const NotFoundPage = lazy(() =>
 const PlaceholderPage = lazy(() =>
   import('./pages/PlaceholderPage').then((m) => ({ default: m.PlaceholderPage })),
 );
+const ProfilePage = lazy(() =>
+  import('./pages/ProfilePage').then((m) => ({ default: m.ProfilePage })),
+);
+const SettingsPage = lazy(() =>
+  import('./pages/SettingsPage').then((m) => ({ default: m.SettingsPage })),
+);
+const DataTablesPage = lazy(() =>
+  import('./pages/DataTablesPage').then((m) => ({ default: m.DataTablesPage })),
+);
 
 function Lazy({ children }: { children: React.ReactNode }) {
   return <Suspense fallback={null}>{children}</Suspense>;
@@ -82,7 +91,7 @@ const profileRoute = createRoute({
   path: '/profile',
   component: () => (
     <Lazy>
-      <PlaceholderPage title="Profile" />
+      <ProfilePage />
     </Lazy>
   ),
 });
@@ -92,7 +101,7 @@ const settingsRoute = createRoute({
   path: '/settings',
   component: () => (
     <Lazy>
-      <PlaceholderPage title="Settings" />
+      <SettingsPage />
     </Lazy>
   ),
 });
@@ -102,7 +111,7 @@ const dataTablesRoute = createRoute({
   path: '/data/tables',
   component: () => (
     <Lazy>
-      <PlaceholderPage title="Tables" />
+      <DataTablesPage />
     </Lazy>
   ),
 });

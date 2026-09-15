@@ -3,6 +3,7 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Checkbox } from '@/components/ui/Checkbox';
+import { DatePicker } from '@/components/ui/DatePicker';
 import { Input } from '@/components/ui/Input';
 import { Radio } from '@/components/ui/Radio';
 import { Select } from '@/components/ui/Select';
@@ -21,6 +22,8 @@ export function ComponentsFormsPage() {
   const [cycle, setCycle] = useState('monthly');
   const [autoRenew, setAutoRenew] = useState(true);
   const [usageAlerts, setUsageAlerts] = useState(false);
+  const [periodStart, setPeriodStart] = useState('2026-09-01');
+  const [periodEnd, setPeriodEnd] = useState('');
 
   return (
     <DashboardLayout title="Forms" breadcrumb={[{ label: 'Components' }, { label: 'Forms' }]}>
@@ -132,6 +135,24 @@ export function ComponentsFormsPage() {
                 label="Sandbox mode"
                 hint="Not available on this plan."
                 disabled
+              />
+            </div>
+          </Card>
+
+          <Card title="Date picker">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <DatePicker
+                id="period-start"
+                label="Period start"
+                value={periodStart}
+                onChange={setPeriodStart}
+              />
+              <DatePicker
+                id="period-end"
+                label="Period end"
+                value={periodEnd}
+                onChange={setPeriodEnd}
+                hint="Leave empty for an open period."
               />
             </div>
           </Card>
