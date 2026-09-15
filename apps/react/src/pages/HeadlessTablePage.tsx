@@ -26,7 +26,14 @@ import type {
   PaginationState,
 } from '@tanstack/react-table';
 import { flexRender } from '@tanstack/react-table';
-import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, ChevronsUpDown, Pin } from 'lucide-react';
+import {
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronUp,
+  ChevronsUpDown,
+  Pin,
+} from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Badge } from '@/components/ui/Badge';
@@ -57,7 +64,11 @@ const COLUMNS = [
   colHelper.accessor('id', { header: 'Invoice', enableSorting: false }),
   colHelper.accessor('customer', { header: 'Customer' }),
   colHelper.accessor('plan', { header: 'Plan', filterFn: filterOneOf, enableColumnFilter: true }),
-  colHelper.accessor('status', { header: 'Status', filterFn: filterOneOf, enableColumnFilter: true }),
+  colHelper.accessor('status', {
+    header: 'Status',
+    filterFn: filterOneOf,
+    enableColumnFilter: true,
+  }),
   colHelper.accessor('amount', {
     header: 'Amount',
     cell: (info) => money(info.getValue()),
@@ -80,15 +91,29 @@ export function HeadlessTablePage() {
   const [globalFilter, setGlobalFilter] = useState('');
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [sorting, setSorting] = useState<SortingState>([{ id: 'date', desc: true }]);
-  const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: PAGE_SIZE });
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: PAGE_SIZE,
+  });
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibilityState>({});
   const [columnOrder, setColumnOrder] = useState<ColumnOrderState>(INITIAL_ORDER);
-  const [columnPinning, setColumnPinning] = useState<ColumnPinningState>({ start: ['id'], end: [] });
+  const [columnPinning, setColumnPinning] = useState<ColumnPinningState>({
+    start: ['id'],
+    end: [],
+  });
 
   const table = useLegacyTable({
     data: invoices,
     columns: COLUMNS,
-    state: { globalFilter, columnFilters, sorting, pagination, columnVisibility, columnOrder, columnPinning },
+    state: {
+      globalFilter,
+      columnFilters,
+      sorting,
+      pagination,
+      columnVisibility,
+      columnOrder,
+      columnPinning,
+    },
     onGlobalFilterChange: setGlobalFilter,
     onColumnFiltersChange: setColumnFilters,
     onSortingChange: setSorting,
@@ -103,7 +128,7 @@ export function HeadlessTablePage() {
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
     autoResetPageIndex: false,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } as any);
 
   const resetView = useCallback(() => {
@@ -147,11 +172,13 @@ export function HeadlessTablePage() {
     const col = (table as any).getColumn(key) as any;
     const selected = (col?.getFilterValue() as string[]) ?? [];
     const values: Array<{ value: string; count: number; checked: boolean }> = col
-      ? [...col.getFacetedUniqueValues()].map(([value, count]: [unknown, number]) => ({
-          value: String(value),
-          count,
-          checked: selected.includes(String(value)),
-        })).sort((a: { value: string }, b: { value: string }) => a.value.localeCompare(b.value))
+      ? [...col.getFacetedUniqueValues()]
+          .map(([value, count]: [unknown, number]) => ({
+            value: String(value),
+            count,
+            checked: selected.includes(String(value)),
+          }))
+          .sort((a: { value: string }, b: { value: string }) => a.value.localeCompare(b.value))
       : [];
     return { key, label: COL_LABELS[key] ?? key, values };
   });
@@ -213,11 +240,13 @@ export function HeadlessTablePage() {
                 }}
                 aria-label="Search invoices"
                 placeholder="Search invoices"
-                className="border-hairline bg-surface-card placeholder:text-ink-secondary w-full rounded-control border py-1.5 pr-3 pl-9 text-caption"
+                className="border-hairline bg-surface-card placeholder:text-ink-secondary rounded-control text-caption w-full border py-1.5 pr-3 pl-9"
               />
             </div>
             <div className="ml-auto">
-              <Button variant="secondary" onClick={resetView}>Reset view</Button>
+              <Button variant="secondary" onClick={resetView}>
+                Reset view
+              </Button>
             </div>
           </div>
 
@@ -229,7 +258,10 @@ export function HeadlessTablePage() {
                   {label}
                 </legend>
                 {values.map(({ value, count, checked }) => (
-                  <label key={value} className="flex cursor-pointer items-center gap-2 text-caption">
+                  <label
+                    key={value}
+                    className="text-caption flex cursor-pointer items-center gap-2"
+                  >
                     <input
                       type="checkbox"
                       checked={checked}
@@ -254,9 +286,9 @@ export function HeadlessTablePage() {
                 return (
                   <div
                     key={id}
-                    className="border-hairline flex items-center gap-1 rounded-control border px-2 py-1"
+                    className="border-hairline rounded-control flex items-center gap-1 border px-2 py-1"
                   >
-                    <label className="flex cursor-pointer items-center gap-2 text-caption">
+                    <label className="text-caption flex cursor-pointer items-center gap-2">
                       <input
                         type="checkbox"
                         checked={col.getIsVisible()}
@@ -270,7 +302,7 @@ export function HeadlessTablePage() {
                       onClick={() => col.pin(pinned ? false : 'start')}
                       aria-pressed={pinned}
                       aria-label={`Pin ${COL_LABELS[id] ?? id}`}
-                      className={`grid size-6 place-items-center rounded-control transition-colors hover:bg-surface-hover ${pinned ? 'text-accent' : 'text-ink-secondary'}`}
+                      className={`rounded-control hover:bg-surface-hover grid size-6 place-items-center transition-colors ${pinned ? 'text-accent' : 'text-ink-secondary'}`}
                     >
                       <Pin size={14} />
                     </button>
@@ -279,7 +311,7 @@ export function HeadlessTablePage() {
                       onClick={() => moveCol(id, -1)}
                       disabled={idx <= 0}
                       aria-label={`Move ${COL_LABELS[id] ?? id} left`}
-                      className="text-ink-secondary grid size-6 place-items-center rounded-control transition-colors hover:bg-surface-hover disabled:opacity-30 disabled:hover:bg-transparent"
+                      className="text-ink-secondary rounded-control hover:bg-surface-hover grid size-6 place-items-center transition-colors disabled:opacity-30 disabled:hover:bg-transparent"
                     >
                       <ChevronLeft size={14} />
                     </button>
@@ -288,7 +320,7 @@ export function HeadlessTablePage() {
                       onClick={() => moveCol(id, 1)}
                       disabled={idx >= columnOrder.length - 1}
                       aria-label={`Move ${COL_LABELS[id] ?? id} right`}
-                      className="text-ink-secondary grid size-6 place-items-center rounded-control transition-colors hover:bg-surface-hover disabled:opacity-30 disabled:hover:bg-transparent"
+                      className="text-ink-secondary rounded-control hover:bg-surface-hover grid size-6 place-items-center transition-colors disabled:opacity-30 disabled:hover:bg-transparent"
                     >
                       <ChevronRight size={14} />
                     </button>
@@ -314,8 +346,8 @@ export function HeadlessTablePage() {
                         scope="col"
                         aria-sort={!sorted ? 'none' : sorted === 'asc' ? 'ascending' : 'descending'}
                         className={[
-                          'text-ink-secondary px-4 py-2 text-left text-micro font-semibold tracking-label uppercase',
-                          pinned && 'sticky left-0 z-10 bg-surface-card',
+                          'text-ink-secondary text-micro tracking-label px-4 py-2 text-left font-semibold uppercase',
+                          pinned && 'bg-surface-card sticky left-0 z-10',
                         ]
                           .filter(Boolean)
                           .join(' ')}
@@ -324,7 +356,7 @@ export function HeadlessTablePage() {
                           <button
                             type="button"
                             onClick={col.getToggleSortingHandler()}
-                            className="hover:text-ink-primary inline-flex max-w-full items-center gap-1 truncate rounded-control uppercase transition-colors"
+                            className="hover:text-ink-primary rounded-control inline-flex max-w-full items-center gap-1 truncate uppercase transition-colors"
                           >
                             {COL_LABELS[id] ?? id}
                             {sorted === 'asc' ? (
@@ -359,7 +391,7 @@ export function HeadlessTablePage() {
                             key={cell.id}
                             className={[
                               'truncate px-4 py-2',
-                              pinned && 'sticky left-0 z-10 bg-surface-card font-medium',
+                              pinned && 'bg-surface-card sticky left-0 z-10 font-medium',
                               (id === 'amount' || id === 'date' || id === 'id') && 'tabular',
                             ]
                               .filter(Boolean)
@@ -401,9 +433,7 @@ export function HeadlessTablePage() {
           <div className="border-hairline border-t">
             <div className="flex items-center justify-between gap-4 px-4 py-3">
               <p className="text-caption text-ink-secondary">
-                {total === 0
-                  ? 'No results'
-                  : `${rangeStart}–${rangeEnd} of ${total}`}
+                {total === 0 ? 'No results' : `${rangeStart}–${rangeEnd} of ${total}`}
               </p>
               <div className="flex items-center gap-1">
                 <Button

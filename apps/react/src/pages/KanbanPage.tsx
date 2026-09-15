@@ -212,7 +212,7 @@ export function KanbanPage() {
             >
               <header className="border-hairline flex items-center justify-between gap-2 border-b px-4 py-3">
                 <h2 className="text-caption font-semibold">{col.title}</h2>
-                <span className="tabular bg-surface-hover text-ink-secondary rounded-full px-2 py-0.5 text-micro">
+                <span className="tabular bg-surface-hover text-ink-secondary text-micro rounded-full px-2 py-0.5">
                   {col.cards.length}
                 </span>
               </header>
@@ -238,12 +238,24 @@ export function KanbanPage() {
                     aria-describedby="kanban-help"
                     aria-label={`${card.title}, ${col.title}`}
                     onKeyDown={(e) => {
-                      if (e.key === 'ArrowLeft') { e.preventDefault(); moveTo(card.id, -1); }
-                      if (e.key === 'ArrowRight') { e.preventDefault(); moveTo(card.id, 1); }
-                      if (e.key === 'ArrowUp') { e.preventDefault(); reorder(card.id, -1); }
-                      if (e.key === 'ArrowDown') { e.preventDefault(); reorder(card.id, 1); }
+                      if (e.key === 'ArrowLeft') {
+                        e.preventDefault();
+                        moveTo(card.id, -1);
+                      }
+                      if (e.key === 'ArrowRight') {
+                        e.preventDefault();
+                        moveTo(card.id, 1);
+                      }
+                      if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        reorder(card.id, -1);
+                      }
+                      if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        reorder(card.id, 1);
+                      }
                     }}
-                    className="border-hairline bg-surface-page hover:bg-surface-hover cursor-grab rounded-control border p-3 transition-colors active:cursor-grabbing"
+                    className="border-hairline bg-surface-page hover:bg-surface-hover rounded-control cursor-grab border p-3 transition-colors active:cursor-grabbing"
                   >
                     <div className="flex items-start gap-2">
                       <span className="text-ink-secondary mt-0.5 shrink-0" aria-hidden>
@@ -252,8 +264,8 @@ export function KanbanPage() {
                       <p className="text-caption min-w-0 flex-1 font-medium">{card.title}</p>
                     </div>
                     <div className="mt-3 flex items-center justify-between gap-2 pl-6">
-                      <span className="text-ink-secondary truncate text-micro">{card.owner}</span>
-                      <span className="bg-surface-hover text-ink-secondary shrink-0 inline-flex items-center rounded-full px-2.5 py-0.5 text-micro font-medium">
+                      <span className="text-ink-secondary text-micro truncate">{card.owner}</span>
+                      <span className="bg-surface-hover text-ink-secondary text-micro inline-flex shrink-0 items-center rounded-full px-2.5 py-0.5 font-medium">
                         {card.tag}
                       </span>
                     </div>
