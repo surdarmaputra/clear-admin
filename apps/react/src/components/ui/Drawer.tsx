@@ -17,12 +17,13 @@ export function Drawer({ open, onClose, title, side = 'right', footer, children 
   return (
     <RDialog.Root open={open} onOpenChange={(o) => !o && onClose()}>
       <RDialog.Portal>
-        <RDialog.Overlay className="bg-graphite/50 fixed inset-0 z-50" />
+        <RDialog.Overlay className="bg-graphite/50 fixed inset-0 z-50 data-[state=closed]:animate-[overlay-hide_200ms_ease-in_forwards] data-[state=open]:animate-[overlay-show_200ms_ease-out]" />
         <RDialog.Content
           className={
             'bg-surface-card shadow-raised fixed inset-y-0 z-50 flex w-full max-w-sm flex-col ' +
-            'transition-transform duration-200 ' +
-            (side === 'right' ? 'right-0' : 'left-0')
+            (side === 'right'
+              ? 'right-0 data-[state=closed]:animate-[drawer-out-right_150ms_ease-in_forwards] data-[state=open]:animate-[drawer-in-right_200ms_ease-out]'
+              : 'left-0 data-[state=closed]:animate-[drawer-out-left_150ms_ease-in_forwards] data-[state=open]:animate-[drawer-in-left_200ms_ease-out]')
           }
         >
           <div className="border-hairline flex items-center gap-3 border-b p-4">
