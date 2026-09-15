@@ -77,11 +77,11 @@ artifact, deployed.
 | Chart — bar                                   | P1       | done | done  |
 | Chart — area                                  | P1       | done | done  |
 | Chart — pie / donut                           | P1       | done | done  |
-| Data table — sortable, paginated              | P1       | done | —     |
-| Pagination                                    | P1       | done | —     |
-| Data table — server-side filter/sort/paginate | P2       | done | —     |
-| Data table — resizable columns                | P2       | done | —     |
-| Data table — edit in cell                     | P2       | done | —     |
+| Data table — sortable, paginated              | P1       | done | done  |
+| Pagination                                    | P1       | done | done  |
+| Data table — server-side filter/sort/paginate | P2       | done | done  |
+| Data table — resizable columns                | P2       | done | done  |
+| Data table — edit in cell                     | P2       | done | done  |
 
 ## Feedback & state
 
@@ -123,7 +123,7 @@ artifact, deployed.
 | Checkbox                             | P0       | done | done  |
 | Radio                                | P0       | done | done  |
 | Switch                               | P1       | done | done  |
-| Date picker                          | P1       | done | —     |
+| Date picker                          | P1       | done | done  |
 | Rich text editor — Lexical, markdown | P2       | done | —     |
 
 ## Files & media
@@ -150,15 +150,15 @@ artifact, deployed.
 | Components — forms    | P1       | done | done  |
 | Components — overlays | P1       | done | done  |
 | Components — feedback | P1       | done | done  |
-| Data — tables         | P2       | done | —     |
+| Data — tables         | P2       | done | done  |
 | Data — headless table | P2       | done | —     |
-| Dashboard — overview  | P1       | done | —     |
+| Dashboard — overview  | P1       | done | done  |
 | Login                 | P1       | done | done  |
 | Register              | P1       | done | done  |
 | Password reset        | P1       | done | done  |
 | 404                   | P1       | done | done  |
-| Profile               | P2       | done | —     |
-| Settings              | P2       | done | —     |
+| Profile               | P2       | done | done  |
+| Settings              | P2       | done | done  |
 | Editor                | P2       | done | —     |
 | Files                 | P2       | done | —     |
 | Data — kanban         | P2       | done | —     |
