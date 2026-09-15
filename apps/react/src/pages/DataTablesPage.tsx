@@ -142,7 +142,6 @@ export function DataTablesPage() {
           if (editing?.rowId === rowId && editing.field === 'customer') {
             return (
               <input
-                // eslint-disable-next-line jsx-a11y/no-autofocus
                 autoFocus
                 className="w-full bg-transparent outline-none"
                 value={editing.value}
@@ -178,7 +177,6 @@ export function DataTablesPage() {
           if (editing?.rowId === rowId && editing.field === 'amount') {
             return (
               <input
-                // eslint-disable-next-line jsx-a11y/no-autofocus
                 autoFocus
                 className="tabular w-full bg-transparent text-right outline-none"
                 value={editing.value}
@@ -205,7 +203,6 @@ export function DataTablesPage() {
           if (editing?.rowId === rowId && editing.field === 'date') {
             return (
               <input
-                // eslint-disable-next-line jsx-a11y/no-autofocus
                 autoFocus
                 className="tabular w-full bg-transparent text-right outline-none"
                 value={editing.value}
@@ -229,19 +226,22 @@ export function DataTablesPage() {
     [editing, startEdit, commitEdit, handleEditKeyDown],
   );
 
-  const table = useLegacyTable({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const tableOptions: any = {
     data: filteredData,
-    columns: columns as any,
-    state: { sorting, pagination } as any,
-    onSortingChange: setSorting as any,
-    onPaginationChange: setPagination as any,
+    columns,
+    state: { sorting, pagination },
+    onSortingChange: setSorting,
+    onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-  });
+  };
+  const table = useLegacyTable(tableOptions);
 
   const state = table.getState();
   const { pageIndex } = state.pagination as { pageIndex: number };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const pageCount = (table as any).getPageCount?.() ?? Math.ceil(filteredData.length / PAGE_SIZE);
   const canPrev = pageIndex > 0;
   const canNext = pageIndex < pageCount - 1;
