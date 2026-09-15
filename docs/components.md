@@ -138,7 +138,7 @@ artifact, deployed.
 
 | Component                  | Priority | HTML | React |
 | -------------------------- | -------- | ---- | ----- |
-| Kanban board — drag & drop | P2       | done | —     |
+| Kanban board — drag & drop | P2       | done | done  |
 
 ---
 
@@ -151,7 +151,7 @@ artifact, deployed.
 | Components — overlays | P1       | done | done  |
 | Components — feedback | P1       | done | done  |
 | Data — tables         | P2       | done | done  |
-| Data — headless table | P2       | done | —     |
+| Data — headless table | P2       | done | done  |
 | Dashboard — overview  | P1       | done | done  |
 | Login                 | P1       | done | done  |
 | Register              | P1       | done | done  |
@@ -161,7 +161,7 @@ artifact, deployed.
 | Settings              | P2       | done | done  |
 | Editor                | P2       | done | —     |
 | Files                 | P2       | done | —     |
-| Data — kanban         | P2       | done | —     |
+| Data — kanban         | P2       | done | done  |
 
 ---
 
