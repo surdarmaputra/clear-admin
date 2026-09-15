@@ -180,9 +180,7 @@ const componentsFeedbackRoute = createRoute({
   ),
 });
 
-const FilesPage = lazy(() =>
-  import('./pages/FilesPage').then((m) => ({ default: m.FilesPage })),
-);
+const FilesPage = lazy(() => import('./pages/FilesPage').then((m) => ({ default: m.FilesPage })));
 const EditorPage = lazy(() =>
   import('./pages/EditorPage').then((m) => ({ default: m.EditorPage })),
 );

@@ -37,7 +37,14 @@ import {
   HeadingNode,
   QuoteNode,
 } from '@lexical/rich-text';
-import { $isListNode, INSERT_ORDERED_LIST_COMMAND, INSERT_UNORDERED_LIST_COMMAND, ListItemNode, ListNode, REMOVE_LIST_COMMAND } from '@lexical/list';
+import {
+  $isListNode,
+  INSERT_ORDERED_LIST_COMMAND,
+  INSERT_UNORDERED_LIST_COMMAND,
+  ListItemNode,
+  ListNode,
+  REMOVE_LIST_COMMAND,
+} from '@lexical/list';
 import { LinkNode } from '@lexical/link';
 import { $setBlocksType } from '@lexical/selection';
 import {
@@ -131,11 +138,7 @@ interface ToolbarState {
   canRedo: boolean;
 }
 
-function ToolbarPlugin({
-  onStateChange,
-}: {
-  onStateChange: (state: ToolbarState) => void;
-}) {
+function ToolbarPlugin({ onStateChange }: { onStateChange: (state: ToolbarState) => void }) {
   const [editor] = useLexicalComposerContext();
   const stateRef = useRef<ToolbarState>({
     bold: false,
@@ -159,10 +162,7 @@ function ToolbarPlugin({
       if (list) {
         block = list.getListType() === 'number' ? 'ol' : 'ul';
       } else {
-        const blockNode = $findMatchingParent(
-          anchor,
-          (n) => $isHeadingNode(n) || $isQuoteNode(n),
-        );
+        const blockNode = $findMatchingParent(anchor, (n) => $isHeadingNode(n) || $isQuoteNode(n));
         if ($isQuoteNode(blockNode)) {
           block = 'quote';
         } else if ($isHeadingNode(blockNode)) {
@@ -443,22 +443,19 @@ export function EditorPage() {
           <p className="text-caption text-ink-secondary mt-1 max-w-3xl">
             Lexical with React bindings — the toolbar is React state, the document is Lexical, and
             markdown is both the input and the output. Typing{' '}
-            <code className="text-micro">## </code> or{' '}
-            <code className="text-micro">- </code> at the start of a line formats it as you go.
+            <code className="text-micro">## </code> or <code className="text-micro">- </code> at the
+            start of a line formats it as you go.
           </p>
         </div>
 
         <LexicalComposer initialConfig={initialConfig}>
           <div className="rounded-card border-hairline bg-surface-card shadow-card overflow-hidden border">
-            <EditorComposer
-              onMarkdownChange={setMarkdown}
-              onWordCountChange={setWords}
-            />
+            <EditorComposer onMarkdownChange={setMarkdown} onWordCountChange={setWords} />
 
             <RichTextPlugin
               contentEditable={
                 <ContentEditable
-                  className="text-body focus-visible:outline-none min-h-72 px-5 py-4"
+                  className="text-body min-h-72 px-5 py-4 focus-visible:outline-none"
                   aria-label="Document body"
                 />
               }
@@ -498,7 +495,7 @@ export function EditorPage() {
             title="Markdown output"
             description="What the editor would send. It updates on every keystroke, so the round trip is visible rather than promised."
           >
-            <pre className="bg-surface-hover text-ink-secondary text-micro overflow-x-auto rounded-control p-4">
+            <pre className="bg-surface-hover text-ink-secondary text-micro rounded-control overflow-x-auto p-4">
               {markdown}
             </pre>
           </Card>

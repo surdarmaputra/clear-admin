@@ -41,12 +41,60 @@ const MAX_BYTES = 8 * KB * KB;
 const ACCEPT = ['image/', 'application/pdf', '.csv', '.zip'];
 
 const SEED: FileItem[] = [
-  { id: 1, name: 'storefront.svg', bytes: 738, type: 'image/svg+xml', url: '/samples/storefront.svg', progress: 100, status: 'done' },
-  { id: 2, name: 'ledger.svg', bytes: 730, type: 'image/svg+xml', url: '/samples/ledger.svg', progress: 100, status: 'done' },
-  { id: 3, name: 'warehouse.svg', bytes: 736, type: 'image/svg+xml', url: '/samples/warehouse.svg', progress: 100, status: 'done' },
-  { id: 4, name: 'receipts.svg', bytes: 734, type: 'image/svg+xml', url: '/samples/receipts.svg', progress: 100, status: 'done' },
-  { id: 5, name: 'q3-invoices.csv', bytes: 184_320, type: 'text/csv', url: null, progress: 100, status: 'done' },
-  { id: 6, name: 'contract-2026.pdf', bytes: 1_260_000, type: 'application/pdf', url: null, progress: 100, status: 'done' },
+  {
+    id: 1,
+    name: 'storefront.svg',
+    bytes: 738,
+    type: 'image/svg+xml',
+    url: '/samples/storefront.svg',
+    progress: 100,
+    status: 'done',
+  },
+  {
+    id: 2,
+    name: 'ledger.svg',
+    bytes: 730,
+    type: 'image/svg+xml',
+    url: '/samples/ledger.svg',
+    progress: 100,
+    status: 'done',
+  },
+  {
+    id: 3,
+    name: 'warehouse.svg',
+    bytes: 736,
+    type: 'image/svg+xml',
+    url: '/samples/warehouse.svg',
+    progress: 100,
+    status: 'done',
+  },
+  {
+    id: 4,
+    name: 'receipts.svg',
+    bytes: 734,
+    type: 'image/svg+xml',
+    url: '/samples/receipts.svg',
+    progress: 100,
+    status: 'done',
+  },
+  {
+    id: 5,
+    name: 'q3-invoices.csv',
+    bytes: 184_320,
+    type: 'text/csv',
+    url: null,
+    progress: 100,
+    status: 'done',
+  },
+  {
+    id: 6,
+    name: 'contract-2026.pdf',
+    bytes: 1_260_000,
+    type: 'application/pdf',
+    url: null,
+    progress: 100,
+    status: 'done',
+  },
 ];
 
 function accepts(file: File): boolean {
@@ -70,11 +118,31 @@ function formatSize(bytes: number): string {
 
 function FileIcon({ type, name }: { type: string; name: string }) {
   const kind = iconFor(type, name);
-  const cls = 'bg-surface-hover text-ink-secondary grid size-11 shrink-0 place-items-center rounded-control';
-  if (kind === 'pdf') return <span className={cls}><FileText size={18} /></span>;
-  if (kind === 'csv') return <span className={cls}><Table2 size={18} /></span>;
-  if (kind === 'zip') return <span className={cls}><FileArchive size={18} /></span>;
-  return <span className={cls}><File size={18} /></span>;
+  const cls =
+    'bg-surface-hover text-ink-secondary grid size-11 shrink-0 place-items-center rounded-control';
+  if (kind === 'pdf')
+    return (
+      <span className={cls}>
+        <FileText size={18} />
+      </span>
+    );
+  if (kind === 'csv')
+    return (
+      <span className={cls}>
+        <Table2 size={18} />
+      </span>
+    );
+  if (kind === 'zip')
+    return (
+      <span className={cls}>
+        <FileArchive size={18} />
+      </span>
+    );
+  return (
+    <span className={cls}>
+      <File size={18} />
+    </span>
+  );
 }
 
 export function FilesPage() {
@@ -191,8 +259,8 @@ export function FilesPage() {
         <div>
           <h1 className="font-display text-title tracking-display font-semibold">Files</h1>
           <p className="text-caption text-ink-secondary mt-1 max-w-3xl">
-            Drag files onto the zone, or pick them with the keyboard — the input behind the label
-            is a real one. Images get a thumbnail and open in the lightbox; everything else gets an
+            Drag files onto the zone, or pick them with the keyboard — the input behind the label is
+            a real one. Images get a thumbnail and open in the lightbox; everything else gets an
             icon by type. Uploads are simulated in the browser, so nothing leaves the page.
           </p>
         </div>
@@ -204,9 +272,7 @@ export function FilesPage() {
           onDragLeave={onDragLeave}
           onDrop={onDrop}
           className={`rounded-card flex flex-col items-center gap-3 border-2 border-dashed px-6 py-10 text-center transition-colors ${
-            dragging
-              ? 'border-accent bg-surface-hover'
-              : 'border-hairline bg-surface-card'
+            dragging ? 'border-accent bg-surface-hover' : 'border-hairline bg-surface-card'
           }`}
         >
           <span className="bg-surface-hover text-ink-secondary grid size-11 place-items-center rounded-full">
@@ -218,7 +284,7 @@ export function FilesPage() {
               Images, PDF, CSV or ZIP. Up to 8 MB each.
             </p>
           </div>
-          <label className="focus-within:shadow-focus inline-flex cursor-pointer items-center justify-center gap-2 rounded-control bg-accent px-4 py-2 text-caption font-medium text-paper transition-colors hover:bg-cobalt">
+          <label className="focus-within:shadow-focus rounded-control bg-accent text-caption text-paper hover:bg-cobalt inline-flex cursor-pointer items-center justify-center gap-2 px-4 py-2 font-medium transition-colors">
             <Paperclip size={16} />
             Choose files
             <input
@@ -257,7 +323,7 @@ export function FilesPage() {
                       type="button"
                       onClick={() => open(item.id)}
                       aria-label={`Preview ${item.name}`}
-                      className="border-hairline size-11 shrink-0 overflow-hidden rounded-control border"
+                      className="border-hairline rounded-control size-11 shrink-0 overflow-hidden border"
                     >
                       <img src={item.url} alt={item.name} className="size-full object-cover" />
                     </button>
@@ -292,7 +358,7 @@ export function FilesPage() {
                     type="button"
                     onClick={() => remove(item.id)}
                     aria-label={`Remove ${item.name}`}
-                    className="text-ink-secondary hover:bg-surface-hover hover:text-danger grid size-8 shrink-0 place-items-center rounded-control transition-colors"
+                    className="text-ink-secondary hover:bg-surface-hover hover:text-danger rounded-control grid size-8 shrink-0 place-items-center transition-colors"
                   >
                     <Trash2 size={16} />
                   </button>
@@ -315,14 +381,14 @@ export function FilesPage() {
                   type="button"
                   onClick={() => open(image.id)}
                   aria-label={`Open ${image.name}`}
-                  className="border-hairline group relative aspect-video overflow-hidden rounded-control border"
+                  className="border-hairline group rounded-control relative aspect-video overflow-hidden border"
                 >
                   <img
                     src={image.url!}
                     alt={image.name}
                     className="size-full object-cover transition-transform duration-300 group-hover:scale-105"
                   />
-                  <span className="absolute inset-0 grid place-items-center bg-graphite/40 text-paper opacity-0 transition-opacity group-hover:opacity-100">
+                  <span className="bg-graphite/40 text-paper absolute inset-0 grid place-items-center opacity-0 transition-opacity group-hover:opacity-100">
                     <Maximize2 size={18} />
                   </span>
                 </button>
@@ -334,19 +400,19 @@ export function FilesPage() {
         {/* Lightbox */}
         <Dialog.Root open={viewing !== null} onOpenChange={(open) => !open && close()}>
           <Dialog.Portal>
-            <Dialog.Overlay className="fixed inset-0 z-50 bg-graphite/80 data-[state=closed]:animate-[overlay-hide_200ms_ease-in_forwards] data-[state=open]:animate-[overlay-show_200ms_ease-out]" />
+            <Dialog.Overlay className="bg-graphite/80 fixed inset-0 z-50 data-[state=closed]:animate-[overlay-hide_200ms_ease-in_forwards] data-[state=open]:animate-[overlay-show_200ms_ease-out]" />
             <Dialog.Content
               className="fixed inset-4 z-50 flex items-center justify-center"
               aria-label="Image preview"
             >
               <div className="relative flex max-h-full w-full max-w-3xl flex-col gap-3">
                 <div className="flex items-center justify-between gap-3">
-                  <Dialog.Title className="text-caption truncate font-medium text-paper">
+                  <Dialog.Title className="text-caption text-paper truncate font-medium">
                     {current?.name}
                   </Dialog.Title>
                   <Dialog.Close
                     aria-label="Close preview"
-                    className="grid size-9 shrink-0 place-items-center rounded-control text-paper transition-colors hover:bg-paper/10"
+                    className="rounded-control text-paper hover:bg-paper/10 grid size-9 shrink-0 place-items-center transition-colors"
                   >
                     <X size={18} />
                   </Dialog.Close>
@@ -357,7 +423,7 @@ export function FilesPage() {
                     type="button"
                     onClick={() => step(-1)}
                     aria-label="Previous image"
-                    className="grid size-9 shrink-0 place-items-center rounded-control text-paper transition-colors hover:bg-paper/10"
+                    className="rounded-control text-paper hover:bg-paper/10 grid size-9 shrink-0 place-items-center transition-colors"
                   >
                     <ChevronLeft size={18} />
                   </button>
@@ -365,14 +431,14 @@ export function FilesPage() {
                     <img
                       src={current.url!}
                       alt={current.name}
-                      className="bg-surface-card max-h-[70vh] min-w-0 flex-1 rounded-card object-contain"
+                      className="bg-surface-card rounded-card max-h-[70vh] min-w-0 flex-1 object-contain"
                     />
                   )}
                   <button
                     type="button"
                     onClick={() => step(1)}
                     aria-label="Next image"
-                    className="grid size-9 shrink-0 place-items-center rounded-control text-paper transition-colors hover:bg-paper/10"
+                    className="rounded-control text-paper hover:bg-paper/10 grid size-9 shrink-0 place-items-center transition-colors"
                   >
                     <ChevronRight size={18} />
                   </button>
