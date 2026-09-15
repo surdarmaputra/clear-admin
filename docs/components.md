@@ -124,15 +124,15 @@ artifact, deployed.
 | Radio                                | P0       | done | done  |
 | Switch                               | P1       | done | done  |
 | Date picker                          | P1       | done | done  |
-| Rich text editor — Lexical, markdown | P2       | done | —     |
+| Rich text editor — Lexical, markdown | P2       | done | done  |
 
 ## Files & media
 
 | Component                 | Priority | HTML | React |
 | ------------------------- | -------- | ---- | ----- |
-| File upload — drag & drop | P2       | done | —     |
-| File preview              | P2       | done | —     |
-| Image preview / lightbox  | P2       | done | —     |
+| File upload — drag & drop | P2       | done | done  |
+| File preview              | P2       | done | done  |
+| Image preview / lightbox  | P2       | done | done  |
 
 ## Interaction
 
@@ -159,8 +159,8 @@ artifact, deployed.
 | 404                   | P1       | done | done  |
 | Profile               | P2       | done | done  |
 | Settings              | P2       | done | done  |
-| Editor                | P2       | done | —     |
-| Files                 | P2       | done | —     |
+| Editor                | P2       | done | done  |
+| Files                 | P2       | done | done  |
 | Data — kanban         | P2       | done | done  |
 
 ---

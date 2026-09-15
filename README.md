@@ -3,8 +3,8 @@
 A comprehensive dashboard template in two self-contained bundles — plain HTML for
 server-rendered apps, and React for SPAs.
 
-**Status: the HTML bundle is complete** — all 62 tracked items, editor, files and
-kanban included. The React bundle has not started. See
+**Status: both bundles are complete** — all tracked items, editor, files and
+kanban included in both HTML and React. See
 [`docs/components.md`](docs/components.md) for exactly what exists today, and
 [RFC-001](docs/rfc/RFC-001-completing-clear-admin-v6.md) for the plan.
 
