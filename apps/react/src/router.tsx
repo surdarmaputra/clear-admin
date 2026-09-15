@@ -182,12 +182,19 @@ const componentsFeedbackRoute = createRoute({
   ),
 });
 
+const FilesPage = lazy(() =>
+  import('./pages/FilesPage').then((m) => ({ default: m.FilesPage })),
+);
+const EditorPage = lazy(() =>
+  import('./pages/EditorPage').then((m) => ({ default: m.EditorPage })),
+);
+
 const filesRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/files',
   component: () => (
     <Lazy>
-      <PlaceholderPage title="Files" />
+      <FilesPage />
     </Lazy>
   ),
 });
@@ -197,7 +204,7 @@ const editorRoute = createRoute({
   path: '/editor',
   component: () => (
     <Lazy>
-      <PlaceholderPage title="Editor" />
+      <EditorPage />
     </Lazy>
   ),
 });
