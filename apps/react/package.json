@@ -30,9 +30,11 @@
     "lucide-react": "^0.509.0",
     "react": "^19.1.0",
     "react-chartjs-2": "^5.3.1",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "sortablejs": "^1.15.7"
   },
   "devDependencies": {
+    "@types/sortablejs": "^1.15.9",
     "@tailwindcss/vite": "^4.0.0",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",

@@ -26,6 +26,12 @@ const SettingsPage = lazy(() =>
 const DataTablesPage = lazy(() =>
   import('./pages/DataTablesPage').then((m) => ({ default: m.DataTablesPage })),
 );
+const HeadlessTablePage = lazy(() =>
+  import('./pages/HeadlessTablePage').then((m) => ({ default: m.HeadlessTablePage })),
+);
+const KanbanPage = lazy(() =>
+  import('./pages/KanbanPage').then((m) => ({ default: m.KanbanPage })),
+);
 
 function Lazy({ children }: { children: React.ReactNode }) {
   return <Suspense fallback={null}>{children}</Suspense>;
@@ -121,7 +127,7 @@ const dataHeadlessRoute = createRoute({
   path: '/data/headless',
   component: () => (
     <Lazy>
-      <PlaceholderPage title="Headless table" />
+      <HeadlessTablePage />
     </Lazy>
   ),
 });
@@ -131,7 +137,7 @@ const dataKanbanRoute = createRoute({
   path: '/data/kanban',
   component: () => (
     <Lazy>
-      <PlaceholderPage title="Kanban" />
+      <KanbanPage />
     </Lazy>
   ),
 });
